@@ -1,0 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Eczar:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #D97706;
+  --primary-hover: #B45309;
+  --primary-subtle: #FEF3C7;
+  --secondary: #C2410C;
+  --secondary-subtle: #FFEDD5;
+  --neutral-bg: #FDFBF7;
+  --neutral-surface: #FFFFFF;
+  --neutral-subtle: #F5EFEB;
+  --neutral-border: #E7DFD5;
+  --neutral-border-strong: #D6CCC2;
+  --neutral-text: #1C1917;
+  --neutral-muted: #78716C;
+  --success: #15803D;
+  --warning: #B45309;
+  --danger: #B91C1C;
+}
+
+body {
+  background-color: var(--neutral-bg);
+  color: var(--neutral-text);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

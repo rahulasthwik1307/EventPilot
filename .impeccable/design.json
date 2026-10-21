@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-21T16:44:15.000Z",
+  "title": "Design System: Event Pilot — The Inclusive Celebration Almanac",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Marigold Amber",
+        "canonical": "#D97706",
+        "tonalRamp": [
+          "#FFFBEB",
+          "#FEF3C7",
+          "#FDE68A",
+          "#FBBF24",
+          "#F59E0B",
+          "#D97706",
+          "#B45309",
+          "#92400E",
+          "#78350F"
+        ]
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "Terracotta",
+        "canonical": "#C2410C",
+        "tonalRamp": [
+          "#FFF7ED",
+          "#FFEDD5",
+          "#FED7AA",
+          "#FDBA74",
+          "#FB923C",
+          "#F97316",
+          "#EA580C",
+          "#C2410C",
+          "#9A3412"
+        ]
+      },
+      "neutral-bg": {
+        "role": "neutral",
+        "displayName": "Papyrus Canvas",
+        "canonical": "#FDFBF7",
+        "tonalRamp": [
+          "#FFFFFF",
+          "#FDFBF7",
+          "#F5EFEB",
+          "#E7DFD5",
+          "#D6CCC2",
+          "#A8A29E",
+          "#78716C",
+          "#44403C",
+          "#1C1917"
+        ]
+      },
+      "success": {
+        "role": "status",
+        "displayName": "Forest Green",
+        "canonical": "#15803D",
+        "tonalRamp": [
+          "#F0FDF4",
+          "#DCFCE7",
+          "#BBF7D0",
+          "#86EFAC",
+          "#4ADE80",
+          "#22C55E",
+          "#16A34A",
+          "#15803D",
+          "#14532D"
+        ]
+      },
+      "danger": {
+        "role": "status",
+        "displayName": "Deep Crimson",
+        "canonical": "#B91C1C",
+        "tonalRamp": [
+          "#FEF2F2",
+          "#FEE2E2",
+          "#FECACA",
+          "#FCA5A5",
+          "#F87171",
+          "#EF4444",
+          "#DC2626",
+          "#B91C1C",
+          "#7F1D1D"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display Heading",
+        "purpose": "Editorial event titles, welcome headings, and prominent planning landmarks in Eczar."
+      },
+      "headline": {
+        "displayName": "Section Headline",
+        "purpose": "Major section titles such as Budget, Timeline, Vendors, and Guests in Eczar."
+      },
+      "title": {
+        "displayName": "Card Title",
+        "purpose": "Ledger cards, dialog headers, and item titles in Plus Jakarta Sans."
+      },
+      "body": {
+        "displayName": "Body Copy",
+        "purpose": "Descriptions, task details, helper guidance, and general operational content."
+      },
+      "mono": {
+        "displayName": "Tabular Numbers & Stamps",
+        "purpose": "Financial amounts, guest counts, dates, countdown values, and compact status stamps where aligned numerals improve scanning."
+      }
+    },
+    "shadows": [
+      {
+        "name": "resting-card",
+        "value": "0 1px 3px rgba(28, 25, 23, 0.04), 0 4px 12px rgba(28, 25, 23, 0.03)",
+        "purpose": "Subtle tactile depth for ledger cards against the warm ivory background."
+      },
+      {
+        "name": "elevated-drawer",
+        "value": "0 12px 32px -4px rgba(28, 25, 23, 0.12)",
+        "purpose": "Focused elevation for AI proposal drawers and modal dialogs."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Smooth, purposeful transitions for navigation, drawers, and panels."
+      },
+      {
+        "name": "duration-fast",
+        "value": "150ms",
+        "purpose": "Button states, checkbox changes, and compact status transitions."
+      },
+      {
+        "name": "duration-normal",
+        "value": "250ms",
+        "purpose": "Card expansion, proposal drawer transitions, and modal presentation."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      },
+      {
+        "name": "2xl",
+        "value": "1536px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Action Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Solid marigold action button for primary workflows such as adding expenses or generating a planning proposal. Deep ink text is used on the marigold background for improved contrast.",
+      "html": "<button class=\"ep-btn-primary\">Generate Plan</button>",
+      "css": ".ep-btn-primary { background: #D97706; color: #1C1917; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.9375rem; font-weight: 600; padding: 10px 20px; border-radius: 8px; border: 1px solid transparent; cursor: pointer; transition: background-color 150ms cubic-bezier(0.16, 1, 0.3, 1), transform 150ms cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 1px 2px rgba(217, 119, 6, 0.2); } .ep-btn-primary:hover { background: #B45309; color: #FFFFFF; transform: translateY(-1px); } .ep-btn-primary:focus-visible { outline: 2px solid #1C1917; outline-offset: 3px; } .ep-btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }"
+    },
+    {
+      "name": "Coupon-Style Status Stamp",
+      "kind": "chip",
+      "refersTo": "badge-coupon",
+      "description": "Tactile coupon-style label for states explicitly recorded by the user or application. It does not independently verify a vendor, booking, or payment.",
+      "html": "<span class=\"ep-badge-coupon\">BOOKING RECORDED</span>",
+      "css": ".ep-badge-coupon { display: inline-flex; align-items: center; background: #FFEDD5; color: #9A3412; border: 1px dashed #9A3412; border-radius: 4px; padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; }"
+    },
+    {
+      "name": "Ledger Card",
+      "kind": "card",
+      "refersTo": "card-ledger",
+      "description": "Clean elevated card for budget items, milestones, and vendor records, using a white surface, fine border, and restrained shadow.",
+      "html": "<div class=\"ep-card-ledger\"><h3>Venue &amp; Catering</h3><p>Allocated: ₹4,50,000</p></div>",
+      "css": ".ep-card-ledger { background: #FFFFFF; color: #1C1917; border: 1px solid #E7DFD5; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(28, 25, 23, 0.04); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Inclusive Celebration Almanac",
+    "overview": "Event Pilot is an editorial event-planning studio inspired by the warmth, organization, and chronological clarity of an almanac. Warm ivory surfaces, deep ink typography, restrained marigold and terracotta accents, and carefully structured ledgers turn planning complexity into a clear and welcoming experience. Panchang, Muhurtam, auspicious-date information, and other tradition-specific features are optional and context-aware; the product never assumes a user's religion, cultural identity, or preferred traditions.",
+    "keyCharacteristics": [
+      "Warm papyrus canvas (#FDFBF7) that evokes tactile stationery without sacrificing digital clarity.",
+      "Distinctive editorial typography pairing Eczar display headings with readable Plus Jakarta Sans and JetBrains Mono for aligned numerical information.",
+      "Stepped, index-inspired navigation that supports orientation without constraining responsive layouts.",
+      "Coupon-style status stamps that represent explicitly recorded user or application states rather than independent verification.",
+      "Layered proposal comparisons that let users review AI additions and changes before accepting them.",
+      "Responsive information hierarchy that keeps planning efficient across desktop, tablet, and mobile.",
+      "Inclusive event setup that makes cultural and tradition-specific preferences optional rather than assumed."
+    ],
+    "rules": [
+      {
+        "name": "The Functional Accent Rule",
+        "body": "Marigold (#D97706) and Terracotta (#C2410C) primarily emphasize interactive actions, selection states, navigation, and meaningful planning information. Avoid arbitrary decorative use. Pair each foreground and background combination according to verified contrast requirements.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Truth Rule",
+        "body": "Use tabular numerals for financial figures, guest counts, dates, and aligned numerical columns where they improve scanning. All financial arithmetic, date calculations, countdowns, and capacity checks must use deterministic application logic.",
+        "section": "typography"
+      },
+      {
+        "name": "The Paper Foundation Rule",
+        "body": "Express elevation through tonal paper shifts, delicate borders (#E7DFD5), and restrained shadows rather than heavy visual effects.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Inclusive Almanac Rule",
+        "body": "The almanac is a visual and organizational inspiration, not a default religious or cultural assumption. Tradition-specific calendars, Muhurtam, auspicious-date guidance, and rituals must be optional and informed by the user's stated context.",
+        "section": "overview"
+      },
+      {
+        "name": "The Recorded State Rule",
+        "body": "Status labels must reflect information explicitly recorded by the user or established by a reliable application operation. Never imply independent vendor verification, confirmed booking, or payment processing without supporting evidence.",
+        "section": "components"
+      },
+      {
+        "name": "The Responsive Workspace Rule",
+        "body": "Keep navigation, summaries, and actions proportional to the available viewport. Use a persistent action bar only when a workflow benefits from it, and never force the full desktop shell onto narrow screens.",
+        "section": "layout"
+      }
+    ],
+    "dos": [
+      "Do use INR (₹) as the default event currency and format it appropriately, for example ₹2,50,000.",
+      "Do display the currency selected for each event and never mix currencies or silently convert between them.",
+      "Do verify foreground/background contrast for all actual component states; target WCAG 2.1 AA contrast requirements.",
+      "Do use tabular numerals for aligned financial amounts, guest counts, dates, and other relevant numerical data.",
+      "Do show clear loading states and progress feedback during Gemini proposal generation.",
+      "Do preserve existing user data when AI generation, validation, or saving fails.",
+      "Do make AI changes reviewable and require explicit user acceptance before applying them.",
+      "Do use badges only for statuses actually recorded by the user or established by reliable application behavior.",
+      "Do pair status colors with text labels or meaningful icons.",
+      "Do keep navigation and action placement responsive across desktop, tablet, and mobile.",
+      "Do respect reduced-motion preferences and maintain keyboard accessibility.",
+      "Do keep guest personal information and dietary details out of AI requests by default.",
+      "Do make tradition-specific planning features optional and context-aware."
+    ],
+    "donts": [
+      "Don't assume a religious tradition, ritual, calendar, or auspicious-date preference for every event.",
+      "Don't use cold generic SaaS blues, purple AI gradients, or decorative neon sparkles.",
+      "Don't label vendors as verified or bookings as confirmed unless the exact status is supported by recorded information or reliable evidence.",
+      "Don't imply that Event Pilot processed or independently verified a deposit when the user only recorded its status.",
+      "Don't hard-code INR as the only supported event currency.",
+      "Don't combine amounts from different currencies or silently convert between currencies.",
+      "Don't use white text on Marigold Amber (#D97706) without verified contrast; use Deep Ink (#1C1917) for the default primary button text.",
+      "Don't rely on color alone to communicate statuses, errors, selection, or AI proposal differences.",
+      "Don't perform currency arithmetic, date arithmetic, or authoritative business-rule calculations inside LLM prompts.",
+      "Don't allow AI suggestions to silently overwrite existing plans; all changes must pass through an explicit review and acceptance step.",
+      "Don't crowd every screen with a fixed header, full navigation rail, multiple summary cards, and a permanent bottom action bar.",
+      "Don't hide essential financial, guest, or task information merely to simplify mobile layouts.",
+      "Don't sacrifice readability, keyboard access, or reduced-motion support for decorative effects."
+    ]
+  }
+}
