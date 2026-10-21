@@ -4,11 +4,11 @@
 
 ## Platform
 
-web
+Web
 
 ## Stack
 
-Next.js (App Router) + TypeScript + Supabase (Postgres & Auth) + server-side Gemini API provider adapter + Zod schema validation + Vitest. Deployment target: Vercel.
+Next.js (App Router) + TypeScript + browser `localStorage` for local persistence + server-side Gemini API provider adapter + Zod schema validation + Vitest. Deployment target: Vercel.
 
 ## Users
 
@@ -33,11 +33,14 @@ Unlike conversational assistants that return unstructured suggestions, Event Pil
 
 The product is a planning and management workspace, not a generic chatbot, vendor marketplace or autonomous event organizer.
 
+The first release prioritizes a frictionless, local-first experience without mandatory registration, authentication or cloud-database setup.
+
 ## Operating Context
 
 - **Primary workflow:** Users choose an event type, provide event details and constraints, generate an initial plan, review proposed recommendations, and manage the resulting workspace.
 - **Event setup:** Capture event type, title, date, location, guest target, budget, currency, theme, preferences, cultural context and other relevant constraints.
 - **Planning workspace:** Provide a coherent, responsive experience for budget management, timeline and tasks, vendor tracking, guest management, seating and AI-assisted planning.
+- **Local-first workflow:** Let users create, edit, save and reopen events in the same browser without creating an account or connecting a database.
 - **Design direction:** Premium editorial planning studio with warm ivory surfaces, deep ink typography, restrained terracotta and marigold accents, generous whitespace, polished micro-interactions and distinctive visual hierarchy. Avoid generic AI-generated styling and generic administrative-dashboard aesthetics.
 - **Desktop:** Support efficient review of budgets, tasks, vendors, guest lists and planning changes.
 - **Mobile:** Support responsive guest management, vendor check-ins, task updates and event-day reference.
@@ -52,8 +55,10 @@ The product is a planning and management workspace, not a generic chatbot, vendo
 - Support weddings, birthdays and community events with appropriate starter templates.
 - Capture event details, date, location, expected attendance, budget, currency, theme and user-defined preferences.
 - Provide an overview of budget status, upcoming milestones, tasks, guest attendance and vendor progress.
-- Allow users to work on an event locally before choosing to save it.
+- Allow users to create, edit and manage events locally without registration.
 - Preserve user-entered details when plans or event dates change.
+- Provide a preloaded sample event so users can explore the product immediately.
+- Keep sample data separate from personal events and clearly label the sample experience.
 
 #### 2. Budget and Expense Management
 
@@ -98,8 +103,8 @@ The product is a planning and management workspace, not a generic chatbot, vendo
 - Track invited, confirmed, declined and pending responses accurately.
 - Keep invitation tracking separate from invitation delivery. Users manage actual invitation delivery outside Event Pilot in the initial release.
 - Use attendance counts consistently in event overviews and guest-dependent budget estimates.
-- Restrict guest information to authorized users of the relevant event.
-- Minimize collection, retention and exposure of personal information, particularly dietary and allergy details.
+- Keep guest information within the relevant local event workspace and avoid unnecessary exposure.
+- Minimize collection, retention and transmission of personal information, particularly dietary and allergy details.
 
 #### 6. Practical Seating Management
 
@@ -131,48 +136,62 @@ The product is a planning and management workspace, not a generic chatbot, vendo
 - On timeout, API failure or invalid output, preserve the existing plan, explain the problem and offer a retry.
 - Never automatically replace an existing plan with a fallback template after a failed request.
 - Keep deterministic budget and date calculations outside the LLM.
+- Keep the Gemini API key strictly on the server.
+- Allow the core interface and sample demo to remain usable when the Gemini API key is not configured. Clearly explain when AI generation is unavailable.
 
 #### 8. Demo, Local Work and Persistence
 
-- Provide a welcome experience with event-type choices and a preloaded sample event.
+- Provide a welcoming entry experience with event-type choices and a preloaded sample event.
 - Make the sample demo usable without authentication, Gemini API calls or database writes.
 - Include sample recommendations and representative content for the core planning sections.
 - Keep demo data isolated from personal events and clearly label the sample experience.
-- Provide a resettable sample workspace.
-- Allow users to create and edit a personal event locally before saving.
-- Trigger Supabase anonymous authentication and persistence only when the user chooses **Save workspace**.
-- Persist the user's event and its related records, including guests, seating assignments, expenses, tasks, vendors and accepted planning changes.
-- Allow users to reload saved work while their anonymous session remains available.
-- Explain that losing an anonymous session may make the saved workspace unrecoverable.
-- Do not implement account linking or account recovery in the initial release.
-- Use a new, dedicated Supabase project for Event Pilot. Never modify the unrelated `factor-attendance` project.
+- Provide a resettable sample workspace that does not erase personal events.
+- Allow users to create, edit and manage personal events locally.
+- Persist personal event data in browser `localStorage`, including event details, guests, seating assignments, expenses, tasks, vendors and accepted planning changes.
+- Restore locally saved events when the user reopens the application in the same browser and origin.
+- Provide clear saving feedback and handle storage failures gracefully.
+- Validate locally stored data when loading it. Handle missing, malformed or outdated data without crashing the application or silently overwriting recoverable user work.
+- Provide an appropriate empty state when no personal event has been created.
+- Explain that local data is specific to the browser and origin and is not automatically synchronized across devices.
+- Explain that clearing browser storage, using a different browser or device, or losing access to the browser profile can make locally saved data unavailable.
+- Do not require registration, login, anonymous authentication, a database or a cloud-persistence account in the initial release.
+- Keep persistence behind a small, well-defined application interface so cloud persistence can be considered later without rewriting the planning domain.
+- Do not introduce a backend database solely to store local event data.
+- Keep the sample experience and personal event workspace separate.
 
 ### Explicitly Out of Scope for the Initial Release
 
+- Supabase, PostgreSQL or any other application database for event persistence.
+- User registration, login, anonymous authentication, account linking or account recovery.
+- Cloud synchronization, cross-device persistence and multi-user collaboration.
 - Vendor marketplace and local vendor discovery.
 - Sending invitations through email, SMS or messaging integrations.
 - Payment processing.
 - Graphical drag-and-drop seating charts.
-- Multi-user collaboration and shared editing.
-- Account linking and account recovery.
 - Automatic foreign-exchange conversion.
 - Autonomous vendor booking, contacting or verification.
 - Automatic acceptance of AI-generated changes.
+- Sending guest contact details, dietary restrictions or allergy records to an AI provider by default.
 
-### Technical and Security Constraints
+## Technical and Security Constraints
 
 - Keep Gemini API credentials and other secrets strictly server-side. Never expose them through client code, public environment variables, logs or committed files.
-- Enforce Supabase Row Level Security and server-side ownership checks for every persisted resource.
-- Ensure guests, invitation groups, tables, seating assignments, vendors, tasks, expenses and proposals cannot be accessed or modified across unauthorized event ownership boundaries.
-- Never rely on client-side filtering as the security boundary.
-- Validate user input and AI-generated data at the appropriate schema and business-rule boundaries.
+- Do not introduce authentication or database infrastructure for the initial release.
+- Treat browser storage as local persistence, not as a secure vault or a cloud backup.
+- Do not store API keys, secrets, authentication tokens or other server credentials in `localStorage`.
+- Avoid storing unnecessary sensitive guest information. Clearly communicate that local event data remains in the user's browser storage and may be accessible to other people who can access the same browser profile.
 - Avoid sending identifiable guest details, contact information or dietary and allergy records to Gemini by default. Prefer aggregate or de-identified context wherever possible.
 - Prevent sensitive guest details from leaking into logs, analytics and error messages.
-- Keep sample/demo data isolated from authenticated personal workspaces.
+- Keep sample/demo data isolated from personal events.
+- Validate user input and AI-generated data at the appropriate schema and business-rule boundaries.
+- Validate persisted local data before using it in application logic.
+- Handle unavailable storage, quota errors, malformed saved data and persistence failures gracefully.
+- Avoid destructive automatic migrations. Preserve recoverable user data when the local data format changes.
 - Use safe, consistent updates for accepted proposals and related records.
 - Use precision-safe monetary arithmetic and deterministic calendar calculations.
 - Keep `.env*` files containing secrets out of version control, with an appropriately sanitized `.env.example`.
 - Do not claim that a feature is secure, tested or production-ready without the corresponding verification.
+- Keep the application modular so a future persistence adapter could be introduced if an actual product or evaluation requirement justifies it.
 
 ## Brand Commitments
 
@@ -190,8 +209,10 @@ The product is a planning and management workspace, not a generic chatbot, vendo
 - Evaluator parameters: Code Quality (High), Security (Medium), Efficiency (Medium), Testing (Low), Accessibility (Low) and Problem Statement Alignment (Very High).
 - Existing repository: EventPilot, with the Matt Pocock skills and Impeccable installed.
 - Product decisions confirmed through the Event Pilot specification review.
+- Initial release decision: local-first event planning with browser persistence, without authentication or a database.
 - Gemini target model availability and API compatibility remain to be verified before integration.
-- The initial repository does not yet have an initialized Next.js application or a dedicated Event Pilot Supabase project.
+- The initial repository foundation has been created and verified with TypeScript, tests and a production build, according to the project setup report.
+- No dedicated Event Pilot database or authentication project is required for the initial release.
 
 ## Product Principles
 
@@ -200,10 +221,11 @@ The product is a planning and management workspace, not a generic chatbot, vendo
 3. **Preserve Existing Work:** Refinement and failure handling must not silently overwrite existing data. Accepted related changes must be applied consistently.
 4. **Actionable Slices Over Generic Text:** AI output should become structured, editable planning entities rather than unstructured prose.
 5. **Resilient Validation:** Validate AI outputs and business rules before applying changes. On failure, preserve the existing plan, explain the error and allow retry.
-6. **Privacy by Default:** Collect only necessary information, protect event ownership and minimize exposure of guest data.
+6. **Privacy by Default:** Collect only necessary information, protect locally stored data from unnecessary exposure and minimize transmission of guest data.
 7. **Transparent Calculations:** Explain budget and attendance-dependent estimate changes and distinguish estimates from actual expenses.
 8. **Demo Without Friction:** The sample experience must work without authentication, AI API calls or database writes.
-9. **Focused Scope:** Prefer reliable, complete core planning workflows over speculative integrations and unnecessary architectural complexity.
+9. **Local-First Simplicity:** Personal events should work without account creation or cloud infrastructure. Communicate the limitations of browser-local persistence clearly.
+10. **Focused Scope:** Prefer reliable, complete core planning workflows over speculative integrations and unnecessary architectural complexity.
 
 ## Accessibility and Inclusion
 
@@ -215,3 +237,4 @@ The product is a planning and management workspace, not a generic chatbot, vendo
 - Respect reduced-motion preferences and avoid using color alone to communicate status.
 - Ensure responsive layouts remain usable on mobile devices and desktop screens.
 - Treat dietary restrictions and allergy information with care and avoid exposing such information unnecessarily.
+- Make local saving and storage failures understandable to users without relying on color alone.
