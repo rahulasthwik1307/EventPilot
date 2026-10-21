@@ -49,6 +49,11 @@ describe('TimelineTasksTab Component', () => {
         updatedAt: '2026-01-01',
       },
     ],
+    vendors: [],
+    households: [],
+    guests: [],
+    tables: [],
+    assignments: [],
     createdAt: '2026-01-01',
     updatedAt: '2026-01-01',
   };

@@ -87,6 +87,15 @@ export interface ChecklistTask {
   updatedAt: string;
 }
 
+// --- Re-export M3 Domain Types ---
+export * from '../vendors/types';
+export * from '../guests/types';
+export * from '../seating/types';
+
+import { Vendor } from '../vendors/types';
+import { Guest, GuestHousehold } from '../guests/types';
+import { SeatingAssignment, SeatingTable } from '../seating/types';
+
 // --- Core Event Entity ---
 
 export interface Event {
@@ -104,13 +113,31 @@ export interface Event {
   expenses: Expense[];
   milestones: TimelineMilestone[];
   tasks: ChecklistTask[];
+  // Milestone 3 Domain Collections
+  vendors: Vendor[];
+  households: GuestHousehold[];
+  guests: Guest[];
+  tables: SeatingTable[];
+  assignments: SeatingAssignment[];
   createdAt: string; // ISO timestamp
   updatedAt: string; // ISO timestamp
 }
 
 export type EventInput = Omit<
   Event,
-  'id' | 'createdAt' | 'updatedAt' | 'isSample' | 'categories' | 'expenses' | 'milestones' | 'tasks'
+  | 'id'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'isSample'
+  | 'categories'
+  | 'expenses'
+  | 'milestones'
+  | 'tasks'
+  | 'vendors'
+  | 'households'
+  | 'guests'
+  | 'tables'
+  | 'assignments'
 >;
 
 // --- Validation & Result Types ---

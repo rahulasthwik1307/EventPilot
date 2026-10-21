@@ -8,7 +8,10 @@ import { WorkspaceNavigation, WorkspaceTab } from './WorkspaceNavigation';
 import { OverviewTab } from './OverviewTab';
 import { BudgetLedgerTab } from '../budget/BudgetLedgerTab';
 import { TimelineTasksTab } from '../timeline/TimelineTasksTab';
-import { ModulePlaceholder } from './ModulePlaceholder';
+import { VendorsTab } from '../vendors/VendorsTab';
+import { GuestsTab } from '../guests/GuestsTab';
+import { SeatingTab } from '../seating/SeatingTab';
+import { AiAssistantTab } from '../ai/AiAssistantTab';
 import { EventEditDialog } from '../events/EventEditDialog';
 
 export interface WorkspaceShellProps {
@@ -84,10 +87,32 @@ export function WorkspaceShell({
             />
           )}
 
-          {activeTab !== 'overview' && activeTab !== 'budget' && activeTab !== 'timeline' && (
-            <ModulePlaceholder
-              tab={activeTab}
-              onReturnToOverview={() => setActiveTab('overview')}
+          {activeTab === 'vendors' && (
+            <VendorsTab
+              event={event}
+              onUpdateEvent={handleEventUpdated}
+            />
+          )}
+
+          {activeTab === 'guests' && (
+            <GuestsTab
+              event={event}
+              onUpdateEvent={handleEventUpdated}
+            />
+          )}
+
+          {activeTab === 'seating' && (
+            <SeatingTab
+              event={event}
+              onUpdateEvent={handleEventUpdated}
+            />
+          )}
+
+          {activeTab === 'ai' && (
+            <AiAssistantTab
+              event={event}
+              onUpdateEvent={handleEventUpdated}
+              onNavigateTab={(tab) => setActiveTab(tab)}
             />
           )}
         </main>
@@ -97,7 +122,7 @@ export function WorkspaceShell({
       <footer className="border-t border-neutral-border py-6 px-4 sm:px-8 mt-12 bg-neutral-surface/60">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-muted gap-2">
           <p>
-            Event Pilot · Milestone 2 · Local-First Celebration Planning Studio
+            Event Pilot · Milestone 4 · Gemini-Powered Local-First Planning Studio
           </p>
           <p className="font-mono tabular-nums">
             Panchang &amp; Utsav Almanac · WCAG 2.1 AA Compliant

@@ -64,15 +64,27 @@ export function ModulePlaceholder({
       ],
     },
     guests: {
-      title: 'Guests & Seating Allocation',
-      milestone: 'Scheduled for Milestone 3',
+      title: 'Guests & RSVP Management',
+      milestone: 'Milestone 3 · Live',
       description:
-        'Individual attendee tracking with invitation groups, RSVP responses, dietary notes, and physical/logical seating tables.',
+        'Individual attendee tracking with invitation groups, RSVP responses, dietary notes, and plus-one commitments.',
       icon: Users,
       features: [
         'RSVP status ledger (pending, confirmed, declined)',
         'Dietary preferences and allergy records kept private',
-        'Seating tables with capacity limits and conflict warnings',
+        'Household groups and plus-one tracking',
+      ],
+    },
+    seating: {
+      title: 'Seating & Table Allocation',
+      milestone: 'Milestone 3 · Live',
+      description:
+        'Interactive table arrangement, capacity limits, and dynamic assignment tracking.',
+      icon: Users,
+      features: [
+        'Tables with capacity limits and conflict warnings',
+        'Guest seating assignments and occupancy indicators',
+        'Dietary summary per table for catering coordinators',
       ],
     },
     ai: {

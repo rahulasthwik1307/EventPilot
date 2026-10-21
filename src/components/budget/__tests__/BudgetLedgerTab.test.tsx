@@ -41,6 +41,11 @@ describe('BudgetLedgerTab Component', () => {
     ],
     milestones: [],
     tasks: [],
+    vendors: [],
+    households: [],
+    guests: [],
+    tables: [],
+    assignments: [],
     createdAt: '2026-01-01',
     updatedAt: '2026-01-01',
   };

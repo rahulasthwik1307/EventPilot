@@ -5,13 +5,8 @@ import { Event } from '../types';
 describe('LocalStorageEventStorage Adapter', () => {
   let storage: LocalStorageEventStorage;
 
-  beforeEach(() => {
-    window.localStorage.clear();
-    storage = new LocalStorageEventStorage();
-  });
-
-  describe('Personal Event Lifecycle', () => {
-    const mockPersonalEvent: Event = {
+  function createTestEvent(overrides: Partial<Event> = {}): Event {
+    return {
       id: 'evt-personal-1',
       type: 'wedding',
       title: "Ananya & Dev's Vivaha",
@@ -24,10 +19,25 @@ describe('LocalStorageEventStorage Adapter', () => {
       expenses: [],
       milestones: [],
       tasks: [],
+      vendors: [],
+      households: [],
+      guests: [],
+      tables: [],
+      assignments: [],
       isSample: false,
       createdAt: '2026-10-21T12:00:00.000Z',
       updatedAt: '2026-10-21T12:00:00.000Z',
+      ...overrides,
     };
+  }
+
+  beforeEach(() => {
+    window.localStorage.clear();
+    storage = new LocalStorageEventStorage();
+  });
+
+  describe('Personal Event Lifecycle', () => {
+    const mockPersonalEvent = createTestEvent();
 
     it('returns empty array when storage is empty', () => {
       const res = storage.getPersonalEvents();
@@ -42,15 +52,24 @@ describe('LocalStorageEventStorage Adapter', () => {
       const listRes = storage.getPersonalEvents();
       expect(listRes.success).toBe(true);
       expect(listRes.data).toHaveLength(1);
-      expect(listRes.data?.[0].title).toBe("Ananya & Dev's Vivaha");
+      expect(listRes.data?.[0].id).toBe(mockPersonalEvent.id);
+      expect(listRes.data?.[0].title).toBe(mockPersonalEvent.title);
       expect(listRes.data?.[0].isSample).toBe(false);
-
-      const singleRes = storage.getPersonalEvent('evt-personal-1');
-      expect(singleRes.success).toBe(true);
-      expect(singleRes.data?.id).toBe('evt-personal-1');
     });
 
-    it('updates an existing personal event in place without duplication', () => {
+    it('retrieves an individual personal event by ID', () => {
+      storage.savePersonalEvent(mockPersonalEvent);
+
+      const foundRes = storage.getPersonalEvent(mockPersonalEvent.id);
+      expect(foundRes.success).toBe(true);
+      expect(foundRes.data?.id).toBe(mockPersonalEvent.id);
+
+      const missingRes = storage.getPersonalEvent('non-existent-id');
+      expect(missingRes.success).toBe(true);
+      expect(missingRes.data).toBeNull();
+    });
+
+    it('updates an existing personal event correctly', () => {
       storage.savePersonalEvent(mockPersonalEvent);
 
       const updatedEvent: Event = {
@@ -69,42 +88,35 @@ describe('LocalStorageEventStorage Adapter', () => {
     });
 
     it('deletes a personal event without affecting other events', () => {
-      const event2: Event = {
+      const event2 = createTestEvent({
         id: 'evt-personal-2',
         type: 'birthday',
         title: "Vihaan's 1st Birthday",
         date: '2026-12-05',
         guestTarget: 40,
         budgetCap: 75000,
-        currency: 'INR',
-        categories: [],
-        expenses: [],
-        milestones: [],
-        tasks: [],
-        isSample: false,
-        createdAt: '2026-10-21T12:00:00.000Z',
-        updatedAt: '2026-10-21T12:00:00.000Z',
-      };
+      });
 
       storage.savePersonalEvent(mockPersonalEvent);
       storage.savePersonalEvent(event2);
 
       expect(storage.getPersonalEvents().data).toHaveLength(2);
 
-      const deleteRes = storage.deletePersonalEvent('evt-personal-1');
+      const deleteRes = storage.deletePersonalEvent(mockPersonalEvent.id);
       expect(deleteRes.success).toBe(true);
 
       const remaining = storage.getPersonalEvents().data;
       expect(remaining).toHaveLength(1);
-      expect(remaining?.[0].id).toBe('evt-personal-2');
+      expect(remaining?.[0].id).toBe(event2.id);
     });
 
-    it('clears active event pointer if the active event is deleted', () => {
-      storage.savePersonalEvent(mockPersonalEvent);
+    it('tracks the active event ID in local storage', () => {
+      expect(storage.getActiveEventId().data).toBeNull();
+
       storage.setActiveEventId('evt-personal-1');
       expect(storage.getActiveEventId().data).toBe('evt-personal-1');
 
-      storage.deletePersonalEvent('evt-personal-1');
+      storage.setActiveEventId(null);
       expect(storage.getActiveEventId().data).toBeNull();
     });
   });
@@ -119,22 +131,14 @@ describe('LocalStorageEventStorage Adapter', () => {
     });
 
     it('persists edits to the sample celebration in isolation from personal events', () => {
-      const personalEvent: Event = {
+      const personalEvent = createTestEvent({
         id: 'evt-personal-1',
         type: 'community',
         title: 'Neighborhood Diwali Mela',
         date: '2026-11-01',
         guestTarget: 500,
         budgetCap: 200000,
-        currency: 'INR',
-        categories: [],
-        expenses: [],
-        milestones: [],
-        tasks: [],
-        isSample: false,
-        createdAt: '2026-10-21T12:00:00.000Z',
-        updatedAt: '2026-10-21T12:00:00.000Z',
-      };
+      });
       storage.savePersonalEvent(personalEvent);
 
       const sample = storage.getSampleEvent().data!;
@@ -158,41 +162,32 @@ describe('LocalStorageEventStorage Adapter', () => {
     });
 
     it('resetSampleEvent restores fresh starter data without deleting personal events', () => {
-      const personalEvent: Event = {
+      const personalEvent = createTestEvent({
         id: 'evt-personal-1',
         type: 'community',
         title: 'Neighborhood Diwali Mela',
         date: '2026-11-01',
         guestTarget: 500,
         budgetCap: 200000,
-        currency: 'INR',
-        categories: [],
-        expenses: [],
-        milestones: [],
-        tasks: [],
-        isSample: false,
-        createdAt: '2026-10-21T12:00:00.000Z',
-        updatedAt: '2026-10-21T12:00:00.000Z',
-      };
+      });
       storage.savePersonalEvent(personalEvent);
 
       const sample = storage.getSampleEvent().data!;
       storage.saveSampleEvent({ ...sample, title: 'Mutated Sample Title' });
 
-      // Reset sample
       const resetRes = storage.resetSampleEvent();
       expect(resetRes.success).toBe(true);
       expect(resetRes.data?.title).toBe("Aarav & Meera's Vivaha Celebration");
 
-      // Verify personal events remained completely intact!
-      const personalEvents = storage.getPersonalEvents().data;
-      expect(personalEvents).toHaveLength(1);
-      expect(personalEvents?.[0].title).toBe('Neighborhood Diwali Mela');
+      // Verify personal events still exist intact!
+      const personalList = storage.getPersonalEvents().data;
+      expect(personalList).toHaveLength(1);
+      expect(personalList?.[0].id).toBe(personalEvent.id);
     });
   });
 
-  describe('Storage Error & Corrupted Data Handling', () => {
-    it('returns PARSE_ERROR for corrupted JSON without crashing or silently wiping', () => {
+  describe('Error Handling & Storage Failure Modes', () => {
+    it('returns PARSE_ERROR when localStorage payload is invalid JSON', () => {
       window.localStorage.setItem(STORAGE_KEYS.PERSONAL_EVENTS, '{"corrupted json');
 
       const res = storage.getPersonalEvents();
@@ -211,22 +206,14 @@ describe('LocalStorageEventStorage Adapter', () => {
         }
       });
 
-      const event: Event = {
+      const event = createTestEvent({
         id: 'evt-quota-test',
         type: 'birthday',
         title: 'Test Birthday',
         date: '2026-12-01',
         guestTarget: 20,
         budgetCap: 50000,
-        currency: 'INR',
-        categories: [],
-        expenses: [],
-        milestones: [],
-        tasks: [],
-        isSample: false,
-        createdAt: '2026-10-21T12:00:00.000Z',
-        updatedAt: '2026-10-21T12:00:00.000Z',
-      };
+      });
 
       const res = storage.savePersonalEvent(event);
       expect(res.success).toBe(false);

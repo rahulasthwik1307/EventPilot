@@ -55,6 +55,38 @@ export function migrateEventToM2(event: Event): Event {
   };
 }
 
+/**
+ * Seamlessly migrates an Event from Milestone 1 or 2 to Milestone 3.
+ * Preserves all existing fields, categories, and overrides while safely
+ * initializing vendors, households, guests, tables, and assignments arrays if absent.
+ * Cleans any orphaned assignments referencing non-existent tables or guests.
+ * Strict Rule: Never fabricates vendors, guests, payments, tables, or assignments in personal events.
+ */
+export function migrateEventToM3(event: Event): Event {
+  const m2 = migrateEventToM2(event);
+
+  const vendors = Array.isArray(m2.vendors) ? m2.vendors : [];
+  const households = Array.isArray(m2.households) ? m2.households : [];
+  const guests = Array.isArray(m2.guests) ? m2.guests : [];
+  const tables = Array.isArray(m2.tables) ? m2.tables : [];
+  const rawAssignments = Array.isArray(m2.assignments) ? m2.assignments : [];
+
+  const validTableIds = new Set(tables.map((t) => t.id));
+  const validGuestIds = new Set(guests.map((g) => g.id));
+  const assignments = rawAssignments.filter(
+    (a) => a && validTableIds.has(a.tableId) && validGuestIds.has(a.guestId)
+  );
+
+  return {
+    ...m2,
+    vendors,
+    households,
+    guests,
+    tables,
+    assignments,
+  };
+}
+
 export class LocalStorageEventStorage implements EventStorage {
   private isAvailable(): boolean {
     if (typeof window === 'undefined' || !window.localStorage) {
@@ -147,7 +179,7 @@ export class LocalStorageEventStorage implements EventStorage {
       for (const item of rawList) {
         const res = validateEvent(item);
         if (res.isValid && !res.data.isSample) {
-          validEvents.push(migrateEventToM2(res.data));
+          validEvents.push(migrateEventToM3(res.data));
         }
       }
 
@@ -175,8 +207,8 @@ export class LocalStorageEventStorage implements EventStorage {
       return { success: false, error: this.unavailableError() };
     }
 
-    // Force isSample = false for personal events and ensure M2 integrity
-    const migrated = migrateEventToM2(event);
+    // Force isSample = false for personal events and ensure M3 integrity
+    const migrated = migrateEventToM3(event);
     const sanitized: Event = {
       ...migrated,
       isSample: false,
@@ -291,7 +323,7 @@ export class LocalStorageEventStorage implements EventStorage {
 
       const val = validateEvent(sampleData);
       if (val.isValid && val.data.isSample) {
-        return { success: true, data: migrateEventToM2(val.data) };
+        return { success: true, data: migrateEventToM3(val.data) };
       }
 
       const fresh = createFreshSampleEvent();
@@ -308,7 +340,7 @@ export class LocalStorageEventStorage implements EventStorage {
     }
 
     const sampleEvent: Event = {
-      ...migrateEventToM2(event),
+      ...migrateEventToM3(event),
       isSample: true,
       updatedAt: new Date().toISOString(),
     };

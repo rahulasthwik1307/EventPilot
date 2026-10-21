@@ -12,8 +12,13 @@ import {
   EventInput,
   EventType,
   Expense,
+  Guest,
+  GuestHousehold,
+  SeatingAssignment,
+  SeatingTable,
   TimelineMilestone,
   ValidationResult,
+  Vendor,
 } from './types';
 
 const VALID_EVENT_TYPES: EventType[] = ['wedding', 'birthday', 'community'];
@@ -342,6 +347,116 @@ export function validateEvent(data: unknown): ValidationResult<Event> {
       });
   }
 
+  let vendors: Vendor[] = [];
+  if (Array.isArray(obj.vendors)) {
+    vendors = obj.vendors
+      .filter((v) => v && typeof v === 'object' && typeof (v as Record<string, unknown>).name === 'string')
+      .map((v, i) => {
+        const item = v as Record<string, unknown>;
+        return {
+          id: typeof item.id === 'string' && item.id ? item.id : `vnd_${i + 1}`,
+          name: String(item.name).trim(),
+          category: (item.category as Vendor['category']) || 'other',
+          contactPerson: typeof item.contactPerson === 'string' ? item.contactPerson : undefined,
+          phone: typeof item.phone === 'string' ? item.phone : undefined,
+          email: typeof item.email === 'string' ? item.email : undefined,
+          website: typeof item.website === 'string' ? item.website : undefined,
+          status: (item.status as Vendor['status']) || 'researching',
+          quotedCost: Number.isFinite(item.quotedCost) ? Math.max(0, Math.round(Number(item.quotedCost))) : 0,
+          agreedCost: typeof item.agreedCost === 'number' && Number.isFinite(item.agreedCost)
+            ? Math.max(0, Math.round(item.agreedCost))
+            : undefined,
+          depositPaid: Number.isFinite(item.depositPaid) ? Math.max(0, Math.round(Number(item.depositPaid))) : 0,
+          amountPaid: Number.isFinite(item.amountPaid) ? Math.max(0, Math.round(Number(item.amountPaid))) : 0,
+          linkedCategoryId: typeof item.linkedCategoryId === 'string' ? item.linkedCategoryId : undefined,
+          notes: typeof item.notes === 'string' ? item.notes : undefined,
+          createdAt: typeof item.createdAt === 'string' ? item.createdAt : createdAt,
+          updatedAt: typeof item.updatedAt === 'string' ? item.updatedAt : createdAt,
+        };
+      });
+  }
+
+  let households: GuestHousehold[] = [];
+  if (Array.isArray(obj.households)) {
+    households = obj.households
+      .filter((h) => h && typeof h === 'object' && typeof (h as Record<string, unknown>).name === 'string')
+      .map((h, i) => {
+        const item = h as Record<string, unknown>;
+        return {
+          id: typeof item.id === 'string' && item.id ? item.id : `hh_${i + 1}`,
+          name: String(item.name).trim(),
+          relationshipType: typeof item.relationshipType === 'string' ? item.relationshipType : undefined,
+          notes: typeof item.notes === 'string' ? item.notes : undefined,
+        };
+      });
+  }
+
+  let guests: Guest[] = [];
+  if (Array.isArray(obj.guests)) {
+    guests = obj.guests
+      .filter((g) => g && typeof g === 'object' && typeof (g as Record<string, unknown>).firstName === 'string')
+      .map((g, i) => {
+        const item = g as Record<string, unknown>;
+        const rsvpStatus = ['pending', 'confirmed', 'declined'].includes(item.rsvpStatus as string)
+          ? (item.rsvpStatus as Guest['rsvpStatus'])
+          : 'pending';
+        const invitationStatus = ['not_sent', 'sent', 'delivered'].includes(item.invitationStatus as string)
+          ? (item.invitationStatus as Guest['invitationStatus'])
+          : 'not_sent';
+        return {
+          id: typeof item.id === 'string' && item.id ? item.id : `gst_${i + 1}`,
+          firstName: String(item.firstName).trim(),
+          lastName: typeof item.lastName === 'string' ? item.lastName.trim() : undefined,
+          householdId: typeof item.householdId === 'string' ? item.householdId : undefined,
+          relationship: typeof item.relationship === 'string' ? item.relationship : undefined,
+          phone: typeof item.phone === 'string' ? item.phone : undefined,
+          email: typeof item.email === 'string' ? item.email : undefined,
+          rsvpStatus,
+          invitationStatus,
+          plusOneAllowed: Boolean(item.plusOneAllowed),
+          plusOneExpected: Boolean(item.plusOneExpected),
+          plusOneName: typeof item.plusOneName === 'string' ? item.plusOneName : undefined,
+          dietaryPreference: (item.dietaryPreference as Guest['dietaryPreference']) || 'none',
+          dietaryNotes: typeof item.dietaryNotes === 'string' ? item.dietaryNotes : undefined,
+          notes: typeof item.notes === 'string' ? item.notes : undefined,
+          createdAt: typeof item.createdAt === 'string' ? item.createdAt : createdAt,
+          updatedAt: typeof item.updatedAt === 'string' ? item.updatedAt : createdAt,
+        };
+      });
+  }
+
+  let tables: SeatingTable[] = [];
+  if (Array.isArray(obj.tables)) {
+    tables = obj.tables
+      .filter((t) => t && typeof t === 'object' && typeof (t as Record<string, unknown>).name === 'string')
+      .map((t, i) => {
+        const item = t as Record<string, unknown>;
+        return {
+          id: typeof item.id === 'string' && item.id ? item.id : `tbl_${i + 1}`,
+          name: String(item.name).trim(),
+          capacity: Number.isInteger(item.capacity) && Number(item.capacity) >= 1 ? Number(item.capacity) : 8,
+          tableType: (item.tableType as SeatingTable['tableType']) || 'round',
+          notes: typeof item.notes === 'string' ? item.notes : undefined,
+        };
+      });
+  }
+
+  let assignments: SeatingAssignment[] = [];
+  if (Array.isArray(obj.assignments)) {
+    assignments = obj.assignments
+      .filter((a) => a && typeof a === 'object' && typeof (a as Record<string, unknown>).tableId === 'string' && typeof (a as Record<string, unknown>).guestId === 'string')
+      .map((a, i) => {
+        const item = a as Record<string, unknown>;
+        return {
+          id: typeof item.id === 'string' && item.id ? item.id : `asg_${i + 1}`,
+          tableId: String(item.tableId),
+          guestId: String(item.guestId),
+          isPlusOne: Boolean(item.isPlusOne),
+          assignedAt: typeof item.assignedAt === 'string' ? item.assignedAt : createdAt,
+        };
+      });
+  }
+
   return {
     isValid: true,
     data: {
@@ -352,6 +467,11 @@ export function validateEvent(data: unknown): ValidationResult<Event> {
       expenses,
       milestones,
       tasks,
+      vendors,
+      households,
+      guests,
+      tables,
+      assignments,
       createdAt,
       updatedAt,
     },

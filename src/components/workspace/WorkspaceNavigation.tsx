@@ -5,6 +5,7 @@ import {
   Clock,
   Briefcase,
   Users,
+  Armchair,
   Sparkles,
 } from 'lucide-react';
 
@@ -14,6 +15,7 @@ export type WorkspaceTab =
   | 'timeline'
   | 'vendors'
   | 'guests'
+  | 'seating'
   | 'ai';
 
 export interface WorkspaceNavigationProps {
@@ -34,9 +36,10 @@ export function WorkspaceNavigation({
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
     { id: 'budget', label: 'Budget Ledger', icon: Wallet },
     { id: 'timeline', label: 'Timeline & Tasks', icon: Clock },
-    { id: 'vendors', label: 'Vendors', icon: Briefcase, milestone: 'M3' },
-    { id: 'guests', label: 'Guests & Seating', icon: Users, milestone: 'M3' },
-    { id: 'ai', label: 'AI Assistant', icon: Sparkles, milestone: 'M4' },
+    { id: 'vendors', label: 'Vendors', icon: Briefcase },
+    { id: 'guests', label: 'Guests & RSVP', icon: Users },
+    { id: 'seating', label: 'Seating Planner', icon: Armchair },
+    { id: 'ai', label: 'AI Assistant', icon: Sparkles },
   ];
 
   return (
