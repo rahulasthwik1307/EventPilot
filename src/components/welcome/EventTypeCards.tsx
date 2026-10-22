@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, Cake, Users, ArrowRight } from 'lucide-react';
+import { Heart, Cake, Users, ArrowRight, Sparkles } from 'lucide-react';
 import { EventType } from '../../features/events/types';
 import { CouponBadge } from '../ui/Badge';
 
@@ -63,17 +63,17 @@ export function EventTypeCards({ onSelectType }: EventTypeCardsProps) {
             return (
               <div
                 key={item.type}
-                className="group relative bg-neutral-surface rounded-lg border border-neutral-border p-6 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between"
+                className="group relative bg-neutral-surface rounded-lg border border-neutral-border p-6 shadow-card hover:border-primary/50 hover:shadow-md transition-all duration-200 flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="w-10 h-10 rounded-md bg-secondary-subtle/80 flex items-center justify-center text-secondary border border-secondary/30">
+                    <div className="w-10 h-10 rounded-md bg-secondary-subtle/80 flex items-center justify-center text-secondary border border-secondary/30 transition-transform group-hover:scale-105">
                       <Icon className="w-5 h-5" />
                     </div>
                     <CouponBadge variant="terracotta">{item.badge}</CouponBadge>
                   </div>
 
-                  <h3 className="font-display text-xl font-semibold text-neutral-text mb-2">
+                  <h3 className="font-display text-xl font-semibold text-neutral-text mb-2 group-hover:text-primary-hover transition-colors">
                     {item.title}
                   </h3>
 
@@ -84,7 +84,7 @@ export function EventTypeCards({ onSelectType }: EventTypeCardsProps) {
                   <ul className="space-y-1.5 border-t border-neutral-border/60 pt-3 mb-6">
                     {item.highlights.map((h, i) => (
                       <li key={i} className="text-xs text-neutral-muted flex items-center gap-1.5">
-                        <span className="w-1 h-1 rounded-full bg-secondary" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0" />
                         <span>{h}</span>
                       </li>
                     ))}
@@ -94,10 +94,10 @@ export function EventTypeCards({ onSelectType }: EventTypeCardsProps) {
                 <button
                   type="button"
                   onClick={() => onSelectType(item.type)}
-                  className="w-full inline-flex items-center justify-center gap-2 bg-neutral-surface hover:bg-neutral-subtle text-neutral-text border border-neutral-border hover:border-neutral-border-strong font-medium text-sm py-2 px-3 rounded-md transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 bg-neutral-surface hover:bg-primary hover:text-neutral-text text-neutral-text border border-neutral-border hover:border-primary font-semibold text-sm py-2.5 px-3 rounded-md transition-all active:translate-y-0.5 shadow-xs"
                 >
                   <span>Start {item.type === 'wedding' ? 'Wedding' : item.type === 'birthday' ? 'Birthday' : 'Community'}</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-neutral-muted group-hover:translate-x-0.5 transition-transform" />
+                  <ArrowRight className="w-3.5 h-3.5 text-neutral-muted group-hover:text-neutral-text group-hover:translate-x-1 transition-all" />
                 </button>
               </div>
             );

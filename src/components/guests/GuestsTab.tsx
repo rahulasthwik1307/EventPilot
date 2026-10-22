@@ -266,7 +266,7 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
 
         {/* 6 Attendance Metrics Cards */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
             <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
               Named Guests
             </span>
@@ -278,7 +278,7 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
             <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
               Confirmed Guests
             </span>
@@ -290,7 +290,7 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
             <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
               Expected +1s
             </span>
@@ -302,7 +302,7 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
             </span>
           </div>
 
-          <div className="bg-primary-subtle/50 border border-primary/30 p-3.5 rounded-md">
+          <div className="bg-primary-subtle/50 border border-primary/30 p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
             <span className="text-xs uppercase font-semibold text-primary block mb-1">
               Expected Attendance
             </span>
@@ -314,7 +314,7 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
             <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
               Pending RSVPs
             </span>
@@ -326,7 +326,7 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
             <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
               Declined
             </span>

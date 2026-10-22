@@ -170,7 +170,7 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
 
         {/* 4 Financial Metric Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
             <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
               Total Quotes Received
             </span>
@@ -182,7 +182,7 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
             <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
               Agreed Commitments
             </span>
@@ -194,7 +194,7 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
             <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
               Total Paid to Date
             </span>
@@ -206,7 +206,7 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
             <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
               Outstanding Balances
             </span>

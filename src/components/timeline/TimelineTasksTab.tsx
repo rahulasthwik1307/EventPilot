@@ -247,7 +247,7 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
               setSelectedMilestone(null);
               setIsMilestoneModalOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border rounded-md transition-colors shadow-xs"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border rounded-md transition-all active:scale-[0.98] shadow-xs"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Milestone</span>
@@ -259,7 +259,7 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
               setDefaultTaskMilestoneId(undefined);
               setIsTaskModalOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-neutral-text bg-primary hover:bg-primary-hover hover:text-white rounded-md transition-all shadow-sm"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-neutral-text bg-primary hover:bg-primary-hover hover:text-white rounded-md transition-all active:scale-[0.98] shadow-sm"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Task</span>
@@ -269,7 +269,7 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
 
       {/* 2. Metrics & Progress Banner */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
             Overall Progress
           </p>
@@ -285,7 +285,7 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
           <p className="text-xs text-neutral-muted mt-1 font-mono">{metrics.pct}% complete</p>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
             Pending Tasks
           </p>
@@ -297,7 +297,7 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
           </p>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
             Overdue Tasks
           </p>
@@ -313,7 +313,7 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
           </p>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
             Celebration Date
           </p>

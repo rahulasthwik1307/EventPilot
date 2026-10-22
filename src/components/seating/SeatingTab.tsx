@@ -430,7 +430,7 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
                             );
                           })}
                           {table.capacity > 20 && (
-                            <span className="text-[10px] font-mono text-neutral-muted">+{table.capacity - 20}</span>
+                            <span className="text-xs font-mono text-neutral-muted">+{table.capacity - 20}</span>
                           )}
                         </div>
                       </div>
@@ -573,7 +573,7 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
         </div>
 
         {/* Right Column: Unassigned Expected Attendees Queue */}
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card space-y-4">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card space-y-4 lg:sticky lg:top-6 self-start">
           <div className="flex items-center justify-between border-b border-neutral-border pb-3">
             <div>
               <h3 className="font-display text-base font-semibold text-neutral-text flex items-center gap-1.5">

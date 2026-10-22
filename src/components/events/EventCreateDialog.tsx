@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Heart, Cake, Users, AlertCircle } from 'lucide-react';
 import { CurrencyCode, Event, EventType } from '../../features/events/types';
-import { validateEventInput } from '../../features/events/validation';
+import { validateEventInput, formatCurrency } from '../../features/events/validation';
 import { eventStorage } from '../../features/events/storage';
 import { generateStarterCategories } from '../../features/events/budget-engine';
 import { generateStarterMilestones, generateStarterTasks } from '../../features/events/timeline-engine';
@@ -319,6 +319,32 @@ export function EventCreateDialog({
                 {errors.guestTarget}
               </p>
             )}
+            <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+              <span className="text-xs text-neutral-muted">Quick:</span>
+              {[50, 150, 300, 500].map((count) => (
+                <button
+                  key={count}
+                  type="button"
+                  onClick={() => {
+                    setGuestTarget(String(count));
+                    if (errors.guestTarget) {
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        delete next.guestTarget;
+                        return next;
+                      });
+                    }
+                  }}
+                  className={`text-xs px-2 py-0.5 rounded border transition-colors ${
+                    guestTarget === String(count)
+                      ? 'bg-primary-subtle border-primary text-neutral-text font-semibold'
+                      : 'bg-neutral-subtle border-neutral-border text-neutral-muted hover:text-neutral-text hover:border-neutral-text'
+                  }`}
+                >
+                  {count}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="sm:col-span-2">
@@ -368,6 +394,52 @@ export function EventCreateDialog({
                 {errors.budgetCap}
               </p>
             )}
+            <div className="flex items-center justify-between mt-2 flex-wrap gap-1">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs text-neutral-muted">Quick:</span>
+                {(currency === 'INR'
+                  ? [
+                      { label: '₹10L', val: 1000000 },
+                      { label: '₹25L', val: 2500000 },
+                      { label: '₹50L', val: 5000000 },
+                      { label: '₹1Cr', val: 10000000 },
+                    ]
+                  : [
+                      { label: '25k', val: 25000 },
+                      { label: '50k', val: 50000 },
+                      { label: '100k', val: 100000 },
+                      { label: '250k', val: 250000 },
+                    ]
+                ).map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => {
+                      setBudgetCap(String(preset.val));
+                      if (errors.budgetCap) {
+                        setErrors((prev) => {
+                          const next = { ...prev };
+                          delete next.budgetCap;
+                          return next;
+                        });
+                      }
+                    }}
+                    className={`text-xs px-2 py-0.5 rounded border transition-colors ${
+                      budgetCap === String(preset.val)
+                        ? 'bg-primary-subtle border-primary text-neutral-text font-semibold'
+                        : 'bg-neutral-subtle border-neutral-border text-neutral-muted hover:text-neutral-text hover:border-neutral-text'
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+              {Number(budgetCap) > 0 && (
+                <span className="text-xs font-mono font-medium text-secondary">
+                  {formatCurrency(Number(budgetCap), currency)}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -399,14 +471,14 @@ export function EventCreateDialog({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2.5 rounded-md text-sm font-medium text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border transition-colors"
+            className="px-4 py-2.5 rounded-md text-sm font-medium text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border transition-all active:scale-[0.98]"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-6 py-2.5 rounded-md text-sm font-semibold text-neutral-text bg-primary hover:bg-primary-hover hover:text-white transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-6 py-2.5 rounded-md text-sm font-semibold text-neutral-text bg-primary hover:bg-primary-hover hover:text-white transition-all shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Establishing Plan...' : 'Create Celebration Plan'}
           </button>

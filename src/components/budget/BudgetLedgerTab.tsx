@@ -201,7 +201,7 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
               setSelectedCategory(null);
               setIsCategoryModalOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border rounded-md transition-colors shadow-xs"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border rounded-md transition-all active:scale-[0.98] shadow-xs"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Category</span>
@@ -213,7 +213,7 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
               setDefaultExpenseCatId(undefined);
               setIsExpenseModalOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-neutral-text bg-primary hover:bg-primary-hover hover:text-white rounded-md transition-all shadow-sm"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-neutral-text bg-primary hover:bg-primary-hover hover:text-white rounded-md transition-all active:scale-[0.98] shadow-sm"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Record Expense</span>
@@ -264,7 +264,7 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
 
       {/* 3. Authoritative Financial Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
             Budget Cap
           </p>
@@ -276,7 +276,7 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
           </p>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
             Total Allocated
           </p>
@@ -288,7 +288,7 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
           </p>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
             Estimated Cost
           </p>
@@ -300,7 +300,7 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
           </p>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
             Actual Spent
           </p>
@@ -312,7 +312,7 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
           </p>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
             Unallocated Pool
           </p>
@@ -328,7 +328,7 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
           </p>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
             Cost Per Guest
           </p>

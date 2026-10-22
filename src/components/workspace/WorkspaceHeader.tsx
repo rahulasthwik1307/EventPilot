@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Users, Wallet, Edit3, ArrowLeft, Trash2, MapPin } from 'lucide-react';
+import { Calendar, Users, Wallet, Edit3, ArrowLeft, Trash2, MapPin, Sparkles } from 'lucide-react';
 import { Event } from '../../features/events/types';
 import { calculateDaysRemaining, formatCurrency, formatDateDisplay } from '../../features/events/validation';
 import { CouponBadge } from '../ui/Badge';
@@ -30,15 +30,15 @@ export function WorkspaceHeader({
 
   return (
     <>
-      <header className="bg-neutral-surface border-b border-neutral-border py-5 px-4 sm:px-8 shadow-card">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
-          {/* Left: Navigation and Identity */}
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-3">
+      <header className="bg-neutral-surface border-b border-neutral-border py-4 px-4 sm:px-6 lg:px-8 shadow-card">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+          {/* Left: Back Link, Badges & Event Title */}
+          <div className="space-y-1.5 min-w-0">
+            <div className="flex flex-wrap items-center gap-2.5">
               <button
                 type="button"
                 onClick={onBackToWelcome}
-                className="inline-flex items-center gap-1.5 text-xs text-neutral-muted hover:text-neutral-text transition-colors py-1 px-2 rounded hover:bg-neutral-subtle -ml-2"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-muted hover:text-neutral-text transition-colors py-1 px-2 rounded-md hover:bg-neutral-subtle -ml-2"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Celebration Studio</span>
@@ -48,81 +48,69 @@ export function WorkspaceHeader({
                 {event.isSample ? 'SAMPLE SANDBOX' : 'PERSONAL EVENT · LOCAL'}
               </CouponBadge>
 
-              <span className="text-xs font-mono uppercase text-neutral-muted">
+              <span className="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-neutral-subtle border border-neutral-border text-neutral-muted">
                 {event.type}
               </span>
             </div>
 
-            <h1 className="font-display text-2xl sm:text-3xl font-semibold text-neutral-text tracking-tight">
-              {event.title}
-            </h1>
+            <div className="flex items-center gap-2.5">
+              <h1 className="font-display text-2xl sm:text-3xl font-semibold text-neutral-text tracking-tight truncate">
+                {event.title}
+              </h1>
+              <span className="hidden sm:inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary-subtle text-primary" title="Auspicious Milestone Planning">
+                <Sparkles className="w-3.5 h-3.5" />
+              </span>
+            </div>
 
-            {event.location && (
-              <p className="text-xs text-neutral-muted flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-secondary" />
-                <span>{event.location}</span>
-              </p>
-            )}
+            {/* Compact inline metadata ribbon */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-muted">
+              {event.location && (
+                <span className="flex items-center gap-1 text-neutral-text/90">
+                  <MapPin className="w-3.5 h-3.5 text-secondary flex-shrink-0" />
+                  <span className="truncate">{event.location}</span>
+                </span>
+              )}
+
+              <span className="flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5 text-neutral-muted flex-shrink-0" />
+                <span>{formatDateDisplay(event.date)}</span>
+                <span className="font-mono text-secondary font-medium">({countdownLabel})</span>
+              </span>
+
+              <span className="flex items-center gap-1 font-mono tabular-nums">
+                <Users className="w-3.5 h-3.5 text-neutral-muted flex-shrink-0" />
+                <span>{event.guestTarget} guests</span>
+              </span>
+
+              <span className="flex items-center gap-1 font-mono tabular-nums font-semibold text-neutral-text">
+                <Wallet className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                <span>{formatCurrency(event.budgetCap, event.currency)}</span>
+              </span>
+            </div>
           </div>
 
-          {/* Right: Aligned Metrics & Actions */}
-          <div className="flex flex-wrap items-center gap-3 sm:gap-6 pt-3 md:pt-0 border-t md:border-t-0 border-neutral-border/60">
-            {/* Quick Metrics */}
-            <div className="flex items-center gap-4 text-xs sm:text-sm font-mono tabular-nums">
-              <div className="text-left sm:text-right">
-                <p className="text-xs uppercase font-semibold text-neutral-muted tracking-wider">
-                  Timeline
-                </p>
-                <p className="font-semibold text-neutral-text">
-                  {countdownLabel}
-                </p>
-              </div>
+          {/* Right: Actions */}
+          <div className="flex items-center gap-2 pt-2 md:pt-0 self-start md:self-auto flex-shrink-0">
+            <button
+              type="button"
+              onClick={onEdit}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold bg-neutral-surface hover:bg-neutral-subtle text-neutral-text border border-neutral-border px-3.5 py-2 rounded-md transition-all shadow-xs active:translate-y-0.5"
+            >
+              <Edit3 className="w-3.5 h-3.5 text-neutral-muted" />
+              <span>Edit Details</span>
+            </button>
 
-              <div className="w-px h-8 bg-neutral-border" />
-
-              <div className="text-left sm:text-right">
-                <p className="text-xs uppercase font-semibold text-neutral-muted tracking-wider">
-                  Guest Target
-                </p>
-                <p className="font-semibold text-neutral-text">
-                  {event.guestTarget}
-                </p>
-              </div>
-
-              <div className="w-px h-8 bg-neutral-border" />
-
-              <div className="text-left sm:text-right">
-                <p className="text-xs uppercase font-semibold text-neutral-muted tracking-wider">
-                  Budget Cap
-                </p>
-                <p className="font-semibold text-neutral-text">
-                  {formatCurrency(event.budgetCap, event.currency)}
-                </p>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-2">
+            {!event.isSample && onDeleteEvent && (
               <button
                 type="button"
-                onClick={onEdit}
-                className="inline-flex items-center gap-1.5 text-xs font-medium bg-neutral-surface hover:bg-neutral-subtle text-neutral-text border border-neutral-border px-3 py-2 rounded-md transition-colors"
+                onClick={() => setShowDeleteConfirm(true)}
+                aria-label="Delete Event"
+                className="p-2 text-neutral-muted hover:text-status-danger hover:bg-status-danger-subtle/50 rounded-md transition-colors"
+                title="Delete Celebration"
               >
-                <Edit3 className="w-3.5 h-3.5 text-neutral-muted" />
-                <span>Edit Details</span>
+                <Trash2 className="w-4 h-4" />
               </button>
-
-              {!event.isSample && onDeleteEvent && (
-                <button
-                  type="button"
-                  onClick={() => setShowDeleteConfirm(true)}
-                  aria-label="Delete Event"
-                  className="p-2 text-neutral-muted hover:text-status-danger hover:bg-status-danger-subtle/50 rounded-md transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </header>

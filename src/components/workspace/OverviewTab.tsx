@@ -12,10 +12,7 @@ import {
   ArrowRight,
   Briefcase,
   AlertTriangle,
-  Layers,
   Armchair,
-  Utensils,
-  UserCheck,
 } from 'lucide-react';
 import { Event } from '../../features/events/types';
 import {
@@ -89,7 +86,7 @@ export function OverviewTab({
     return { total, completed, overdue, pct };
   }, [tasks, todayStr]);
 
-  // Deterministic M3 metrics
+  // Deterministic vendor, attendance, and seating metrics
   const vendorFinancials = useMemo(
     () => calculateVendorFinancials(vendors),
     [vendors]
@@ -106,11 +103,14 @@ export function OverviewTab({
   );
 
   return (
-    <div className="space-y-8">
-      {/* 1. Identity & Quick Snapshot Banner */}
-      <div className="bg-neutral-surface border border-neutral-border rounded-lg p-6 sm:p-8 shadow-card">
+    <div className="space-y-6 sm:space-y-8">
+      {/* 1. Auspicious Celebration Planning Baseline */}
+      <div className="bg-neutral-surface border border-neutral-border rounded-lg p-6 sm:p-7 shadow-card relative overflow-hidden">
+        {/* Subtle decorative almanac accent line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-primary" />
+
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
+          <div className="space-y-2.5 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
               <CouponBadge variant={event.isSample ? 'terracotta' : 'marigold'}>
                 {event.isSample ? 'SAMPLE CELEBRATION' : 'ACTIVE PERSONAL PLAN'}
@@ -124,9 +124,9 @@ export function OverviewTab({
               {event.title}
             </h2>
 
-            <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-muted font-sans">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-neutral-muted font-sans">
               <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-secondary" />
+                <Calendar className="w-4 h-4 text-secondary flex-shrink-0" />
                 <span className="font-medium text-neutral-text">
                   {formatDateDisplay(event.date)}
                 </span>
@@ -137,19 +137,19 @@ export function OverviewTab({
 
               {event.location && (
                 <div className="flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-secondary" />
+                  <MapPin className="w-4 h-4 text-secondary flex-shrink-0" />
                   <span>{event.location}</span>
                 </div>
               )}
 
               <div className="flex items-center gap-1.5 font-mono">
-                <Users className="w-4 h-4 text-secondary" />
+                <Users className="w-4 h-4 text-secondary flex-shrink-0" />
                 <span>{event.guestTarget} Target Guests</span>
               </div>
             </div>
 
             {event.culturalContext?.traditionOrTheme && (
-              <div className="text-xs text-neutral-text/80 bg-neutral-subtle/80 border border-neutral-border p-3 rounded-md mt-2">
+              <div className="text-xs text-neutral-text/90 bg-neutral-subtle/80 border border-neutral-border/80 p-3 rounded-md mt-2">
                 <span className="font-semibold text-neutral-text">Tradition / Theme: </span>
                 {event.culturalContext.traditionOrTheme}
                 {event.culturalContext.notes && (
@@ -175,7 +175,7 @@ export function OverviewTab({
             <button
               type="button"
               onClick={onEdit}
-              className="text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 self-start md:self-end"
+              className="text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 self-start md:self-end transition-transform active:translate-x-0.5"
             >
               <span>Edit Celebration Baseline</span>
               <ArrowRight className="w-3 h-3" />
@@ -184,7 +184,7 @@ export function OverviewTab({
         </div>
 
         {/* Sync & Trust Footer Note */}
-        <div className="border-t border-neutral-border/60 mt-6 pt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-muted gap-2">
+        <div className="border-t border-neutral-border/60 mt-5 pt-3.5 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-muted gap-2">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-status-success" />
             <span className="font-mono">
@@ -199,9 +199,9 @@ export function OverviewTab({
         </div>
       </div>
 
-      {/* 2. Milestone 3 Operations Snapshot (Vendors, Attendance, Seating) */}
+      {/* 2. Operations Snapshot (Vendors, Attendance, Seating) */}
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3.5">
           <div>
             <h3 className="font-display text-xl font-semibold text-neutral-text">
               Celebration Operations Snapshot
@@ -214,19 +214,21 @@ export function OverviewTab({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Vendor Commitments Card */}
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card flex flex-col justify-between">
+          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-neutral-muted">
                   Vendor Contracts
                 </span>
-                <Briefcase className="w-4 h-4 text-secondary" />
+                <span className="w-7 h-7 rounded bg-secondary-subtle/80 flex items-center justify-center text-secondary">
+                  <Briefcase className="w-3.5 h-3.5" />
+                </span>
               </div>
 
               <p className="font-mono text-xl font-bold text-neutral-text">
                 {formatCurrency(vendorFinancials.totalAgreed, event.currency)}
               </p>
-              <p className="text-xs text-neutral-muted mt-1 font-mono">
+              <p className="text-xs text-neutral-muted mt-0.5 font-mono">
                 Agreed contract commitments
               </p>
 
@@ -250,7 +252,7 @@ export function OverviewTab({
               <button
                 type="button"
                 onClick={() => onNavigateTab('vendors')}
-                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1"
+                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 transition-transform active:translate-x-0.5"
               >
                 <span>Open Vendor Book</span>
                 <ArrowRight className="w-3 h-3" />
@@ -259,19 +261,21 @@ export function OverviewTab({
           </div>
 
           {/* Guest Attendance Card */}
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card flex flex-col justify-between">
+          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-neutral-muted">
                   Guest Register &amp; RSVPs
                 </span>
-                <Users className="w-4 h-4 text-primary" />
+                <span className="w-7 h-7 rounded bg-primary-subtle flex items-center justify-center text-primary">
+                  <Users className="w-3.5 h-3.5" />
+                </span>
               </div>
 
               <p className="font-mono text-xl font-bold text-neutral-text">
                 {attendanceSummary.expectedAttendance}
               </p>
-              <p className="text-xs text-neutral-muted mt-1 font-mono">
+              <p className="text-xs text-neutral-muted mt-0.5 font-mono">
                 Expected attendees ({attendanceSummary.confirmedCount} + {attendanceSummary.expectedPlusOnes} +1s)
               </p>
 
@@ -293,7 +297,7 @@ export function OverviewTab({
               <button
                 type="button"
                 onClick={() => onNavigateTab('guests')}
-                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1"
+                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 transition-transform active:translate-x-0.5"
               >
                 <span>Manage Guests &amp; Groups</span>
                 <ArrowRight className="w-3 h-3" />
@@ -302,19 +306,21 @@ export function OverviewTab({
           </div>
 
           {/* Seating Allocation Card */}
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card flex flex-col justify-between">
+          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-neutral-muted">
                   Banquet Seating
                 </span>
-                <Armchair className="w-4 h-4 text-secondary" />
+                <span className="w-7 h-7 rounded bg-secondary-subtle/80 flex items-center justify-center text-secondary">
+                  <Armchair className="w-3.5 h-3.5" />
+                </span>
               </div>
 
               <p className="font-mono text-xl font-bold text-neutral-text">
                 {seatingSummary.seatingProgressPct}%
               </p>
-              <p className="text-xs text-neutral-muted mt-1 font-mono">
+              <p className="text-xs text-neutral-muted mt-0.5 font-mono">
                 {attendanceSummary.expectedAttendance === 0
                   ? '0 seated (no guests registered)'
                   : `${seatingSummary.expectedAssigned} / ${attendanceSummary.expectedAttendance} expected seated`}
@@ -340,7 +346,7 @@ export function OverviewTab({
               <button
                 type="button"
                 onClick={() => onNavigateTab('seating')}
-                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1"
+                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 transition-transform active:translate-x-0.5"
               >
                 <span>Open Seating Planner</span>
                 <ArrowRight className="w-3 h-3" />
@@ -352,7 +358,7 @@ export function OverviewTab({
 
       {/* 3. Deterministic Financial Snapshot */}
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3.5">
           <div>
             <h3 className="font-display text-xl font-semibold text-neutral-text">
               Financial &amp; Allocation Snapshot
@@ -365,7 +371,7 @@ export function OverviewTab({
             <button
               type="button"
               onClick={() => onNavigateTab('budget')}
-              className="text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1"
+              className="text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 transition-transform active:translate-x-0.5"
             >
               <span>Manage Ledger</span>
               <ArrowRight className="w-3 h-3" />
@@ -374,7 +380,7 @@ export function OverviewTab({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card">
+          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all">
             <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
               Budget Cap
             </p>
@@ -386,7 +392,7 @@ export function OverviewTab({
             </p>
           </div>
 
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card">
+          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all">
             <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
               Allocated Planned
             </p>
@@ -398,7 +404,7 @@ export function OverviewTab({
             </p>
           </div>
 
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card">
+          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all">
             <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
               Recorded Actuals
             </p>
@@ -410,7 +416,7 @@ export function OverviewTab({
             </p>
           </div>
 
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card">
+          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all">
             <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
               Unallocated Reserve
             </p>
@@ -460,7 +466,7 @@ export function OverviewTab({
             <button
               type="button"
               onClick={() => onNavigateTab('timeline')}
-              className="text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 self-start sm:self-center"
+              className="text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 self-start sm:self-center transition-transform active:translate-x-0.5"
             >
               <span>Open Timeline</span>
               <ArrowRight className="w-3 h-3" />
@@ -523,8 +529,8 @@ export function OverviewTab({
         </div>
       </div>
 
-      {/* AI Assistant Spotlight Banner */}
-      <div className="bg-gradient-to-r from-primary-subtle/50 via-neutral-surface to-secondary-subtle/30 border border-primary/40 rounded-lg p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* 5. AI Assistant Spotlight Banner */}
+      <div className="bg-gradient-to-r from-primary-subtle/50 via-neutral-surface to-secondary-subtle/30 border border-primary/40 rounded-lg p-5 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-start gap-3.5">
           <div className="p-2.5 rounded-lg bg-primary text-neutral-text shadow-sm shrink-0">
             <Sparkles className="w-5 h-5 text-neutral-text" />
@@ -546,7 +552,7 @@ export function OverviewTab({
           <button
             type="button"
             onClick={() => onNavigateTab('ai')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-neutral-text font-semibold text-xs sm:text-sm hover:bg-primary-hover shadow-sm transition-all self-start md:self-center shrink-0"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-primary text-neutral-text font-semibold text-xs sm:text-sm hover:bg-primary-hover shadow-sm transition-all self-start md:self-center shrink-0 active:translate-y-0.5"
           >
             <span>Consult AI Assistant</span>
             <ArrowRight className="w-4 h-4" />
@@ -554,9 +560,9 @@ export function OverviewTab({
         )}
       </div>
 
-      {/* 5. Planning Modules Toolkit */}
+      {/* 6. Planning Modules Toolkit */}
       <div>
-        <div className="mb-4">
+        <div className="mb-3.5">
           <h3 className="font-display text-xl font-semibold text-neutral-text">
             Your Planning Toolkit
           </h3>
@@ -566,7 +572,7 @@ export function OverviewTab({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card flex flex-col justify-between">
+          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="w-8 h-8 rounded-md bg-secondary-subtle flex items-center justify-center text-secondary">
@@ -593,7 +599,7 @@ export function OverviewTab({
             )}
           </div>
 
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card flex flex-col justify-between">
+          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="w-8 h-8 rounded-md bg-secondary-subtle flex items-center justify-center text-secondary">
@@ -620,7 +626,7 @@ export function OverviewTab({
             )}
           </div>
 
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card flex flex-col justify-between">
+          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="w-8 h-8 rounded-md bg-secondary-subtle flex items-center justify-center text-secondary">
@@ -647,7 +653,7 @@ export function OverviewTab({
             )}
           </div>
 
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card flex flex-col justify-between">
+          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="w-8 h-8 rounded-md bg-secondary-subtle flex items-center justify-center text-secondary">
@@ -674,7 +680,7 @@ export function OverviewTab({
             )}
           </div>
 
-          <div className="bg-neutral-surface border border-primary/40 rounded-lg p-5 shadow-card flex flex-col justify-between ring-1 ring-primary/20">
+          <div className="bg-neutral-surface border border-primary/40 rounded-lg p-5 shadow-card hover:border-primary transition-all flex flex-col justify-between ring-1 ring-primary/20">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="w-8 h-8 rounded-md bg-primary-subtle flex items-center justify-center text-primary">
