@@ -37,9 +37,9 @@ export default {
         },
       },
       fontFamily: {
-        display: ["Eczar", "serif"],
-        sans: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
-        mono: ["JetBrains Mono", "monospace"],
+        display: ["var(--font-eczar)", "Eczar", "serif"],
+        sans: ["var(--font-sans)", "Plus Jakarta Sans", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "JetBrains Mono", "monospace"],
       },
       borderRadius: {
         sm: "4px",
