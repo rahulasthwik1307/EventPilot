@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
-import * as provider from '../../../../features/ai/gemini-provider';
+import * as orchestrator from '../../../../features/ai/ai-orchestrator';
 
 describe('POST /api/assistant (App Router API Route)', () => {
   const validPayload = {
@@ -45,15 +45,16 @@ describe('POST /api/assistant (App Router API Route)', () => {
     expect(body.details).toBeDefined();
   });
 
-  it('returns 200 with structured response on successful generation', async () => {
-    vi.spyOn(provider, 'generateAssistantResponse').mockResolvedValueOnce({
+  it('returns 200 with structured response on successful generation via orchestrator', async () => {
+    vi.spyOn(orchestrator, 'orchestrateAssistantResponse').mockResolvedValueOnce({
       success: true,
       data: {
         answer: 'You have a healthy reserve allocation.',
         summary: 'Review catering estimates.',
         recommendations: ['Confirm headcount 30 days prior.'],
         proposals: [],
-        modelUsed: 'gemini-3.8-flash',
+        modelUsed: '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+        provider: 'cloudflare',
         timestamp: '2026-10-21T17:00:00.000Z',
       },
     });
@@ -67,15 +68,16 @@ describe('POST /api/assistant (App Router API Route)', () => {
     const body = await res.json();
     expect(body.success).toBe(true);
     expect(body.answer).toContain('healthy reserve');
-    expect(body.modelUsed).toBe('gemini-3.8-flash');
+    expect(body.modelUsed).toBe('@cf/meta/llama-3.3-70b-instruct-fp8-fast');
+    expect(body.provider).toBe('cloudflare');
   });
 
   it('maps provider 503 error to HTTP 503 without leaking credentials', async () => {
-    vi.spyOn(provider, 'generateAssistantResponse').mockResolvedValueOnce({
+    vi.spyOn(orchestrator, 'orchestrateAssistantResponse').mockResolvedValueOnce({
       success: false,
       error: {
         code: 'MODEL_UNAVAILABLE',
-        message: 'Gemini 3.8 Flash is currently experiencing high demand. Please try again shortly.',
+        message: 'AI Planning Assistant services are currently experiencing high demand. Please try again shortly.',
         status: 503,
       },
     });

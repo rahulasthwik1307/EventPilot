@@ -101,5 +101,6 @@ export interface AiAssistantResponse {
   recommendations: string[];
   proposals: StagedProposal[];
   modelUsed: string;
+  provider?: 'cloudflare' | 'gemini';
   timestamp: string;
 }

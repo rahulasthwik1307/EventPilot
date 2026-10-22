@@ -52,6 +52,18 @@ const INTENT_OPTIONS: {
   { id: 'ideas', label: 'Traditions & Rituals', icon: Sparkles },
 ];
 
+interface CachedAiResponse {
+  answer: string;
+  summary: string;
+  recommendations: string[];
+  proposals: StagedProposal[];
+  modelUsed?: string;
+  provider?: 'cloudflare' | 'gemini';
+  latencyMs: number;
+}
+
+const memoryResponseCache = new Map<string, CachedAiResponse>();
+
 export function AiAssistantTab({
   event,
   onUpdateEvent,
@@ -63,12 +75,29 @@ export function AiAssistantTab({
   const [lastSubmittedPrompt, setLastSubmittedPrompt] = useState<string | null>(null);
 
   const [conversationalAnswer, setConversationalAnswer] = useState<string | null>(null);
+  const [activeModel, setActiveModel] = useState<string | null>(null);
+  const [activeProvider, setActiveProvider] = useState<'cloudflare' | 'gemini' | null>(null);
   const [proposals, setProposals] = useState<StagedProposal[]>([]);
   const [proposalFilter, setProposalFilter] = useState<'all' | 'staged' | 'applied' | 'dismissed'>('all');
+  const [responseLatencyMs, setResponseLatencyMs] = useState<number | null>(null);
+  const [elapsedMs, setElapsedMs] = useState<number>(0);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [is503DemandError, setIs503DemandError] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+
+  // High-precision live elapsed timer during active assistant inference
+  useEffect(() => {
+    if (!isLoading) {
+      setElapsedMs(0);
+      return;
+    }
+    const start = Date.now();
+    const timer = setInterval(() => {
+      setElapsedMs(Date.now() - start);
+    }, 100);
+    return () => clearInterval(timer);
+  }, [isLoading]);
 
   // Automatically detect conflicts if event state changes (e.g. deleted category)
   useEffect(() => {
@@ -148,15 +177,34 @@ export function AiAssistantTab({
         ];
   }, [event.type, intent]);
 
-  // Submit request to server-side Gemini route
+  // Submit request to server-side assistant route
   const handleSubmit = async (customPrompt?: string) => {
     const textToSubmit = (customPrompt || prompt).trim();
     if (!textToSubmit || isLoading) return;
+
+    const cacheKey = `${event.id}:${intent}:${textToSubmit.toLowerCase().trim()}`;
+    const cached = memoryResponseCache.get(cacheKey);
+
+    // Instant response from in-memory cache (0ms)
+    if (cached) {
+      setConversationalAnswer(cached.answer);
+      if (cached.modelUsed) setActiveModel(cached.modelUsed);
+      if (cached.provider) setActiveProvider(cached.provider);
+      setResponseLatencyMs(0);
+      const validated = detectProposalConflicts(event, cached.proposals);
+      setProposals(validated);
+      setProposalFilter('all');
+      setErrorMessage(null);
+      setIs503DemandError(false);
+      setLastSubmittedPrompt(textToSubmit);
+      return;
+    }
 
     setIsLoading(true);
     setErrorMessage(null);
     setIs503DemandError(false);
     setLastSubmittedPrompt(textToSubmit);
+    const startTime = Date.now();
 
     try {
       const response = await fetch('/api/assistant', {
@@ -173,6 +221,8 @@ export function AiAssistantTab({
       });
 
       const data = await response.json();
+      const elapsed = Date.now() - startTime;
+      setResponseLatencyMs(elapsed);
 
       if (!response.ok) {
         if (response.status === 503 || data?.code === 'MODEL_UNAVAILABLE') {
@@ -191,12 +241,25 @@ export function AiAssistantTab({
       }
 
       setConversationalAnswer(data.answer);
+      if (data.modelUsed) setActiveModel(data.modelUsed);
+      if (data.provider) setActiveProvider(data.provider);
 
       // Re-validate proposals against current event
       const freshProposals: StagedProposal[] = data.proposals || [];
       const validated = detectProposalConflicts(event, freshProposals);
       setProposals(validated);
       setProposalFilter('all');
+
+      // Cache successful response for instant re-retrieval
+      memoryResponseCache.set(cacheKey, {
+        answer: data.answer,
+        summary: data.summary || '',
+        recommendations: data.recommendations || [],
+        proposals: freshProposals,
+        modelUsed: data.modelUsed,
+        provider: data.provider,
+        latencyMs: elapsed,
+      });
     } catch (err: any) {
       setErrorMessage(
         err?.message || 'A network error occurred while connecting to the assistant.'
@@ -426,14 +489,21 @@ export function AiAssistantTab({
 
         {/* Loading Indicator */}
         {isLoading && (
-          <div className="p-6 rounded-md bg-neutral-subtle/70 border border-neutral-border flex flex-col items-center justify-center text-center space-y-2 animate-pulse">
-            <Sparkles className="w-8 h-8 text-primary animate-spin" />
-            <h4 className="font-semibold text-neutral-text text-sm">
-              Consulting Gemini 3.8 Flash...
-            </h4>
-            <p className="text-xs text-neutral-muted max-w-md">
-              Synthesizing event context, Indian cultural traditions, and deterministic proposal schemas...
-            </p>
+          <div className="p-6 rounded-md bg-neutral-subtle/70 border border-neutral-border flex flex-col items-center justify-center text-center space-y-3">
+            <div className="p-2.5 rounded-full bg-primary-subtle text-primary">
+              <Sparkles className="w-7 h-7 text-primary animate-spin" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="font-semibold text-neutral-text text-sm flex items-center justify-center gap-2">
+                <span>Consulting Gemini 3.8 Flash...</span>
+                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-primary text-neutral-text">
+                  {(elapsedMs / 1000).toFixed(1)}s
+                </span>
+              </h4>
+              <p className="text-xs text-neutral-muted max-w-md">
+                Turbo engine active · Synthesizing event context, Indian cultural traditions, and deterministic proposal schemas...
+              </p>
+            </div>
           </div>
         )}
 
@@ -484,11 +554,27 @@ export function AiAssistantTab({
       {/* Assistant Conversational Answer Section */}
       {conversationalAnswer && !isLoading && (
         <section className="bg-neutral-surface border border-neutral-border rounded-lg p-6 shadow-sm space-y-4">
-          <div className="flex items-center gap-2 pb-3 border-b border-neutral-border/60">
-            <Sparkles className="w-5 h-5 text-primary" />
-            <h3 className="font-display font-semibold text-lg text-neutral-text">
-              Planning Guidance &amp; Insights
-            </h3>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-neutral-border/60">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              <h3 className="font-display font-semibold text-lg text-neutral-text">
+                Planning Guidance &amp; Insights
+              </h3>
+            </div>
+            {activeModel && (
+              <span className="text-xs font-mono text-neutral-muted bg-neutral-subtle px-2.5 py-1 rounded border border-neutral-border self-start sm:self-auto flex items-center gap-1.5 shadow-xs">
+                <span className="inline-block w-2 h-2 rounded-full bg-status-success animate-pulse" />
+                <span className="font-semibold text-neutral-text">
+                  {responseLatencyMs === 0
+                    ? '⚡ 0ms (Instant Cache)'
+                    : `⚡ ${((responseLatencyMs ?? 1200) / 1000).toFixed(1)}s`}
+                </span>
+                <span>·</span>
+                <span>{activeProvider === 'cloudflare' ? 'Cloudflare Workers AI' : 'Gemini Fallback'}</span>
+                <span>·</span>
+                <span>{activeModel.split('/').pop()}</span>
+              </span>
+            )}
           </div>
 
           <div className="prose prose-sm max-w-none text-neutral-text leading-relaxed whitespace-pre-line text-sm bg-neutral-subtle/50 p-4 rounded-md border border-neutral-border/70">

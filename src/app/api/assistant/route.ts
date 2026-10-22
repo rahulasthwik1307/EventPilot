@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AiAssistantRequestSchema } from '../../../features/ai/schemas';
-import { generateAssistantResponse } from '../../../features/ai/gemini-provider';
+import { orchestrateAssistantResponse } from '../../../features/ai/ai-orchestrator';
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = await generateAssistantResponse(validated.data);
+    const result = await orchestrateAssistantResponse(validated.data);
 
     if (!result.success || !result.data) {
       const err = result.error || {

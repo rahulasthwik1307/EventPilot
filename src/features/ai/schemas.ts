@@ -125,6 +125,7 @@ export const AiAssistantResponseSchema = z.object({
   recommendations: z.array(z.string()).default([]),
   proposals: z.array(StagedProposalSchema).default([]),
   modelUsed: z.string(),
+  provider: z.enum(['cloudflare', 'gemini']).optional(),
   timestamp: z.string(),
 });
 
