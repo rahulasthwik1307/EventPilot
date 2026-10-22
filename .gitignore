@@ -15,7 +15,29 @@ build
 
 # Misc
 .DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 *.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+credentials.json
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Editor and IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
 # Local env files
 .env*.local
@@ -29,6 +51,17 @@ build
 *.tsbuildinfo
 next-env.d.ts
 
+# Testing cache
+.vitest/
+
+# Media and screen recordings (Demo videos must be hosted externally)
+*.mp4
+*.webm
+*.mov
+*.mkv
+*.avi
+
 # Large binaries and precompiled skill tooling
 *.exe
 .agents/skills/impeccable/scripts/bin/
+

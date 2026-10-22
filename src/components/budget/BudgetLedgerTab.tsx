@@ -117,9 +117,15 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
 
   const handleConfirmDeleteCategory = (categoryId: string) => {
     const updatedCategories = categories.filter((c) => c.id !== categoryId);
+    // Unlink any vendor that was linked to this deleted budget category
+    const updatedVendors = (event.vendors || []).map((v) =>
+      v.linkedCategoryId === categoryId ? { ...v, linkedCategoryId: undefined } : v
+    );
+
     onUpdateEvent({
       ...event,
       categories: updatedCategories,
+      vendors: updatedVendors,
       updatedAt: new Date().toISOString(),
     });
   };
