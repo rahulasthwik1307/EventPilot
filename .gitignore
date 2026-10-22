@@ -28,3 +28,7 @@ build
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Large binaries and precompiled skill tooling
+*.exe
+.agents/skills/impeccable/scripts/bin/

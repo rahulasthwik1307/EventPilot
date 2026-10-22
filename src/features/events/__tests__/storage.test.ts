@@ -198,6 +198,23 @@ describe('LocalStorageEventStorage Adapter', () => {
       expect(window.localStorage.getItem(STORAGE_KEYS.PERSONAL_EVENTS)).toBe('{"corrupted json');
     });
 
+    it('does not overwrite corrupted storage when savePersonalEvent is attempted on malformed data', () => {
+      window.localStorage.setItem(STORAGE_KEYS.PERSONAL_EVENTS, '{"corrupted raw user data');
+
+      const event = createTestEvent({
+        id: 'evt-safety-test',
+        type: 'birthday',
+        title: 'Safety Birthday',
+      });
+
+      const res = storage.savePersonalEvent(event);
+      expect(res.success).toBe(false);
+      expect(res.error?.code).toBe('PARSE_ERROR');
+
+      // Crucial: The corrupted raw string is preserved and not overwritten!
+      expect(window.localStorage.getItem(STORAGE_KEYS.PERSONAL_EVENTS)).toBe('{"corrupted raw user data');
+    });
+
     it('handles QuotaExceededError gracefully', () => {
       const quotaErr = new DOMException('Quota exceeded', 'QuotaExceededError');
       const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string) => {

@@ -227,6 +227,9 @@ export class LocalStorageEventStorage implements EventStorage {
     }
 
     const currentListRes = this.getPersonalEvents();
+    if (!currentListRes.success) {
+      return { success: false, error: currentListRes.error };
+    }
     const currentList = currentListRes.data || [];
 
     const existingIndex = currentList.findIndex((e) => e.id === sanitized.id);

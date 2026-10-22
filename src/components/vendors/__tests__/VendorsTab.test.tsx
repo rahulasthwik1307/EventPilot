@@ -88,4 +88,41 @@ describe('VendorsTab Component', () => {
     expect(screen.getByText('The Grand Mandap Palace')).toBeInTheDocument();
     expect(screen.queryByText('Royal Feast Caterers')).not.toBeInTheDocument();
   });
+
+  it('unlinks vendorId from associated expenses when vendor is deleted', () => {
+    const onUpdate = vi.fn();
+    const eventWithLinkedExpense: Event = {
+      ...mockEvent,
+      expenses: [
+        {
+          id: 'exp-1',
+          categoryId: 'cat-venue',
+          name: 'Mandap Booking Advance',
+          estimatedCost: 200000,
+          actualCost: 200000,
+          paymentStatus: 'deposit_paid',
+          vendorId: 'vnd-1',
+        },
+      ],
+    };
+
+    render(<VendorsTab event={eventWithLinkedExpense} onUpdateEvent={onUpdate} />);
+
+    // Click the delete button for The Grand Mandap Palace
+    const deleteButtons = screen.getAllByRole('button', { name: /Delete/i });
+    fireEvent.click(deleteButtons[0]);
+
+    // Confirm dialog is open
+    expect(screen.getByText(/Are you sure you want to delete/i)).toBeInTheDocument();
+
+    // Confirm delete
+    const confirmButton = screen.getByRole('button', { name: /^Delete Vendor$/i });
+    fireEvent.click(confirmButton);
+
+    expect(onUpdate).toHaveBeenCalledTimes(1);
+    const updatedEvent = onUpdate.mock.calls[0][0] as Event;
+    expect(updatedEvent.vendors.find((v) => v.id === 'vnd-1')).toBeUndefined();
+    expect(updatedEvent.expenses.find((e) => e.id === 'exp-1')?.vendorId).toBeUndefined();
+    expect(updatedEvent.expenses.find((e) => e.id === 'exp-1')?.name).toBe('Mandap Booking Advance');
+  });
 });
