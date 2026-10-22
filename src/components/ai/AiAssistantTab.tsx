@@ -351,9 +351,9 @@ export function AiAssistantTab({
                 <Sparkles className="w-5 h-5 text-primary" />
               </span>
               <h2 className="font-display font-semibold text-2xl text-neutral-text">
-                Gemini Planning Assistant
+                AI Planning Assistant
               </h2>
-              <CouponBadge variant="marigold">gemini-3.8-flash</CouponBadge>
+              <CouponBadge variant="marigold">Cloudflare AI + Fallback</CouponBadge>
             </div>
             <p className="text-sm text-neutral-muted">
               AI proposes structured advisory changes. You review before/after diffs before any change is applied.
@@ -455,7 +455,7 @@ export function AiAssistantTab({
               rows={3}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Ask Gemini for advice on budgeting, timeline milestones, vendor vetting questions, or cultural traditions..."
+              placeholder="Ask the planning assistant for advice on budgeting, timeline milestones, vendor vetting questions, or cultural traditions..."
               disabled={isLoading}
               className="w-full rounded-md border border-neutral-border bg-neutral-bg px-3.5 py-3 text-sm text-neutral-text placeholder:text-neutral-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary resize-y transition-all disabled:opacity-60"
             />
@@ -463,7 +463,7 @@ export function AiAssistantTab({
 
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs text-neutral-muted">
-              Press Ask Gemini to generate cultural recommendations and staged proposals.
+              Press Ask Assistant to generate cultural recommendations and staged proposals.
             </p>
 
             <Button
@@ -480,7 +480,7 @@ export function AiAssistantTab({
               ) : (
                 <>
                   <Send className="w-4 h-4 mr-1.5" />
-                  Ask Gemini
+                  Ask Assistant
                 </>
               )}
             </Button>
@@ -495,13 +495,13 @@ export function AiAssistantTab({
             </div>
             <div className="space-y-1">
               <h4 className="font-semibold text-neutral-text text-sm flex items-center justify-center gap-2">
-                <span>Consulting Gemini 3.8 Flash...</span>
+                <span>Consulting AI Planning Assistant...</span>
                 <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-primary text-neutral-text">
                   {(elapsedMs / 1000).toFixed(1)}s
                 </span>
               </h4>
               <p className="text-xs text-neutral-muted max-w-md">
-                Turbo engine active · Synthesizing event context, Indian cultural traditions, and deterministic proposal schemas...
+                Synthesizing celebration context, cultural traditions, and structured proposal diffs...
               </p>
             </div>
           </div>
@@ -522,7 +522,7 @@ export function AiAssistantTab({
               <div>
                 <p className="font-semibold">
                   {is503DemandError
-                    ? 'Gemini 3.8 Flash High Demand (Spike)'
+                    ? 'AI Assistant High Demand (Spike)'
                     : 'Assistant Communication Notice'}
                 </p>
                 <p className="text-xs mt-0.5 opacity-90">
@@ -681,7 +681,7 @@ export function AiAssistantTab({
         isOpen={isPrivacyModalOpen}
         onClose={() => setIsPrivacyModalOpen(false)}
         title="Privacy Guard — Minimal Projected Context"
-        description="Event Pilot uses strict context projection. This is the exact, complete payload sent to Gemini for planning analysis. Notice that no guest names, contact numbers, dietary restrictions, or private vendor notes are present."
+        description="Event Pilot uses strict context projection. This is the exact, complete payload sent to the AI engine for planning analysis. Notice that no guest names, contact numbers, dietary restrictions, or private vendor notes are present."
         maxWidth="lg"
       >
         <div className="space-y-4">

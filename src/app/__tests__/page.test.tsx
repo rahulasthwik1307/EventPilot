@@ -171,7 +171,7 @@ describe("HomePage - Milestone 1, 2, and 3 End-to-End Workflows", () => {
     fireEvent.click(timelineTabBtn);
 
     await waitFor(() => {
-      expect(screen.getByText("Timeline & Tasks Matrix")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { level: 2, name: /^Timeline & Tasks$/i })).toBeInTheDocument();
       expect(screen.getByText(/Consult Panchang for auspicious Muhurtham window/i)).toBeInTheDocument();
       expect(screen.getAllByRole("button", { name: /Add Task/i }).length).toBeGreaterThanOrEqual(1);
     });
@@ -190,7 +190,7 @@ describe("HomePage - Milestone 1, 2, and 3 End-to-End Workflows", () => {
     fireEvent.click(vendorsTabBtn);
 
     await waitFor(() => {
-      expect(screen.getByText("Vendor Management Book")).toBeInTheDocument();
+      expect(screen.getByText("Vendor Directory & Contracts")).toBeInTheDocument();
       expect(screen.getByText("The Tamarind Tree Estate")).toBeInTheDocument();
       expect(screen.getByText("Annapurna Heritage Caterers")).toBeInTheDocument();
       expect(screen.getByRole("button", { name: /Record Vendor/i })).toBeInTheDocument();
@@ -230,7 +230,7 @@ describe("HomePage - Milestone 1, 2, and 3 End-to-End Workflows", () => {
     fireEvent.click(seatingTabBtn);
 
     await waitFor(() => {
-      expect(screen.getByText("Practical Seating Planner")).toBeInTheDocument();
+      expect(screen.getByText("Banquet Seating Planner")).toBeInTheDocument();
       expect(screen.getByText("Table 1 - Mandap Royal Front")).toBeInTheDocument();
       expect(screen.getByText("Unassigned Queue")).toBeInTheDocument();
       expect(screen.getByRole("button", { name: /Add Table/i })).toBeInTheDocument();
@@ -250,10 +250,10 @@ describe("HomePage - Milestone 1, 2, and 3 End-to-End Workflows", () => {
     fireEvent.click(aiTabBtn);
 
     await waitFor(() => {
-      expect(screen.getByText("Gemini Planning Assistant")).toBeInTheDocument();
-      expect(screen.getByText("gemini-3.8-flash")).toBeInTheDocument();
+      expect(screen.getByText("AI Planning Assistant")).toBeInTheDocument();
+      expect(screen.getByText("Cloudflare AI + Fallback")).toBeInTheDocument();
       expect(screen.getByText(/Privacy Guard Active/i)).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Ask Gemini/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Ask Assistant/i })).toBeInTheDocument();
     });
   });
 
@@ -265,12 +265,12 @@ describe("HomePage - Milestone 1, 2, and 3 End-to-End Workflows", () => {
       expect(screen.getByRole("heading", { level: 1, name: "Aarav & Meera's Vivaha Celebration" })).toBeInTheDocument();
     });
 
-    // In Overview tab, click the spotlight banner "Consult Gemini Assistant" button
-    const spotlightBtn = screen.getByRole("button", { name: /Consult Gemini Assistant/i });
+    // In Overview tab, click the spotlight banner "Consult AI Assistant" button
+    const spotlightBtn = screen.getByRole("button", { name: /Consult AI Assistant/i });
     fireEvent.click(spotlightBtn);
 
     await waitFor(() => {
-      expect(screen.getByText("Gemini Planning Assistant")).toBeInTheDocument();
+      expect(screen.getByText("AI Planning Assistant")).toBeInTheDocument();
       expect(screen.getByText(/Zero PII Transmitted/i)).toBeInTheDocument();
     });
   });

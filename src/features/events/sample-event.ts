@@ -28,8 +28,10 @@ function getFutureSampleDate(daysAhead: number = 90): string {
   return `${year}-${month}-${day}`;
 }
 
+export const SAMPLE_EVENT_ID = 'sample-event-aarav-meera';
+
 export function createFreshSampleEvent(): Event {
-  const targetDate = getFutureSampleDate(90);
+  const targetDate = '2027-01-19'; // Canonical date: 19 January 2027
   const budgetCap = 2500000; // ₹25,00,000 INR
   const guestTarget = 350;
   const now = new Date().toISOString();
@@ -577,3 +579,5 @@ export function createFreshSampleEvent(): Event {
     updatedAt: now,
   };
 }
+
+export const createSampleEvent = createFreshSampleEvent;

@@ -78,10 +78,13 @@ export default function HomePage() {
 
   const handleUpdateEvent = (updated: Event) => {
     setActiveEvent(updated);
-    if (!updated.isSample) {
+    if (updated.isSample) {
+      eventStorage.saveSampleEvent(updated);
+    } else {
       setPersonalEvents((prev) =>
         prev.map((e) => (e.id === updated.id ? updated : e))
       );
+      eventStorage.savePersonalEvent(updated);
     }
   };
 

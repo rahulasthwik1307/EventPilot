@@ -17,6 +17,7 @@ import {
   TABLE_TYPES,
   unassignAttendee,
 } from '../../features/seating/seating-engine';
+import { calculateAttendanceSummary } from '../../features/guests/guest-engine';
 import { CouponBadge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { TableDialog } from './TableDialog';
@@ -56,6 +57,11 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
   const summary = useMemo(
     () => calculateSeatingSummary(tables, assignments, guests),
     [tables, assignments, guests]
+  );
+
+  const attendanceSummary = useMemo(
+    () => calculateAttendanceSummary(guests),
+    [guests]
   );
 
   const unassignedAttendees = useMemo(
@@ -141,12 +147,12 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs font-mono uppercase tracking-wider text-secondary font-semibold">
-                Banquet Allocation &amp; Floor Plan · Milestone 3
+                Banquet Allocation &amp; Floor Plan
               </span>
-              <CouponBadge variant="marigold">LIVE</CouponBadge>
+              <CouponBadge variant="marigold">Seating Engine</CouponBadge>
             </div>
             <h2 className="font-display text-2xl sm:text-3xl font-semibold text-neutral-text">
-              Practical Seating Planner
+              Banquet Seating Planner
             </h2>
             <p className="text-xs text-neutral-muted mt-1">
               Deterministic seat allocations, positive table capacities, dynamic over-capacity alerts, and unassigned attendee queues.
@@ -399,6 +405,34 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
                             }}
                           />
                         </div>
+
+                        {/* Seat occupancy dots (up to capacity, max 20) */}
+                        <div className="flex flex-wrap items-center gap-1 pt-1" title={`${occ.currentOccupancy} of ${table.capacity} seats occupied`}>
+                          {Array.from({ length: Math.min(table.capacity, 20) }).map((_, seatIdx) => {
+                            const isOccupied = seatIdx < occ.currentOccupancy;
+                            const isOver = occ.isOverCapacity && seatIdx >= table.capacity - (occ.currentOccupancy - table.capacity);
+                            return (
+                              <span
+                                key={seatIdx}
+                                className={`w-2.5 h-2.5 rounded-full border transition-colors ${
+                                  isOver
+                                    ? 'bg-status-danger border-status-danger'
+                                    : isOccupied
+                                    ? occ.isOverCapacity
+                                      ? 'bg-status-danger/70 border-status-danger'
+                                      : occ.isFull
+                                      ? 'bg-status-success border-status-success'
+                                      : 'bg-primary border-primary'
+                                    : 'bg-neutral-subtle border-neutral-border'
+                                }`}
+                                aria-hidden="true"
+                              />
+                            );
+                          })}
+                          {table.capacity > 20 && (
+                            <span className="text-[10px] font-mono text-neutral-muted">+{table.capacity - 20}</span>
+                          )}
+                        </div>
                       </div>
 
                       {/* Location notes if any */}
@@ -556,15 +590,47 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
           </div>
 
           {unassignedAttendees.length === 0 ? (
-            <div className="text-center py-8 text-neutral-muted">
-              <CheckCircle2 className="w-8 h-8 text-status-success mx-auto mb-2 opacity-80" />
-              <p className="text-xs font-semibold text-neutral-text mb-0.5">
-                All Expected Attendees Seated!
-              </p>
-              <p className="text-xs text-neutral-muted">
-                Every confirmed attendee and partner currently holds a reserved table seat.
-              </p>
-            </div>
+            guests.length === 0 ? (
+              <div className="text-center py-8 text-neutral-muted">
+                <Users className="w-8 h-8 text-neutral-muted/60 mx-auto mb-2" />
+                <p className="text-xs font-semibold text-neutral-text mb-0.5">
+                  No Guests Registered
+                </p>
+                <p className="text-xs text-neutral-muted max-w-xs mx-auto">
+                  Add guests and record their RSVPs in the Guests tab to begin seating arrangements.
+                </p>
+              </div>
+            ) : attendanceSummary.expectedAttendance === 0 ? (
+              <div className="text-center py-8 text-neutral-muted">
+                <Clock className="w-8 h-8 text-status-warning mx-auto mb-2 opacity-80" />
+                <p className="text-xs font-semibold text-neutral-text mb-0.5">
+                  Awaiting Confirmed RSVPs
+                </p>
+                <p className="text-xs text-neutral-muted max-w-xs mx-auto">
+                  There are no confirmed attendees to assign. Update guest RSVPs to confirmed to seat them.
+                </p>
+              </div>
+            ) : tables.length === 0 ? (
+              <div className="text-center py-8 text-neutral-muted">
+                <Armchair className="w-8 h-8 text-secondary mx-auto mb-2 opacity-80" />
+                <p className="text-xs font-semibold text-neutral-text mb-0.5">
+                  Tables Needed
+                </p>
+                <p className="text-xs text-neutral-muted max-w-xs mx-auto">
+                  Create banquet tables to begin assigning seats to your confirmed guests.
+                </p>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-neutral-muted">
+                <CheckCircle2 className="w-8 h-8 text-status-success mx-auto mb-2 opacity-80" />
+                <p className="text-xs font-semibold text-neutral-text mb-0.5">
+                  All Confirmed Attendees Seated!
+                </p>
+                <p className="text-xs text-neutral-muted max-w-xs mx-auto">
+                  Every confirmed attendee and attending partner currently holds a reserved table seat.
+                </p>
+              </div>
+            )
           ) : (
             <div className="space-y-2.5 max-h-[600px] overflow-y-auto pr-1">
               {unassignedAttendees.map((u) => (

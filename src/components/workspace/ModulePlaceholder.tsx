@@ -22,14 +22,14 @@ export function ModulePlaceholder({
   const details = {
     overview: {
       title: 'Overview',
-      milestone: 'Milestone 1 · Live',
+      milestone: 'Active Module',
       description: 'Central celebration summary, deterministic metrics, and local persistence.',
       icon: Wallet,
       features: [],
     },
     budget: {
       title: 'Budget & Expense Ledger',
-      milestone: 'Scheduled for Milestone 2',
+      milestone: 'Active Module',
       description:
         'Granular expense lines grouped by budget category with recorded payment statuses (projected, deposit_paid, settled).',
       icon: Wallet,
@@ -40,10 +40,10 @@ export function ModulePlaceholder({
       ],
     },
     timeline: {
-      title: 'Timeline Milestones & Task Matrix',
-      milestone: 'Scheduled for Milestone 2',
+      title: 'Timeline & Tasks',
+      milestone: 'Active Module',
       description:
-        'Chronological schedule calculated from relative day offsets (offset_days) from the main celebration date.',
+        'Chronological schedule calculated from relative day offsets from the celebration date.',
       icon: Clock,
       features: [
         'Phase anchors (e.g. -90 days, -30 days, -1 day, celebration day)',
@@ -52,8 +52,8 @@ export function ModulePlaceholder({
       ],
     },
     vendors: {
-      title: 'Vendor Records & Quote Tracker',
-      milestone: 'Scheduled for Milestone 3',
+      title: 'Vendor Directory & Contracts',
+      milestone: 'Active Module',
       description:
         'Private service provider tracking containing contact details, quoted prices, booked status, notes, and deposit milestones.',
       icon: Briefcase,
@@ -65,7 +65,7 @@ export function ModulePlaceholder({
     },
     guests: {
       title: 'Guests & RSVP Management',
-      milestone: 'Milestone 3 · Live',
+      milestone: 'Active Module',
       description:
         'Individual attendee tracking with invitation groups, RSVP responses, dietary notes, and plus-one commitments.',
       icon: Users,
@@ -76,8 +76,8 @@ export function ModulePlaceholder({
       ],
     },
     seating: {
-      title: 'Seating & Table Allocation',
-      milestone: 'Milestone 3 · Live',
+      title: 'Banquet Seating Planner',
+      milestone: 'Active Module',
       description:
         'Interactive table arrangement, capacity limits, and dynamic assignment tracking.',
       icon: Users,
@@ -89,9 +89,9 @@ export function ModulePlaceholder({
     },
     ai: {
       title: 'AI Planning Assistant & Staged Proposals',
-      milestone: 'Scheduled for Milestone 4',
+      milestone: 'Active Module',
       description:
-        'Gemini-powered recommendation engine generating structured proposals held in staging diff drawers for explicit human approval.',
+        'AI recommendation engine generating structured proposals held in staging diff drawers for explicit human approval.',
       icon: Sparkles,
       features: [
         'Staged proposal diff comparisons before accepting changes',

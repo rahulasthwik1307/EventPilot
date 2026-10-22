@@ -144,7 +144,7 @@ export function OverviewTab({
 
               <div className="flex items-center gap-1.5 font-mono">
                 <Users className="w-4 h-4 text-secondary" />
-                <span>{event.guestTarget} Expected Attendees</span>
+                <span>{event.guestTarget} Target Guests</span>
               </div>
             </div>
 
@@ -194,7 +194,7 @@ export function OverviewTab({
           </div>
 
           <div className="text-neutral-muted/80 text-xs font-mono">
-            Deterministic Engine Active
+            Mathematical precision active
           </div>
         </div>
       </div>
@@ -315,7 +315,9 @@ export function OverviewTab({
                 {seatingSummary.seatingProgressPct}%
               </p>
               <p className="text-xs text-neutral-muted mt-1 font-mono">
-                {seatingSummary.expectedAssigned} / {attendanceSummary.expectedAttendance} expected seated
+                {attendanceSummary.expectedAttendance === 0
+                  ? '0 seated (no guests registered)'
+                  : `${seatingSummary.expectedAssigned} / ${attendanceSummary.expectedAttendance} expected seated`}
               </p>
 
               <div className="mt-3 pt-3 border-t border-neutral-border/50 text-xs space-y-1 font-mono">
@@ -445,7 +447,7 @@ export function OverviewTab({
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs font-mono uppercase text-secondary font-semibold">
-                Ceremonial Sequence Matrix
+                Celebration Timeline
               </span>
               <CouponBadge variant="marigold">Timeline Active</CouponBadge>
             </div>
@@ -460,7 +462,7 @@ export function OverviewTab({
               onClick={() => onNavigateTab('timeline')}
               className="text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 self-start sm:self-center"
             >
-              <span>Open Timeline Matrix</span>
+              <span>Open Timeline</span>
               <ArrowRight className="w-3 h-3" />
             </button>
           )}
@@ -521,7 +523,7 @@ export function OverviewTab({
         </div>
       </div>
 
-      {/* Gemini AI Assistant Spotlight Banner */}
+      {/* AI Assistant Spotlight Banner */}
       <div className="bg-gradient-to-r from-primary-subtle/50 via-neutral-surface to-secondary-subtle/30 border border-primary/40 rounded-lg p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-start gap-3.5">
           <div className="p-2.5 rounded-lg bg-primary text-neutral-text shadow-sm shrink-0">
@@ -530,12 +532,12 @@ export function OverviewTab({
           <div>
             <div className="flex items-center gap-2 mb-1">
               <h3 className="font-display text-lg font-semibold text-neutral-text">
-                Gemini Celebration Advisor
+                AI Celebration Advisor
               </h3>
-              <CouponBadge variant="marigold">LIVE · M4</CouponBadge>
+              <CouponBadge variant="marigold">Smart Advisory</CouponBadge>
             </div>
             <p className="text-xs text-neutral-muted max-w-2xl leading-relaxed">
-              Ask Gemini for cultural tradition advice, budget reallocation suggestions, or missing milestone tasks. All AI suggestions are staged for your review with before/after diffs before any changes touch your event.
+              Ask your assistant for cultural tradition advice, budget reallocation suggestions, or missing milestone tasks. All AI suggestions are staged for your review with before/after diffs before any changes touch your event.
             </p>
           </div>
         </div>
@@ -546,17 +548,17 @@ export function OverviewTab({
             onClick={() => onNavigateTab('ai')}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-neutral-text font-semibold text-xs sm:text-sm hover:bg-primary-hover shadow-sm transition-all self-start md:self-center shrink-0"
           >
-            <span>Consult Gemini Assistant</span>
+            <span>Consult AI Assistant</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         )}
       </div>
 
-      {/* 5. Modules Architecture Roadmap */}
+      {/* 5. Planning Modules Toolkit */}
       <div>
         <div className="mb-4">
           <h3 className="font-display text-xl font-semibold text-neutral-text">
-            Planning Modules Architecture
+            Your Planning Toolkit
           </h3>
           <p className="text-xs text-neutral-muted">
             Event Pilot is structured across focused planning modules.
@@ -570,7 +572,7 @@ export function OverviewTab({
                 <div className="w-8 h-8 rounded-md bg-secondary-subtle flex items-center justify-center text-secondary">
                   <Wallet className="w-4 h-4" />
                 </div>
-                <CouponBadge variant="marigold">LIVE · M2</CouponBadge>
+                <CouponBadge variant="marigold">Budget Active</CouponBadge>
               </div>
               <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
                 Budget &amp; Ledger
@@ -597,10 +599,10 @@ export function OverviewTab({
                 <div className="w-8 h-8 rounded-md bg-secondary-subtle flex items-center justify-center text-secondary">
                   <Clock className="w-4 h-4" />
                 </div>
-                <CouponBadge variant="marigold">LIVE · M2</CouponBadge>
+                <CouponBadge variant="marigold">Timeline Active</CouponBadge>
               </div>
               <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
-                Timeline Matrix
+                Celebration Timeline
               </h4>
               <p className="text-xs text-neutral-muted leading-relaxed">
                 Relative day offsets, checklist tasks, and date-reanchoring.
@@ -624,7 +626,7 @@ export function OverviewTab({
                 <div className="w-8 h-8 rounded-md bg-secondary-subtle flex items-center justify-center text-secondary">
                   <Briefcase className="w-4 h-4" />
                 </div>
-                <CouponBadge variant="marigold">LIVE · M3</CouponBadge>
+                <CouponBadge variant="marigold">Vendors Active</CouponBadge>
               </div>
               <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
                 Vendors &amp; Contacts
@@ -651,7 +653,7 @@ export function OverviewTab({
                 <div className="w-8 h-8 rounded-md bg-secondary-subtle flex items-center justify-center text-secondary">
                   <Users className="w-4 h-4" />
                 </div>
-                <CouponBadge variant="marigold">LIVE · M3</CouponBadge>
+                <CouponBadge variant="marigold">Guests Active</CouponBadge>
               </div>
               <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
                 Guests &amp; Seating
@@ -678,13 +680,13 @@ export function OverviewTab({
                 <div className="w-8 h-8 rounded-md bg-primary-subtle flex items-center justify-center text-primary">
                   <Sparkles className="w-4 h-4" />
                 </div>
-                <CouponBadge variant="marigold">LIVE · M4</CouponBadge>
+                <CouponBadge variant="marigold">AI Powered</CouponBadge>
               </div>
               <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
                 AI Planning Assistant
               </h4>
               <p className="text-xs text-neutral-muted leading-relaxed">
-                Gemini 3.8 Flash recommendations with review-first staged diffs.
+                Smart event suggestions with review-first staged diffs.
               </p>
             </div>
             {onNavigateTab && (

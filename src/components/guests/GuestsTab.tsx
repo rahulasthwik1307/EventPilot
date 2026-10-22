@@ -228,12 +228,12 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs font-mono uppercase tracking-wider text-secondary font-semibold">
-                Guest Register & Attendance · Milestone 3
+                Guest Register &amp; Attendance
               </span>
-              <CouponBadge variant="marigold">LIVE</CouponBadge>
+              <CouponBadge variant="marigold">RSVP Tracker</CouponBadge>
             </div>
             <h2 className="font-display text-2xl sm:text-3xl font-semibold text-neutral-text">
-              Guest & RSVP Management
+              Guest &amp; RSVP Management
             </h2>
             <p className="text-xs text-neutral-muted mt-1">
               Household groupings, individual guest attendance, partner plus-ones, and dietary restrictions.
@@ -338,6 +338,75 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
             </span>
           </div>
         </div>
+
+        {/* RSVP Distribution Visualization Bar */}
+        {summary.totalNamedGuests > 0 ? (
+          <div className="mt-4 pt-4 border-t border-neutral-border/60 space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-semibold text-neutral-text">
+                RSVP Response Distribution
+              </span>
+              <span className="font-mono text-neutral-muted">
+                {summary.expectedAttendance} attending ({summary.confirmedCount} confirmed + {summary.expectedPlusOnes} +1s) of {summary.totalNamedGuests} invited
+              </span>
+            </div>
+
+            {(() => {
+              const total = summary.totalNamedGuests;
+              const confPct = Math.round((summary.confirmedCount / total) * 100);
+              const pendPct = Math.round((summary.pendingCount / total) * 100);
+              const declPct = Math.max(0, 100 - confPct - pendPct);
+
+              return (
+                <div className="space-y-1.5">
+                  <div
+                    className="w-full h-2.5 bg-neutral-subtle rounded-full overflow-hidden flex border border-neutral-border/60"
+                    role="progressbar"
+                    aria-label="RSVP Response Distribution"
+                    aria-valuenow={confPct}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  >
+                    <div
+                      className="bg-status-success transition-all duration-300"
+                      style={{ width: `${confPct}%` }}
+                      title={`Confirmed: ${summary.confirmedCount} (${confPct}%)`}
+                    />
+                    <div
+                      className="bg-status-warning transition-all duration-300"
+                      style={{ width: `${pendPct}%` }}
+                      title={`Pending: ${summary.pendingCount} (${pendPct}%)`}
+                    />
+                    <div
+                      className="bg-neutral-muted/40 transition-all duration-300"
+                      style={{ width: `${declPct}%` }}
+                      title={`Declined: ${summary.declinedCount} (${declPct}%)`}
+                    />
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-neutral-muted">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-status-success inline-block" />
+                      <span>Confirmed: <strong className="text-neutral-text">{summary.confirmedCount}</strong> ({confPct}%)</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-status-warning inline-block" />
+                      <span>Pending: <strong className="text-neutral-text">{summary.pendingCount}</strong> ({pendPct}%)</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-neutral-muted/40 inline-block" />
+                      <span>Declined: <strong className="text-neutral-text">{summary.declinedCount}</strong> ({declPct}%)</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        ) : (
+          <div className="mt-4 pt-4 border-t border-neutral-border/60 text-xs text-neutral-muted italic">
+            No guests registered yet. Click &ldquo;Add Guest&rdquo; or &ldquo;New Group&rdquo; above to begin tracking RSVPs.
+          </div>
+        )}
 
         {/* Dietary Catering Requirements Bar */}
         {Object.keys(summary.dietaryBreakdown).length > 0 && (

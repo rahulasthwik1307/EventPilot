@@ -62,7 +62,7 @@ describe('TimelineTasksTab Component', () => {
     const onUpdate = vi.fn();
     render(<TimelineTasksTab event={mockEvent} onUpdateEvent={onUpdate} />);
 
-    expect(screen.getByText('Timeline & Tasks Matrix')).toBeInTheDocument();
+    expect(screen.getByText('Timeline & Tasks')).toBeInTheDocument();
     expect(screen.getByText('3 Months Prior — Wardrobe & Decor')).toBeInTheDocument();
     expect(screen.getByText('Day of Celebration')).toBeInTheDocument();
     expect(screen.getByText('Consult Panchang for Muhurtham')).toBeInTheDocument();

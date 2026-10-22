@@ -62,7 +62,7 @@ describe('VendorsTab Component', () => {
     const onUpdate = vi.fn();
     render(<VendorsTab event={mockEvent} onUpdateEvent={onUpdate} />);
 
-    expect(screen.getByText('Vendor Management Book')).toBeInTheDocument();
+    expect(screen.getByText('Vendor Directory & Contracts')).toBeInTheDocument();
     expect(screen.getByText('The Grand Mandap Palace')).toBeInTheDocument();
     expect(screen.getByText('Royal Feast Caterers')).toBeInTheDocument();
   });

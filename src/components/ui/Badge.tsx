@@ -4,12 +4,14 @@ export interface CouponBadgeProps {
   children: React.ReactNode;
   variant?: 'terracotta' | 'marigold' | 'stone' | 'forest';
   className?: string;
+  title?: string;
 }
 
 export function CouponBadge({
   children,
   variant = 'terracotta',
   className = '',
+  title,
 }: CouponBadgeProps) {
   const variantStyles = {
     terracotta: 'bg-secondary-subtle text-secondary border-secondary',
@@ -20,6 +22,7 @@ export function CouponBadge({
 
   return (
     <span
+      title={title}
       className={`inline-flex items-center px-2 py-0.5 rounded-sm font-mono text-xs font-bold tracking-wider uppercase border border-dashed ${variantStyles} ${className}`}
     >
       {children}

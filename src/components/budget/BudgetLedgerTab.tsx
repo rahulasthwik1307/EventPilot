@@ -187,10 +187,10 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
             <h2 className="font-display text-2xl sm:text-3xl font-semibold text-neutral-text">
               Budget &amp; Expense Ledger
             </h2>
-            <CouponBadge variant="marigold">Deterministic</CouponBadge>
+            <CouponBadge variant="marigold">Live Ledger</CouponBadge>
           </div>
           <p className="text-xs text-neutral-muted">
-            All arithmetic, allocations, actual expenses, and guest costs are derived by deterministic logic.
+            Category allocations, payment statuses, recorded actuals, and per-guest costs computed in real time.
           </p>
         </div>
 
@@ -340,6 +340,77 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
           </p>
         </div>
       </div>
+
+      {/* 3b. Budget Allocation & Utilization Visualization Bar */}
+      {summary.budgetCap > 0 && (
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
+            <div>
+              <span className="font-display font-semibold text-sm text-neutral-text">
+                Budget Allocation &amp; Spending Utilization
+              </span>
+              <p className="text-neutral-muted">
+                Track how much of your total budget ceiling is spent, committed, or held in reserve.
+              </p>
+            </div>
+            <div className="font-mono font-semibold text-neutral-text">
+              Cap: {formatCurrency(summary.budgetCap, event.currency)}
+            </div>
+          </div>
+
+          {/* Segmented Progress Bar */}
+          {(() => {
+            const spentPct = Math.min(100, Math.round((summary.totalActual / summary.budgetCap) * 100));
+            const committedUnspent = Math.max(0, summary.totalAllocated - summary.totalActual);
+            const committedPct = Math.min(100 - spentPct, Math.round((committedUnspent / summary.budgetCap) * 100));
+            const reservePct = Math.max(0, 100 - spentPct - committedPct);
+
+            return (
+              <div className="space-y-2">
+                <div
+                  className="w-full h-3 bg-neutral-subtle rounded-full overflow-hidden flex border border-neutral-border/60"
+                  role="progressbar"
+                  aria-label="Budget cap utilization"
+                  aria-valuenow={spentPct}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                >
+                  <div
+                    className="bg-primary transition-all duration-300"
+                    style={{ width: `${spentPct}%` }}
+                    title={`Actual Spent: ${spentPct}% (${formatCurrency(summary.totalActual, event.currency)})`}
+                  />
+                  <div
+                    className="bg-secondary/60 transition-all duration-300"
+                    style={{ width: `${committedPct}%` }}
+                    title={`Allocated Unspent: ${committedPct}% (${formatCurrency(committedUnspent, event.currency)})`}
+                  />
+                  <div
+                    className="bg-neutral-border/40 transition-all duration-300"
+                    style={{ width: `${reservePct}%` }}
+                    title={`Unallocated Reserve: ${reservePct}% (${formatCurrency(summary.unallocatedBudget, event.currency)})`}
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-neutral-muted pt-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-primary inline-block" />
+                    <span>Actual Spent: <strong className="text-neutral-text">{formatCurrency(summary.totalActual, event.currency)}</strong> ({spentPct}%)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-secondary/60 inline-block" />
+                    <span>Allocated Unspent: <strong className="text-neutral-text">{formatCurrency(committedUnspent, event.currency)}</strong> ({committedPct}%)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-neutral-border inline-block" />
+                    <span>Unallocated Reserve: <strong className={summary.unallocatedBudget < 0 ? 'text-status-danger' : 'text-neutral-text'}>{formatCurrency(summary.unallocatedBudget, event.currency)}</strong></span>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
 
       {/* 4. Category Allocations Section */}
       <div className="bg-neutral-surface border border-neutral-border rounded-lg p-6 shadow-card">

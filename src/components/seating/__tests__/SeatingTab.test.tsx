@@ -73,7 +73,7 @@ describe('SeatingTab Component', () => {
     const onUpdate = vi.fn();
     render(<SeatingTab event={mockEvent} onUpdateEvent={onUpdate} />);
 
-    expect(screen.getByText('Practical Seating Planner')).toBeInTheDocument();
+    expect(screen.getByText('Banquet Seating Planner')).toBeInTheDocument();
     expect(screen.getByText('Table 1 - Mandap Royal')).toBeInTheDocument();
     expect(screen.getByText('Total Tables')).toBeInTheDocument();
   });
@@ -123,5 +123,34 @@ describe('SeatingTab Component', () => {
     render(<SeatingTab event={overCapacityEvent} onUpdateEvent={onUpdate} />);
 
     expect(screen.getByText(/Over-Capacity Warning/i)).toBeInTheDocument();
+  });
+
+  it('displays state-aware empty states in unassigned queue', () => {
+    const onUpdate = vi.fn();
+
+    // 1. No guests at all
+    const noGuestsEvent: Event = { ...mockEvent, guests: [], assignments: [], tables: [] };
+    const { rerender } = render(<SeatingTab event={noGuestsEvent} onUpdateEvent={onUpdate} />);
+    expect(screen.getByText('No Guests Registered')).toBeInTheDocument();
+
+    // 2. Declined only (no confirmed attendees)
+    const declinedGuestsEvent: Event = {
+      ...mockEvent,
+      guests: [{ ...mockEvent.guests[0], rsvpStatus: 'declined', plusOneExpected: false }],
+      assignments: [],
+      tables: mockEvent.tables,
+    };
+    rerender(<SeatingTab event={declinedGuestsEvent} onUpdateEvent={onUpdate} />);
+    expect(screen.getByText('Awaiting Confirmed RSVPs')).toBeInTheDocument();
+
+    // 3. Confirmed attendees exist and are all seated
+    const allSeatedEvent: Event = {
+      ...mockEvent,
+      guests: [{ ...mockEvent.guests[0], plusOneExpected: false }],
+      tables: mockEvent.tables,
+      assignments: [{ id: 'asg-1', tableId: 'tbl-1', guestId: 'gst-1', isPlusOne: false, assignedAt: '' }],
+    };
+    rerender(<SeatingTab event={allSeatedEvent} onUpdateEvent={onUpdate} />);
+    expect(screen.getByText('All Confirmed Attendees Seated!')).toBeInTheDocument();
   });
 });

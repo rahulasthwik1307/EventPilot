@@ -229,9 +229,11 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
         <div>
           <div className="flex items-center gap-2 mb-1">
             <h2 className="font-display text-2xl sm:text-3xl font-semibold text-neutral-text">
-              Timeline &amp; Tasks Matrix
+              Timeline &amp; Tasks
             </h2>
-            <CouponBadge variant="marigold">Anchor-Derived</CouponBadge>
+            <CouponBadge variant="marigold" title="Dates adjust with celebration date">
+              Auto-Synchronized
+            </CouponBadge>
           </div>
           <p className="text-xs text-neutral-muted">
             Milestones and tasks stay synchronized with your celebration date. Manual overrides are strictly protected.

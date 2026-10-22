@@ -67,11 +67,11 @@ describe('AiAssistantTab Component', () => {
       />
     );
 
-    expect(screen.getByText('Gemini Planning Assistant')).toBeDefined();
+    expect(screen.getByText('AI Planning Assistant')).toBeDefined();
     expect(screen.getByText(/Privacy Guard Active/i)).toBeDefined();
     expect(screen.getByRole('radio', { name: /Budget Ledger/i })).toBeDefined();
     expect(screen.getByRole('radio', { name: /Timeline & Tasks/i })).toBeDefined();
-    expect(screen.getByRole('button', { name: /Ask Gemini/i })).toBeDefined();
+    expect(screen.getByRole('button', { name: /Ask Assistant/i })).toBeDefined();
   });
 
   it('opens privacy transparency modal when clicking Inspect Safe Context and confirms zero PII', () => {
@@ -128,10 +128,10 @@ describe('AiAssistantTab Component', () => {
       />
     );
 
-    const textarea = screen.getByPlaceholderText(/Ask Gemini for advice/i);
+    const textarea = screen.getByPlaceholderText(/Ask the planning assistant for advice/i);
     fireEvent.change(textarea, { target: { value: 'Help with budget allocations' } });
 
-    const submitBtn = screen.getByRole('button', { name: /Ask Gemini/i });
+    const submitBtn = screen.getByRole('button', { name: /Ask Assistant/i });
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
@@ -177,9 +177,9 @@ describe('AiAssistantTab Component', () => {
       />
     );
 
-    const textarea = screen.getByPlaceholderText(/Ask Gemini for advice/i);
+    const textarea = screen.getByPlaceholderText(/Ask the planning assistant for advice/i);
     fireEvent.change(textarea, { target: { value: 'Review budget' } });
-    fireEvent.click(screen.getByRole('button', { name: /Ask Gemini/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Ask Assistant/i }));
 
     await waitFor(() => {
       expect(screen.getByText('Adjust Venue Budget')).toBeDefined();
@@ -232,9 +232,9 @@ describe('AiAssistantTab Component', () => {
       />
     );
 
-    const textarea = screen.getByPlaceholderText(/Ask Gemini for advice/i);
+    const textarea = screen.getByPlaceholderText(/Ask the planning assistant for advice/i);
     fireEvent.change(textarea, { target: { value: 'Check' } });
-    fireEvent.click(screen.getByRole('button', { name: /Ask Gemini/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Ask Assistant/i }));
 
     await waitFor(() => {
       expect(screen.getByText('Unwanted Adjustment')).toBeDefined();
@@ -265,12 +265,12 @@ describe('AiAssistantTab Component', () => {
       />
     );
 
-    const textarea = screen.getByPlaceholderText(/Ask Gemini for advice/i);
+    const textarea = screen.getByPlaceholderText(/Ask the planning assistant for advice/i);
     fireEvent.change(textarea, { target: { value: 'Help plan ceremony' } });
-    fireEvent.click(screen.getByRole('button', { name: /Ask Gemini/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Ask Assistant/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/Gemini 3.8 Flash High Demand/i)).toBeDefined();
+      expect(screen.getByText(/AI Assistant High Demand/i)).toBeDefined();
     });
 
     expect(screen.getByRole('button', { name: /Retry Request/i })).toBeDefined();

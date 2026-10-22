@@ -143,12 +143,12 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs font-mono uppercase tracking-wider text-secondary font-semibold">
-                Celebration Operations · Milestone 3
+                Celebration Operations
               </span>
-              <CouponBadge variant="marigold">LIVE</CouponBadge>
+              <CouponBadge variant="marigold">Contracts &amp; Balances</CouponBadge>
             </div>
             <h2 className="font-display text-2xl sm:text-3xl font-semibold text-neutral-text">
-              Vendor Management Book
+              Vendor Directory &amp; Contracts
             </h2>
             <p className="text-xs text-neutral-muted mt-1">
               Authoritative tracking of quotes, contract commitments, and deposits. Separated from budget actuals.
