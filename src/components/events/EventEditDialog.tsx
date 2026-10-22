@@ -188,7 +188,7 @@ export function EventEditDialog({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label
               htmlFor="edit-guest-target"
@@ -209,19 +209,19 @@ export function EventEditDialog({
             )}
           </div>
 
-          <div>
+          <div className="sm:col-span-2">
             <label
               htmlFor="edit-budget-cap"
               className="block text-xs font-semibold uppercase tracking-wider text-neutral-text mb-1"
             >
               Budget Cap <span className="text-secondary">*</span>
             </label>
-            <div className="flex gap-2">
+            <div className="flex gap-2 min-w-0">
               <select
                 aria-label="Currency"
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
-                className="bg-neutral-subtle border border-neutral-border px-2.5 py-2 rounded-md text-sm font-mono text-neutral-text"
+                className="flex-shrink-0 bg-neutral-subtle border border-neutral-border px-2.5 py-2 rounded-md text-sm font-mono text-neutral-text focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="INR">INR (₹)</option>
                 <option value="USD">USD ($)</option>
@@ -235,7 +235,7 @@ export function EventEditDialog({
                 step="1000"
                 value={budgetCap}
                 onChange={(e) => setBudgetCap(e.target.value)}
-                className="flex-1 bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text font-mono focus:outline-none focus:ring-2 focus:ring-primary"
+                className="flex-1 min-w-0 bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text font-mono focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
             {errors.budgetCap && (

@@ -25,7 +25,12 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "Event Pilot — Celebration & Event Planner",
-  description: "Inclusive, editorial event-planning studio inspired by the warmth and order of an almanac.",
+  description:
+    "Plan celebrations with organized budgets, timelines, vendors, guests, seating, and thoughtful AI-powered suggestions.",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/icon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export default function RootLayout({

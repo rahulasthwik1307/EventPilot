@@ -155,6 +155,7 @@ export function EventCreateDialog({
                 <button
                   key={item.id}
                   type="button"
+                  aria-pressed={isSelected}
                   onClick={() => {
                     setType(item.id);
                     if (errors.type) {
@@ -208,7 +209,13 @@ export function EventCreateDialog({
                 });
               }
             }}
-            placeholder="e.g. Priya &amp; Rohan's Vivaha Celebration"
+            placeholder={
+              type === 'wedding'
+                ? "e.g. Priya & Rohan's Vivaha Celebration"
+                : type === 'birthday'
+                ? "e.g. Grandma's 80th Milestone Celebration"
+                : "e.g. Diwali Community Festival 2026"
+            }
             aria-invalid={Boolean(errors.title)}
             aria-describedby={errors.title ? 'title-error' : undefined}
             className={`w-full bg-neutral-surface border px-3.5 py-2.5 rounded-md text-sm text-neutral-text focus:outline-none focus:ring-2 focus:ring-primary ${
@@ -321,12 +328,12 @@ export function EventCreateDialog({
             >
               Total Budget Cap <span className="text-secondary">*</span>
             </label>
-            <div className="flex gap-2">
+            <div className="flex gap-2 min-w-0">
               <select
                 aria-label="Event Currency"
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
-                className="bg-neutral-subtle border border-neutral-border px-3 py-2.5 rounded-md text-sm font-mono text-neutral-text focus:outline-none focus:ring-2 focus:ring-primary"
+                className="flex-shrink-0 bg-neutral-subtle border border-neutral-border px-3 py-2.5 rounded-md text-sm font-mono text-neutral-text focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="INR">INR (₹)</option>
                 <option value="USD">USD ($)</option>
@@ -351,7 +358,7 @@ export function EventCreateDialog({
                 }}
                 aria-invalid={Boolean(errors.budgetCap)}
                 aria-describedby={errors.budgetCap ? 'budget-error' : undefined}
-                className={`flex-1 bg-neutral-surface border px-3.5 py-2.5 rounded-md text-sm text-neutral-text font-mono focus:outline-none focus:ring-2 focus:ring-primary ${
+                className={`flex-1 min-w-0 bg-neutral-surface border px-3.5 py-2.5 rounded-md text-sm text-neutral-text font-mono focus:outline-none focus:ring-2 focus:ring-primary ${
                   errors.budgetCap ? 'border-status-danger' : 'border-neutral-border'
                 }`}
               />

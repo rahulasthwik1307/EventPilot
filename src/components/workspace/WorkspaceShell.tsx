@@ -121,11 +121,17 @@ export function WorkspaceShell({
       {/* Footer */}
       <footer className="border-t border-neutral-border py-6 px-4 sm:px-8 mt-12 bg-neutral-surface/60">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-muted gap-2">
-          <p>
-            Event Pilot · Milestone 4 · Gemini-Powered Local-First Planning Studio
-          </p>
-          <p className="font-mono tabular-nums">
-            Panchang &amp; Utsav Almanac · WCAG 2.1 AA Compliant
+          <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-center sm:text-left">
+            <p className="font-medium text-neutral-text">
+              Event Pilot · Your celebration, thoughtfully planned.
+            </p>
+            <span className="hidden sm:inline text-neutral-border-strong">·</span>
+            <p>
+              Thoughtful planning · Clear budgets · Your data stays in your browser.
+            </p>
+          </div>
+          <p className="font-mono tabular-nums text-neutral-text/90">
+            Panchang &amp; Utsav Almanac
           </p>
         </div>
       </footer>

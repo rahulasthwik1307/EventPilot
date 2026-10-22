@@ -11,7 +11,7 @@ describe("HomePage - Milestone 1, 2, and 3 End-to-End Workflows", () => {
     render(<HomePage />);
     expect(screen.getByText("Event Pilot")).toBeInTheDocument();
     expect(screen.getByText(/Almanac Studio/i)).toBeInTheDocument();
-    expect(screen.getByText("Panchang & Utsav Almanac")).toBeInTheDocument();
+    expect(screen.getAllByText("Panchang & Utsav Almanac").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByRole("heading", { level: 1, name: /Every Milestone Celebration/i })).toBeInTheDocument();
   });
 
@@ -20,6 +20,63 @@ describe("HomePage - Milestone 1, 2, and 3 End-to-End Workflows", () => {
     expect(screen.getByRole("heading", { level: 3, name: "Vivaha & Weddings" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Milestone Birthdays" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Community Festivals" })).toBeInTheDocument();
+  });
+
+  it("renders the clean product footer and omits internal development text", () => {
+    render(<HomePage />);
+    expect(screen.getByText("Event Pilot · Your celebration, thoughtfully planned.")).toBeInTheDocument();
+    expect(screen.getByText("Thoughtful planning · Clear budgets · Your data stays in your browser.")).toBeInTheDocument();
+    expect(screen.getAllByText("Panchang & Utsav Almanac").length).toBeGreaterThanOrEqual(1);
+
+    // Verify obsolete development-stage strings are removed
+    expect(screen.queryByText(/Challenge 5/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Milestone 1/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Deterministic Math Engine · Browser-Local Persistence/i)).not.toBeInTheDocument();
+  });
+
+  it("opens shared creation dialog with corresponding archetype when clicking archetype cards", async () => {
+    const { unmount } = render(<HomePage />);
+
+    // Test Birthday Archetype Card
+    const startBirthdayBtn = screen.getByRole("button", { name: /Start Birthday/i });
+    fireEvent.click(startBirthdayBtn);
+
+    expect(screen.getByRole("heading", { name: "Create Celebration Plan" })).toBeInTheDocument();
+    const birthdayOption = screen.getByRole("button", { name: /Milestone Birthday/i });
+    expect(birthdayOption).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByPlaceholderText("e.g. Grandma's 80th Milestone Celebration")).toBeInTheDocument();
+
+    // Close dialog
+    fireEvent.click(screen.getByRole("button", { name: /Cancel/i }));
+    await waitFor(() => {
+      expect(screen.queryByRole("heading", { name: "Create Celebration Plan" })).not.toBeInTheDocument();
+    });
+
+    // Test Community Festival Archetype Card
+    const startCommunityBtn = screen.getByRole("button", { name: /Start Community/i });
+    fireEvent.click(startCommunityBtn);
+
+    expect(screen.getByRole("heading", { name: "Create Celebration Plan" })).toBeInTheDocument();
+    const communityOption = screen.getByRole("button", { name: /Community Festival/i });
+    expect(communityOption).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByPlaceholderText("e.g. Diwali Community Festival 2026")).toBeInTheDocument();
+
+    // Close dialog
+    fireEvent.click(screen.getByRole("button", { name: /Cancel/i }));
+    await waitFor(() => {
+      expect(screen.queryByRole("heading", { name: "Create Celebration Plan" })).not.toBeInTheDocument();
+    });
+
+    // Test Wedding Archetype Card
+    const startWeddingBtn = screen.getByRole("button", { name: /Start Wedding/i });
+    fireEvent.click(startWeddingBtn);
+
+    expect(screen.getByRole("heading", { name: "Create Celebration Plan" })).toBeInTheDocument();
+    const weddingOption = screen.getByRole("button", { name: /Wedding \/ Vivaha/i });
+    expect(weddingOption).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByPlaceholderText("e.g. Priya & Rohan's Vivaha Celebration")).toBeInTheDocument();
+
+    unmount();
   });
 
   it("opens the sample celebration sandbox workspace when clicking 'Explore Sample Event'", async () => {
