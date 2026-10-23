@@ -98,7 +98,7 @@ export function WorkspaceNavigation({
                   {tab.index}
                 </span>
                 {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-secondary" aria-hidden="true" />
                 )}
               </div>
             </button>

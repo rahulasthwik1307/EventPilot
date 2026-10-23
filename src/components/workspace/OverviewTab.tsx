@@ -24,7 +24,7 @@ import {
   calculateBudgetSummary,
   calculateCategorySummaries,
 } from '../../features/events/budget-engine';
-import { isTaskOverdue } from '../../features/events/timeline-engine';
+import { isTaskOverdue, calculateMilestoneDate } from '../../features/events/timeline-engine';
 import { calculateVendorFinancials } from '../../features/vendors/vendor-engine';
 import { calculateAttendanceSummary } from '../../features/guests/guest-engine';
 import { calculateSeatingSummary } from '../../features/seating/seating-engine';
@@ -102,99 +102,145 @@ export function OverviewTab({
     [tables, assignments, guests]
   );
 
+  // Calculate next upcoming milestone
+  const nextMilestone = useMemo(() => {
+    if (!milestones || milestones.length === 0) return null;
+    const sorted = [...milestones].sort((a, b) => a.offsetDays - b.offsetDays);
+    const withDates = sorted.map((m) => ({
+      ...m,
+      effectiveDate: calculateMilestoneDate(event.date, m.offsetDays),
+    }));
+    const future = withDates.find((m) => m.effectiveDate >= todayStr);
+    return future || withDates[0];
+  }, [milestones, event.date, todayStr]);
+
+  // Deterministic Celebration Readiness Score (0-100%)
+  const readiness = useMemo(() => {
+    const budgetScore =
+      event.budgetCap > 0
+        ? Math.min(Math.round((summary.totalAllocated / event.budgetCap) * 100), 100)
+        : 0;
+    const taskScore = taskMetrics.pct;
+    const rsvpScore =
+      event.guestTarget > 0
+        ? Math.min(Math.round((attendanceSummary.expectedAttendance / event.guestTarget) * 100), 100)
+        : 0;
+    const composite = Math.round((budgetScore * 0.4) + (taskScore * 0.3) + (rsvpScore * 0.3));
+    return {
+      score: Math.max(10, Math.min(composite, 100)),
+      budgetScore,
+      taskScore,
+      rsvpScore,
+    };
+  }, [summary.totalAllocated, event.budgetCap, taskMetrics.pct, attendanceSummary.expectedAttendance, event.guestTarget]);
+
   return (
     <div className="space-y-6 sm:space-y-8">
-      {/* 1. Auspicious Celebration Planning Baseline */}
+      {/* 1. Auspicious Celebration Master Readiness & Countdown */}
       <div className="bg-neutral-surface border border-neutral-border rounded-lg p-6 sm:p-7 shadow-card relative overflow-hidden">
         {/* Subtle decorative almanac accent line */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-primary" />
 
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-          <div className="space-y-2.5 max-w-2xl">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-3 max-w-xl">
             <div className="flex flex-wrap items-center gap-2">
               <CouponBadge variant={event.isSample ? 'terracotta' : 'marigold'}>
                 {event.isSample ? 'SAMPLE CELEBRATION' : 'ACTIVE PERSONAL PLAN'}
               </CouponBadge>
-              <span className="text-xs font-mono uppercase text-neutral-muted">
+              <span className="text-xs font-mono uppercase tracking-wider text-neutral-text/75">
                 {event.type} Archetype
               </span>
             </div>
 
-            <h2 className="font-display text-2xl sm:text-3xl font-semibold text-neutral-text">
-              {event.title}
-            </h2>
-
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-neutral-muted font-sans">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-secondary flex-shrink-0" />
-                <span className="font-medium text-neutral-text">
-                  {formatDateDisplay(event.date)}
-                </span>
-                <span className="font-mono text-neutral-muted">
-                  ({countdownLabel})
-                </span>
-              </div>
-
-              {event.location && (
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-secondary flex-shrink-0" />
-                  <span>{event.location}</span>
-                </div>
-              )}
-
-              <div className="flex items-center gap-1.5 font-mono">
-                <Users className="w-4 h-4 text-secondary flex-shrink-0" />
-                <span>{event.guestTarget} Target Guests</span>
-              </div>
+            <div>
+              <h2 className="font-display text-2xl sm:text-3xl font-semibold text-neutral-text">
+                Celebration Master Readiness
+              </h2>
+              <p className="text-xs sm:text-sm text-neutral-text/80 mt-1 leading-relaxed">
+                Deterministic readiness across budget allocations, ritual milestones, vendor contracts, and guest attendance.
+              </p>
             </div>
 
+            {/* Next Milestone Ticker */}
+            {nextMilestone && (
+              <div className="flex items-center gap-2.5 text-xs bg-neutral-subtle/80 border border-neutral-border/80 px-3.5 py-2.5 rounded-md">
+                <Clock className="w-4 h-4 text-secondary flex-shrink-0" />
+                <div className="min-w-0 truncate">
+                  <span className="font-semibold text-neutral-text">Next Scheduled Milestone: </span>
+                  <span className="text-neutral-text/90 font-medium">{nextMilestone.title}</span>
+                  <span className="text-neutral-text/70 font-mono ml-1.5">
+                    ({formatDateDisplay(nextMilestone.effectiveDate)})
+                  </span>
+                </div>
+              </div>
+            )}
+
             {event.culturalContext?.traditionOrTheme && (
-              <div className="text-xs text-neutral-text/90 bg-neutral-subtle/80 border border-neutral-border/80 p-3 rounded-md mt-2">
+              <div className="text-xs text-neutral-text/85 bg-neutral-surface border border-neutral-border/70 p-2.5 rounded-md">
                 <span className="font-semibold text-neutral-text">Tradition / Theme: </span>
                 {event.culturalContext.traditionOrTheme}
-                {event.culturalContext.notes && (
-                  <p className="mt-1 text-neutral-muted">{event.culturalContext.notes}</p>
-                )}
               </div>
             )}
           </div>
 
-          <div className="flex flex-col items-start md:items-end justify-between gap-4 self-stretch border-t md:border-t-0 md:border-l border-neutral-border/60 pt-4 md:pt-0 md:pl-6">
-            <div className="text-left md:text-right">
-              <span className="text-xs uppercase font-semibold text-neutral-muted tracking-wider">
-                Total Budget Cap
+          {/* Master Readiness Gauge & Composite Pillars */}
+          <div className="lg:w-80 flex-shrink-0 bg-neutral-subtle/40 border border-neutral-border/60 rounded-lg p-5">
+            <div className="flex items-baseline justify-between mb-2">
+              <span className="text-xs font-mono uppercase tracking-wider text-neutral-text/75 font-semibold">
+                Almanac Readiness
               </span>
-              <p className="font-mono text-2xl sm:text-3xl font-bold text-neutral-text">
-                {formatCurrency(event.budgetCap, event.currency)}
-              </p>
-              <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
-                {formatCurrency(summary.costPerGuest, event.currency)} per guest target
+              <span className="font-mono text-2xl font-bold text-neutral-text">
+                {readiness.score}%
               </span>
             </div>
 
-            <button
-              type="button"
-              onClick={onEdit}
-              className="text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 self-start md:self-end transition-transform active:translate-x-0.5"
-            >
-              <span>Edit Celebration Baseline</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
+            <div className="w-full bg-neutral-subtle rounded-full h-2.5 overflow-hidden border border-neutral-border/60 mb-4">
+              <div
+                className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-500 rounded-full"
+                style={{ width: `${readiness.score}%` }}
+              />
+            </div>
+
+            <div className="space-y-2 text-xs font-mono">
+              <div className="flex justify-between text-neutral-text/80">
+                <span>Budget Allocated:</span>
+                <span className="font-bold text-neutral-text">{readiness.budgetScore}%</span>
+              </div>
+              <div className="flex justify-between text-neutral-text/80">
+                <span>Milestone Tasks:</span>
+                <span className="font-bold text-neutral-text">{readiness.taskScore}%</span>
+              </div>
+              <div className="flex justify-between text-neutral-text/80">
+                <span>Guest Target RSVPs:</span>
+                <span className="font-bold text-neutral-text">{readiness.rsvpScore}%</span>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-neutral-border/60 flex items-center justify-between text-xs">
+              <button
+                type="button"
+                onClick={onEdit}
+                className="font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 active:translate-x-0.5 transition-transform"
+              >
+                <span>Edit Celebration Baseline</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Sync & Trust Footer Note */}
-        <div className="border-t border-neutral-border/60 mt-5 pt-3.5 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-muted gap-2">
+        <div className="border-t border-neutral-border/60 mt-5 pt-3.5 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-text/75 gap-2">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-status-success" />
             <span className="font-mono">
-              Persisted in browser localStorage (v1)
+              Local-First Browser Storage (v1)
               {lastSavedAt ? ` · Last synced at ${lastSavedAt}` : ''}
             </span>
           </div>
 
-          <div className="text-neutral-muted/80 text-xs font-mono">
-            Mathematical precision active
+          <div className="text-neutral-text/70 text-xs font-mono">
+            Deterministic mathematical precision
           </div>
         </div>
       </div>

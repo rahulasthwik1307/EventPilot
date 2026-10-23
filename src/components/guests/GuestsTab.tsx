@@ -86,6 +86,45 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
     return map;
   }, [filteredGuests]);
 
+  const [selectedGuestIds, setSelectedGuestIds] = useState<string[]>([]);
+
+  const handleToggleSelectGuest = (id: string) => {
+    setSelectedGuestIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAllFiltered = () => {
+    if (selectedGuestIds.length === filteredGuests.length) {
+      setSelectedGuestIds([]);
+    } else {
+      setSelectedGuestIds(filteredGuests.map((g) => g.id));
+    }
+  };
+
+  const handleBulkUpdateRsvp = (newStatus: RsvpStatus) => {
+    if (selectedGuestIds.length === 0) return;
+    const now = new Date().toISOString();
+    const selectedSet = new Set(selectedGuestIds);
+    const updatedGuests = guests.map((g) =>
+      selectedSet.has(g.id)
+        ? {
+            ...g,
+            rsvpStatus: newStatus,
+            updatedAt: now,
+          }
+        : g
+    );
+
+    onUpdateEvent({
+      ...event,
+      guests: updatedGuests,
+      updatedAt: now,
+    });
+
+    setSelectedGuestIds([]);
+  };
+
   const handleSaveGuest = (guestData: GuestInput) => {
     const now = new Date().toISOString();
 
@@ -502,9 +541,22 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
         </div>
 
         <div className="flex items-center justify-between text-xs text-neutral-muted pt-2 border-t border-neutral-border/40">
-          <span>
-            Showing {filteredGuests.length} of {guests.length} guests
-          </span>
+          <div className="flex items-center gap-3">
+            <span>
+              Showing {filteredGuests.length} of {guests.length} guests
+            </span>
+            {filteredGuests.length > 0 && (
+              <button
+                type="button"
+                onClick={handleSelectAllFiltered}
+                className="text-secondary hover:underline font-semibold font-mono text-xs"
+              >
+                {selectedGuestIds.length === filteredGuests.length
+                  ? 'Deselect All'
+                  : `Select All (${filteredGuests.length})`}
+              </button>
+            )}
+          </div>
           {(searchQuery || rsvpFilter !== 'all' || householdFilter !== 'all' || dietaryFilter !== 'all') && (
             <button
               type="button"
@@ -521,6 +573,54 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
           )}
         </div>
       </div>
+
+      {/* 2.5 Bulk Action Bar when guests are selected */}
+      {selectedGuestIds.length > 0 && (
+        <div className="bg-primary-subtle/80 border border-primary/50 rounded-lg p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm animate-in fade-in-0 duration-150">
+          <div className="flex items-center gap-2 text-xs font-mono font-semibold text-neutral-text">
+            <span className="w-2 h-2 rounded-full bg-primary" />
+            <span>
+              {selectedGuestIds.length} {selectedGuestIds.length === 1 ? 'guest' : 'guests'} selected
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold text-neutral-text mr-1">Bulk RSVP:</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleBulkUpdateRsvp('confirmed')}
+              className="bg-neutral-surface text-status-success border-status-success/30 hover:bg-status-success-subtle text-xs py-1 px-2.5 h-auto"
+            >
+              Mark Confirmed
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleBulkUpdateRsvp('pending')}
+              className="bg-neutral-surface text-status-warning border-status-warning/30 hover:bg-status-warning-subtle text-xs py-1 px-2.5 h-auto"
+            >
+              Mark Pending
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleBulkUpdateRsvp('declined')}
+              className="bg-neutral-surface text-status-danger border-status-danger/30 hover:bg-status-danger-subtle text-xs py-1 px-2.5 h-auto"
+            >
+              Mark Declined
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedGuestIds([])}
+              className="text-xs text-neutral-muted hover:text-neutral-text py-1 px-2 h-auto"
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* 3. Grouped Guest List */}
       {filteredGuests.length === 0 ? (
@@ -673,6 +773,7 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
 
   function renderGuestCard(guest: Guest) {
     const fullName = `${guest.firstName} ${guest.lastName || ''}`.trim();
+    const isSelected = selectedGuestIds.includes(guest.id);
     const dietLabel =
       guest.dietaryPreference && guest.dietaryPreference !== 'none'
         ? DIETARY_PREFERENCES.find((d) => d.id === guest.dietaryPreference)?.label
@@ -681,11 +782,21 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
     return (
       <div
         key={guest.id}
-        className="py-3 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
+        className={`py-3 px-2 rounded-md flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs transition-colors ${
+          isSelected ? 'bg-primary-subtle/40 border border-primary/30' : 'hover:bg-neutral-subtle/40'
+        }`}
       >
-        <div className="space-y-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-semibold text-sm text-neutral-text">{fullName}</span>
+        <div className="flex items-start gap-3 min-w-0">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => handleToggleSelectGuest(guest.id)}
+            aria-label={`Select ${fullName}`}
+            className="w-4 h-4 rounded border-neutral-border text-primary focus:ring-primary cursor-pointer mt-0.5 flex-shrink-0"
+          />
+          <div className="space-y-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-semibold text-sm text-neutral-text">{fullName}</span>
             {guest.relationship && (
               <span className="text-neutral-muted italic font-sans">
                 ({guest.relationship})
@@ -732,8 +843,9 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
             {guest.notes && <span className="italic">&ldquo;{guest.notes}&rdquo;</span>}
           </div>
         </div>
+      </div>
 
-        {/* Quick RSVP toggle buttons & Actions */}
+      {/* Quick RSVP toggle buttons & Actions */}
         <div className="flex items-center gap-2 self-start md:self-center">
           <div className="flex items-center border border-neutral-border rounded overflow-hidden">
             <button

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Event } from '../../features/events/types';
 import { WorkspaceHeader } from './WorkspaceHeader';
 import { SampleBanner } from './SampleBanner';
@@ -13,6 +13,7 @@ import { GuestsTab } from '../guests/GuestsTab';
 import { SeatingTab } from '../seating/SeatingTab';
 import { AiAssistantTab } from '../ai/AiAssistantTab';
 import { EventEditDialog } from '../events/EventEditDialog';
+import { Dialog } from '../ui/Dialog';
 
 export interface WorkspaceShellProps {
   event: Event;
@@ -31,9 +32,50 @@ export function WorkspaceShell({
 }: WorkspaceShellProps) {
   const [activeTab, setActiveTab] = useState<WorkspaceTab>('overview');
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isShortcutsDialogOpen, setIsShortcutsDialogOpen] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<string>(
     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
   );
+
+  // Global Keyboard Shortcuts (Tabs 1-7, '?' for cheatsheet, Esc for dialogs)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if (e.key === '?') {
+        e.preventDefault();
+        setIsShortcutsDialogOpen((prev) => !prev);
+        return;
+      }
+
+      const tabMap: Record<string, WorkspaceTab> = {
+        '1': 'overview',
+        '2': 'budget',
+        '3': 'timeline',
+        '4': 'vendors',
+        '5': 'guests',
+        '6': 'seating',
+        '7': 'ai',
+      };
+
+      if (tabMap[e.key]) {
+        e.preventDefault();
+        setActiveTab(tabMap[e.key]);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleEventUpdated = (updated: Event) => {
     onUpdateEvent(updated);
@@ -139,9 +181,19 @@ export function WorkspaceShell({
               Thoughtful planning · Clear budgets · Your data stays in your browser.
             </p>
           </div>
-          <p className="font-mono tabular-nums text-neutral-text/90">
-            Panchang &amp; Utsav Almanac
-          </p>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsShortcutsDialogOpen(true)}
+              className="text-neutral-text/80 hover:text-secondary underline inline-flex items-center gap-1 font-mono text-xs transition-colors"
+            >
+              Shortcuts: <kbd className="px-1.5 py-0.5 rounded bg-neutral-subtle border border-neutral-border font-bold text-neutral-text text-[11px]">?</kbd>
+            </button>
+            <span className="text-neutral-border-strong">·</span>
+            <p className="font-mono tabular-nums text-neutral-text/90">
+              Panchang &amp; Utsav Almanac
+            </p>
+          </div>
         </div>
       </footer>
 
@@ -152,6 +204,69 @@ export function WorkspaceShell({
         event={event}
         onSuccess={handleEventUpdated}
       />
+
+      {/* Keyboard Shortcuts Cheatsheet Modal */}
+      <Dialog
+        isOpen={isShortcutsDialogOpen}
+        onClose={() => setIsShortcutsDialogOpen(false)}
+        title="Almanac Keyboard Shortcuts"
+        description="Speed up your planning workflow with direct keyboard navigation."
+        maxWidth="md"
+      >
+        <div className="space-y-4 text-xs font-mono">
+          <div className="space-y-2">
+            <h4 className="font-sans font-semibold text-neutral-text text-sm">
+              Tab Navigation
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-neutral-text">
+              <div className="flex items-center justify-between p-2 rounded bg-neutral-subtle/60 border border-neutral-border/60">
+                <span>01 Overview</span>
+                <kbd className="px-2 py-0.5 rounded bg-neutral-surface border border-neutral-border font-bold">1</kbd>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-neutral-subtle/60 border border-neutral-border/60">
+                <span>02 Budget Ledger</span>
+                <kbd className="px-2 py-0.5 rounded bg-neutral-surface border border-neutral-border font-bold">2</kbd>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-neutral-subtle/60 border border-neutral-border/60">
+                <span>03 Timeline &amp; Tasks</span>
+                <kbd className="px-2 py-0.5 rounded bg-neutral-surface border border-neutral-border font-bold">3</kbd>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-neutral-subtle/60 border border-neutral-border/60">
+                <span>04 Vendors</span>
+                <kbd className="px-2 py-0.5 rounded bg-neutral-surface border border-neutral-border font-bold">4</kbd>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-neutral-subtle/60 border border-neutral-border/60">
+                <span>05 Guests &amp; RSVP</span>
+                <kbd className="px-2 py-0.5 rounded bg-neutral-surface border border-neutral-border font-bold">5</kbd>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-neutral-subtle/60 border border-neutral-border/60">
+                <span>06 Seating Planner</span>
+                <kbd className="px-2 py-0.5 rounded bg-neutral-surface border border-neutral-border font-bold">6</kbd>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-neutral-subtle/60 border border-neutral-border/60 sm:col-span-2">
+                <span>07 AI Assistant</span>
+                <kbd className="px-2 py-0.5 rounded bg-neutral-surface border border-neutral-border font-bold">7</kbd>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2 pt-2 border-t border-neutral-border/60">
+            <h4 className="font-sans font-semibold text-neutral-text text-sm">
+              Dialog &amp; Form Controls
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-neutral-text">
+              <div className="flex items-center justify-between p-2 rounded bg-neutral-subtle/60 border border-neutral-border/60">
+                <span>Dismiss modal / dialog</span>
+                <kbd className="px-2 py-0.5 rounded bg-neutral-surface border border-neutral-border font-bold">Esc</kbd>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-neutral-subtle/60 border border-neutral-border/60">
+                <span>Toggle shortcuts help</span>
+                <kbd className="px-2 py-0.5 rounded bg-neutral-surface border border-neutral-border font-bold">?</kbd>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }

@@ -23,7 +23,7 @@ export function CouponBadge({
   return (
     <span
       title={title}
-      className={`inline-flex items-center px-2 py-0.5 rounded-sm font-mono text-xs font-bold tracking-wider uppercase border border-dashed ${variantStyles} ${className}`}
+      className={`inline-flex items-center px-2.5 py-1 rounded-sm font-mono text-xs font-bold tracking-wider uppercase border border-dashed ${variantStyles} ${className}`}
     >
       {children}
     </span>
