@@ -61,7 +61,10 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-neutral-bg text-neutral-text antialiased font-sans">
         {children}
-      </body>
+      {/* impeccable-live-start */}
+<script src="http://localhost:8400/live.js?token=6bb300ea-1aad-49c5-9018-460d97f340c5"></script>
+{/* impeccable-live-end */}
+</body>
     </html>
   );
 }
