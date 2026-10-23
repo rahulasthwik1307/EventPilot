@@ -571,14 +571,17 @@ export function OverviewTab({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+          <div className="bg-neutral-surface border border-neutral-border rounded-xl p-5 shadow-card hover:border-neutral-border-strong hover:shadow-md transition-all flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-8 h-8 rounded-md bg-secondary-subtle flex items-center justify-center text-secondary">
+              <div className="flex items-center justify-between gap-2 mb-3.5">
+                <div className="w-9 h-9 rounded-lg bg-secondary-subtle flex items-center justify-center text-secondary shrink-0 shadow-xs">
                   <Wallet className="w-4 h-4" />
                 </div>
-                <CouponBadge variant="marigold">Budget Active</CouponBadge>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-subtle text-primary-hover border border-primary/25 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  Active
+                </span>
               </div>
               <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
                 Budget &amp; Ledger
@@ -591,21 +594,24 @@ export function OverviewTab({
               <button
                 type="button"
                 onClick={() => onNavigateTab('budget')}
-                className="mt-3 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 self-start"
+                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1.5 self-start group"
               >
                 <span>Open Ledger</span>
-                <ArrowRight className="w-3 h-3" />
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
               </button>
             )}
           </div>
 
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
+          <div className="bg-neutral-surface border border-neutral-border rounded-xl p-5 shadow-card hover:border-neutral-border-strong hover:shadow-md transition-all flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-8 h-8 rounded-md bg-secondary-subtle flex items-center justify-center text-secondary">
+              <div className="flex items-center justify-between gap-2 mb-3.5">
+                <div className="w-9 h-9 rounded-lg bg-secondary-subtle flex items-center justify-center text-secondary shrink-0 shadow-xs">
                   <Clock className="w-4 h-4" />
                 </div>
-                <CouponBadge variant="marigold">Timeline Active</CouponBadge>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-subtle text-primary-hover border border-primary/25 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  Active
+                </span>
               </div>
               <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
                 Celebration Timeline
@@ -618,21 +624,24 @@ export function OverviewTab({
               <button
                 type="button"
                 onClick={() => onNavigateTab('timeline')}
-                className="mt-3 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 self-start"
+                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1.5 self-start group"
               >
                 <span>Open Timeline</span>
-                <ArrowRight className="w-3 h-3" />
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
               </button>
             )}
           </div>
 
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
+          <div className="bg-neutral-surface border border-neutral-border rounded-xl p-5 shadow-card hover:border-neutral-border-strong hover:shadow-md transition-all flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-8 h-8 rounded-md bg-secondary-subtle flex items-center justify-center text-secondary">
+              <div className="flex items-center justify-between gap-2 mb-3.5">
+                <div className="w-9 h-9 rounded-lg bg-secondary-subtle flex items-center justify-center text-secondary shrink-0 shadow-xs">
                   <Briefcase className="w-4 h-4" />
                 </div>
-                <CouponBadge variant="marigold">Vendors Active</CouponBadge>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-subtle text-primary-hover border border-primary/25 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  Active
+                </span>
               </div>
               <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
                 Vendors &amp; Contacts
@@ -645,21 +654,24 @@ export function OverviewTab({
               <button
                 type="button"
                 onClick={() => onNavigateTab('vendors')}
-                className="mt-3 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 self-start"
+                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1.5 self-start group"
               >
                 <span>Open Vendors</span>
-                <ArrowRight className="w-3 h-3" />
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
               </button>
             )}
           </div>
 
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
+          <div className="bg-neutral-surface border border-neutral-border rounded-xl p-5 shadow-card hover:border-neutral-border-strong hover:shadow-md transition-all flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-8 h-8 rounded-md bg-secondary-subtle flex items-center justify-center text-secondary">
+              <div className="flex items-center justify-between gap-2 mb-3.5">
+                <div className="w-9 h-9 rounded-lg bg-secondary-subtle flex items-center justify-center text-secondary shrink-0 shadow-xs">
                   <Users className="w-4 h-4" />
                 </div>
-                <CouponBadge variant="marigold">Guests Active</CouponBadge>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-subtle text-primary-hover border border-primary/25 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  Active
+                </span>
               </div>
               <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
                 Guests &amp; Seating
@@ -672,21 +684,24 @@ export function OverviewTab({
               <button
                 type="button"
                 onClick={() => onNavigateTab('guests')}
-                className="mt-3 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 self-start"
+                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1.5 self-start group"
               >
                 <span>Open Guests</span>
-                <ArrowRight className="w-3 h-3" />
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
               </button>
             )}
           </div>
 
-          <div className="bg-neutral-surface border border-primary/40 rounded-lg p-5 shadow-card hover:border-primary transition-all flex flex-col justify-between ring-1 ring-primary/20">
+          <div className="bg-neutral-surface border border-primary/40 rounded-xl p-5 shadow-card hover:border-primary hover:shadow-md transition-all flex flex-col justify-between ring-1 ring-primary/20">
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-8 h-8 rounded-md bg-primary-subtle flex items-center justify-center text-primary">
+              <div className="flex items-center justify-between gap-2 mb-3.5">
+                <div className="w-9 h-9 rounded-lg bg-primary-subtle flex items-center justify-center text-primary shrink-0 shadow-xs">
                   <Sparkles className="w-4 h-4" />
                 </div>
-                <CouponBadge variant="marigold">AI Powered</CouponBadge>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-subtle text-primary-hover border border-primary/30 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  AI Ready
+                </span>
               </div>
               <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
                 AI Planning Assistant
@@ -699,10 +714,10 @@ export function OverviewTab({
               <button
                 type="button"
                 onClick={() => onNavigateTab('ai')}
-                className="mt-3 text-xs font-semibold text-primary-hover hover:underline flex items-center gap-1 self-start"
+                className="mt-4 text-xs font-semibold text-primary-hover hover:underline flex items-center gap-1.5 self-start group"
               >
                 <span>Open Assistant</span>
-                <ArrowRight className="w-3 h-3" />
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
               </button>
             )}
           </div>
