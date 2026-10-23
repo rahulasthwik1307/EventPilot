@@ -265,75 +265,87 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
         </div>
 
         {/* 6 Attendance Metrics Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
-              Named Guests
-            </span>
-            <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text">
-              {summary.totalNamedGuests}
-            </p>
-            <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 items-stretch">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+            <div>
+              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+                Named Guests
+              </span>
+              <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text">
+                {summary.totalNamedGuests}
+              </p>
+            </div>
+            <span className="text-xs text-neutral-muted font-mono mt-1.5 block">
               Registered records
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
-              Confirmed Guests
-            </span>
-            <p className="font-mono text-xl sm:text-2xl font-bold text-status-success">
-              {summary.confirmedCount}
-            </p>
-            <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+            <div>
+              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+                Confirmed Guests
+              </span>
+              <p className="font-mono text-xl sm:text-2xl font-bold text-status-success">
+                {summary.confirmedCount}
+              </p>
+            </div>
+            <span className="text-xs text-neutral-muted font-mono mt-1.5 block">
               Named attendees
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
-              Expected +1s
-            </span>
-            <p className="font-mono text-xl sm:text-2xl font-bold text-primary">
-              {summary.expectedPlusOnes}
-            </p>
-            <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+            <div>
+              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+                Expected +1s
+              </span>
+              <p className="font-mono text-xl sm:text-2xl font-bold text-primary">
+                {summary.expectedPlusOnes}
+              </p>
+            </div>
+            <span className="text-xs text-neutral-muted font-mono mt-1.5 block">
               Attending partners
             </span>
           </div>
 
-          <div className="bg-primary-subtle/50 border border-primary/30 p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-            <span className="text-xs uppercase font-semibold text-primary block mb-1">
-              Expected Attendance
-            </span>
-            <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text">
-              {summary.expectedAttendance}
-            </p>
-            <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
+          <div className="bg-primary-subtle/50 border border-primary/30 p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+            <div>
+              <span className="text-xs uppercase font-semibold text-primary mb-1.5 h-8 flex items-start leading-4">
+                Expected Attendance
+              </span>
+              <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text">
+                {summary.expectedAttendance}
+              </p>
+            </div>
+            <span className="text-xs text-neutral-muted font-mono mt-1.5 block">
               Total seats needed
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
-              Pending RSVPs
-            </span>
-            <p className="font-mono text-xl sm:text-2xl font-bold text-status-warning">
-              {summary.pendingCount}
-            </p>
-            <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+            <div>
+              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+                Pending RSVPs
+              </span>
+              <p className="font-mono text-xl sm:text-2xl font-bold text-status-warning">
+                {summary.pendingCount}
+              </p>
+            </div>
+            <span className="text-xs text-neutral-muted font-mono mt-1.5 block">
               Awaiting reply
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
-              Declined
-            </span>
-            <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-muted">
-              {summary.declinedCount}
-            </p>
-            <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+            <div>
+              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+                Declined
+              </span>
+              <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-muted">
+                {summary.declinedCount}
+              </p>
+            </div>
+            <span className="text-xs text-neutral-muted font-mono mt-1.5 block">
               Not attending
             </span>
           </div>

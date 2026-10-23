@@ -263,79 +263,91 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
       )}
 
       {/* 3. Authoritative Financial Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
-            Budget Cap
-          </p>
-          <p className="font-mono text-lg sm:text-xl font-bold text-neutral-text">
-            {formatCurrency(summary.budgetCap, event.currency)}
-          </p>
-          <p className="text-xs text-neutral-muted mt-1 font-mono">
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4 items-stretch">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-3.5 sm:p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+              Budget Cap
+            </p>
+            <p className="font-mono text-lg sm:text-xl font-bold text-neutral-text">
+              {formatCurrency(summary.budgetCap, event.currency)}
+            </p>
+          </div>
+          <p className="text-xs text-neutral-muted mt-2 font-mono">
             Locked ceiling
           </p>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
-            Total Allocated
-          </p>
-          <p className="font-mono text-lg sm:text-xl font-bold text-neutral-text">
-            {formatCurrency(summary.totalAllocated, event.currency)}
-          </p>
-          <p className="text-xs text-neutral-muted mt-1 font-mono">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-3.5 sm:p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+              Total Allocated
+            </p>
+            <p className="font-mono text-lg sm:text-xl font-bold text-neutral-text">
+              {formatCurrency(summary.totalAllocated, event.currency)}
+            </p>
+          </div>
+          <p className="text-xs text-neutral-muted mt-2 font-mono">
             {categories.length} {categories.length === 1 ? 'category' : 'categories'}
           </p>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
-            Estimated Cost
-          </p>
-          <p className="font-mono text-lg sm:text-xl font-bold text-neutral-text">
-            {formatCurrency(summary.totalEstimated, event.currency)}
-          </p>
-          <p className="text-xs text-neutral-muted mt-1 font-mono">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-3.5 sm:p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+              Estimated Cost
+            </p>
+            <p className="font-mono text-lg sm:text-xl font-bold text-neutral-text">
+              {formatCurrency(summary.totalEstimated, event.currency)}
+            </p>
+          </div>
+          <p className="text-xs text-neutral-muted mt-2 font-mono">
             {expenses.length} {expenses.length === 1 ? 'item' : 'items'}
           </p>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
-            Actual Spent
-          </p>
-          <p className="font-mono text-lg sm:text-xl font-bold text-neutral-text">
-            {formatCurrency(summary.totalActual, event.currency)}
-          </p>
-          <p className="text-xs text-neutral-muted mt-1 font-mono">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-3.5 sm:p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+              Actual Spent
+            </p>
+            <p className="font-mono text-lg sm:text-xl font-bold text-neutral-text">
+              {formatCurrency(summary.totalActual, event.currency)}
+            </p>
+          </div>
+          <p className="text-xs text-neutral-muted mt-2 font-mono">
             Confirmed payments
           </p>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
-            Unallocated Pool
-          </p>
-          <p
-            className={`font-mono text-lg sm:text-xl font-bold ${
-              summary.unallocatedBudget < 0 ? 'text-status-danger' : 'text-neutral-text'
-            }`}
-          >
-            {formatCurrency(summary.unallocatedBudget, event.currency)}
-          </p>
-          <p className="text-xs text-neutral-muted mt-1 font-mono">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-3.5 sm:p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+              Unallocated Pool
+            </p>
+            <p
+              className={`font-mono text-lg sm:text-xl font-bold ${
+                summary.unallocatedBudget < 0 ? 'text-status-danger' : 'text-neutral-text'
+              }`}
+            >
+              {formatCurrency(summary.unallocatedBudget, event.currency)}
+            </p>
+          </div>
+          <p className="text-xs text-neutral-muted mt-2 font-mono">
             {summary.unallocatedBudget >= 0 ? 'Safety reserve' : 'Over allocated'}
           </p>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
-            Cost Per Guest
-          </p>
-          <p className="font-mono text-lg sm:text-xl font-bold text-neutral-text">
-            {formatCurrency(summary.costPerGuest, event.currency)}
-          </p>
-          <p className="text-xs text-neutral-muted mt-1 font-mono">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-3.5 sm:p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+              Cost Per Guest
+            </p>
+            <p className="font-mono text-lg sm:text-xl font-bold text-neutral-text">
+              {formatCurrency(summary.costPerGuest, event.currency)}
+            </p>
+          </div>
+          <p className="text-xs text-neutral-muted mt-2 font-mono">
             For {event.guestTarget} guests
           </p>
         </div>

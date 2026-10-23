@@ -169,51 +169,59 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
         </div>
 
         {/* 4 Financial Metric Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
-              Total Quotes Received
-            </span>
-            <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text">
-              {formatCurrency(financials.totalQuoted, event.currency)}
-            </p>
-            <span className="text-xs text-neutral-muted font-mono mt-1 block">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+            <div>
+              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+                Total Quotes Received
+              </span>
+              <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text">
+                {formatCurrency(financials.totalQuoted, event.currency)}
+              </p>
+            </div>
+            <span className="text-xs text-neutral-muted font-mono mt-2 block">
               {financials.vendorCount} tracked vendors
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
-              Agreed Commitments
-            </span>
-            <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text">
-              {formatCurrency(financials.totalAgreed, event.currency)}
-            </p>
-            <span className="text-xs text-status-success font-mono mt-1 block">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+            <div>
+              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+                Agreed Commitments
+              </span>
+              <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text">
+                {formatCurrency(financials.totalAgreed, event.currency)}
+              </p>
+            </div>
+            <span className="text-xs text-status-success font-mono mt-2 block">
               {financials.bookedCount} booked / contracted
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
-              Total Paid to Date
-            </span>
-            <p className="font-mono text-xl sm:text-2xl font-bold text-status-success">
-              {formatCurrency(financials.totalPaid, event.currency)}
-            </p>
-            <span className="text-xs text-neutral-muted font-mono mt-1 block">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+            <div>
+              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+                Total Paid to Date
+              </span>
+              <p className="font-mono text-xl sm:text-2xl font-bold text-status-success">
+                {formatCurrency(financials.totalPaid, event.currency)}
+              </p>
+            </div>
+            <span className="text-xs text-neutral-muted font-mono mt-2 block">
               Includes all recorded advances
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
-              Outstanding Balances
-            </span>
-            <p className="font-mono text-xl sm:text-2xl font-bold text-secondary">
-              {formatCurrency(financials.totalRemaining, event.currency)}
-            </p>
-            <span className="text-xs text-neutral-muted font-mono mt-1 block">
+          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+            <div>
+              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+                Outstanding Balances
+              </span>
+              <p className="font-mono text-xl sm:text-2xl font-bold text-secondary">
+                {formatCurrency(financials.totalRemaining, event.currency)}
+              </p>
+            </div>
+            <span className="text-xs text-neutral-muted font-mono mt-2 block">
               Remaining under agreed contracts
             </span>
           </div>

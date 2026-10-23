@@ -379,55 +379,63 @@ export function OverviewTab({
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all">
-            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
-              Budget Cap
-            </p>
-            <p className="font-mono text-xl font-bold text-neutral-text">
-              {formatCurrency(summary.budgetCap, event.currency)}
-            </p>
-            <p className="text-xs text-neutral-muted mt-1 font-mono">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
+          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+                Budget Cap
+              </p>
+              <p className="font-mono text-xl font-bold text-neutral-text">
+                {formatCurrency(summary.budgetCap, event.currency)}
+              </p>
+            </div>
+            <p className="text-xs text-neutral-muted mt-2 font-mono">
               Authoritative ceiling
             </p>
           </div>
 
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all">
-            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
-              Allocated Planned
-            </p>
-            <p className="font-mono text-xl font-bold text-neutral-text">
-              {formatCurrency(summary.totalAllocated, event.currency)}
-            </p>
-            <p className="text-xs text-neutral-muted mt-1 font-mono">
+          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+                Allocated Planned
+              </p>
+              <p className="font-mono text-xl font-bold text-neutral-text">
+                {formatCurrency(summary.totalAllocated, event.currency)}
+              </p>
+            </div>
+            <p className="text-xs text-neutral-muted mt-2 font-mono">
               {categories.length} {categories.length === 1 ? 'category' : 'categories'} defined
             </p>
           </div>
 
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all">
-            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
-              Recorded Actuals
-            </p>
-            <p className="font-mono text-xl font-bold text-neutral-text">
-              {formatCurrency(summary.totalActual, event.currency)}
-            </p>
-            <p className="text-xs text-neutral-muted mt-1 font-mono">
+          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+                Recorded Actuals
+              </p>
+              <p className="font-mono text-xl font-bold text-neutral-text">
+                {formatCurrency(summary.totalActual, event.currency)}
+              </p>
+            </div>
+            <p className="text-xs text-neutral-muted mt-2 font-mono">
               {expenses.length} expense items recorded
             </p>
           </div>
 
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all">
-            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
-              Unallocated Reserve
-            </p>
-            <p
-              className={`font-mono text-xl font-bold ${
-                summary.unallocatedBudget < 0 ? 'text-status-danger' : 'text-neutral-text'
-              }`}
-            >
-              {formatCurrency(summary.unallocatedBudget, event.currency)}
-            </p>
-            <p className="text-xs text-neutral-muted mt-1 font-mono">
+          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+                Unallocated Reserve
+              </p>
+              <p
+                className={`font-mono text-xl font-bold ${
+                  summary.unallocatedBudget < 0 ? 'text-status-danger' : 'text-neutral-text'
+                }`}
+              >
+                {formatCurrency(summary.unallocatedBudget, event.currency)}
+              </p>
+            </div>
+            <p className="text-xs text-neutral-muted mt-2 font-mono">
               {summary.unallocatedBudget >= 0 ? 'Safety buffer' : 'Over allocated'}
             </p>
           </div>

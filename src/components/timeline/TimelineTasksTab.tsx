@@ -268,59 +268,69 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
       </div>
 
       {/* 2. Metrics & Progress Banner */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
-            Overall Progress
-          </p>
-          <p className="font-mono text-xl font-bold text-neutral-text">
-            {metrics.completed} / {metrics.total}
-          </p>
-          <div className="w-full h-1.5 bg-neutral-border/40 rounded-full overflow-hidden mt-2">
-            <div
-              className="h-full bg-primary rounded-full transition-all"
-              style={{ width: `${metrics.pct}%` }}
-            />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 items-stretch">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+              Overall Progress
+            </p>
+            <p className="font-mono text-xl font-bold text-neutral-text">
+              {metrics.completed} / {metrics.total}
+            </p>
           </div>
-          <p className="text-xs text-neutral-muted mt-1 font-mono">{metrics.pct}% complete</p>
+          <div>
+            <div className="w-full h-1.5 bg-neutral-border/40 rounded-full overflow-hidden mt-2">
+              <div
+                className="h-full bg-primary rounded-full transition-all"
+                style={{ width: `${metrics.pct}%` }}
+              />
+            </div>
+            <p className="text-xs text-neutral-muted mt-1 font-mono">{metrics.pct}% complete</p>
+          </div>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
-            Pending Tasks
-          </p>
-          <p className="font-mono text-xl font-bold text-neutral-text">
-            {metrics.pending}
-          </p>
-          <p className="text-xs text-neutral-muted mt-1 font-mono">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+              Pending Tasks
+            </p>
+            <p className="font-mono text-xl font-bold text-neutral-text">
+              {metrics.pending}
+            </p>
+          </div>
+          <p className="text-xs text-neutral-muted mt-2 font-mono">
             Awaiting action
           </p>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
-            Overdue Tasks
-          </p>
-          <p
-            className={`font-mono text-xl font-bold ${
-              metrics.overdue > 0 ? 'text-status-danger' : 'text-neutral-text'
-            }`}
-          >
-            {metrics.overdue}
-          </p>
-          <p className="text-xs text-neutral-muted mt-1 font-mono">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+              Overdue Tasks
+            </p>
+            <p
+              className={`font-mono text-xl font-bold ${
+                metrics.overdue > 0 ? 'text-status-danger' : 'text-neutral-text'
+              }`}
+            >
+              {metrics.overdue}
+            </p>
+          </div>
+          <p className="text-xs text-neutral-muted mt-2 font-mono">
             {metrics.overdue > 0 ? 'Requires attention' : 'On schedule'}
           </p>
         </div>
 
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1">
-            Celebration Date
-          </p>
-          <p className="font-mono text-xl font-bold text-neutral-text truncate">
-            {event.date}
-          </p>
-          <p className="text-xs text-neutral-muted mt-1 font-mono">
+        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+              Celebration Date
+            </p>
+            <p className="font-mono text-xl font-bold text-neutral-text truncate">
+              {event.date}
+            </p>
+          </div>
+          <p className="text-xs text-neutral-muted mt-2 font-mono">
             {calculateDaysRemaining(event.date) >= 0
               ? `${calculateDaysRemaining(event.date)} days away`
               : `${Math.abs(calculateDaysRemaining(event.date))} days ago`}
