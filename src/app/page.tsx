@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { Event, EventType } from '../features/events/types';
 import { eventStorage } from '../features/events/storage';
-import { WelcomeVariantHarness } from '../components/welcome/variants/WelcomeVariantHarness';
+import { EditorialNocturneHero } from '../components/welcome/EditorialNocturneHero';
+import { SavedEventsList } from '../components/welcome/SavedEventsList';
 import { EventCreateDialog } from '../components/events/EventCreateDialog';
 import { WorkspaceShell } from '../components/workspace/WorkspaceShell';
 import { CouponBadge } from '../components/ui/Badge';
@@ -178,17 +179,22 @@ export default function HomePage() {
 
         {/* Main Welcome Content */}
         <main className="max-w-6xl mx-auto w-full px-6 sm:px-8 md:px-12">
-          <WelcomeVariantHarness
+          <EditorialNocturneHero
             onOpenSample={handleOpenSample}
             onCreateEvent={() => {
               setInitialCreateType('wedding');
               setIsCreateDialogOpen(true);
             }}
             onSelectType={handleSelectEventType}
-            personalEvents={personalEvents}
-            onSelectSavedEvent={handleSelectSavedEvent}
-            onDeleteEvent={handleDeleteEvent}
           />
+
+          {mounted && (
+            <SavedEventsList
+              events={personalEvents}
+              onSelectEvent={handleSelectSavedEvent}
+              onDeleteEvent={handleDeleteEvent}
+            />
+          )}
         </main>
       </div>
 
