@@ -7,7 +7,6 @@ import { EditorialNocturneHero } from '../components/welcome/EditorialNocturneHe
 import { SavedEventsList } from '../components/welcome/SavedEventsList';
 import { EventCreateDialog } from '../components/events/EventCreateDialog';
 import { WorkspaceShell } from '../components/workspace/WorkspaceShell';
-import { CouponBadge } from '../components/ui/Badge';
 import { AlertCircle, Sparkles } from 'lucide-react';
 
 export default function HomePage() {
@@ -130,21 +129,23 @@ export default function HomePage() {
     <div className="min-h-screen bg-neutral-bg flex flex-col justify-between">
       <div>
         {/* Top Studio Bar */}
-        <header className="border-b border-neutral-border bg-neutral-surface/80 py-4 px-4 sm:px-8">
+        <header className="bg-neutral-surface py-5 px-4 sm:px-8">
           <div className="max-w-6xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="font-display text-xl sm:text-2xl font-bold text-neutral-text tracking-tight">
+              <span className="font-display text-2xl font-bold text-neutral-text">
                 Event Pilot
               </span>
-              <CouponBadge variant="terracotta">Almanac Studio</CouponBadge>
+              <span className="text-sm font-bold bg-primary-subtle text-secondary px-3 py-1 rounded-md">
+                Almanac Studio
+              </span>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <div className="hidden sm:block text-right">
-                <p className="text-xs uppercase font-semibold text-neutral-muted tracking-wider">
+                <p className="text-sm font-medium text-neutral-muted">
                   Design System
                 </p>
-                <p className="text-xs font-medium text-neutral-text">
+                <p className="text-sm font-semibold text-neutral-text">
                   Panchang &amp; Utsav Almanac
                 </p>
               </div>
@@ -155,9 +156,9 @@ export default function HomePage() {
                   setInitialCreateType('wedding');
                   setIsCreateDialogOpen(true);
                 }}
-                className="inline-flex items-center gap-1.5 bg-primary hover:bg-primary-hover text-neutral-text hover:text-white font-semibold text-xs px-3.5 py-2 rounded-md transition-all shadow-xs"
+                className="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-neutral-text font-bold text-sm px-4 py-2.5 rounded-md transition-all active:translate-y-0.5"
               >
-                <Sparkles className="w-3.5 h-3.5 text-neutral-text" />
+                <Sparkles className="w-4 h-4 text-neutral-text" />
                 <span>New Event</span>
               </button>
             </div>
@@ -169,7 +170,7 @@ export default function HomePage() {
           <div className="max-w-6xl mx-auto px-4 sm:px-8 pt-4">
             <div
               role="alert"
-              className="flex items-center gap-2 bg-status-danger-subtle text-status-danger border border-status-danger/30 p-3 rounded-md text-xs"
+              className="flex items-center gap-2 bg-status-danger-subtle text-status-danger p-4 rounded-lg text-sm"
             >
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{storageError}</span>
@@ -178,7 +179,7 @@ export default function HomePage() {
         )}
 
         {/* Main Welcome Content */}
-        <main className="max-w-6xl mx-auto w-full px-6 sm:px-8 md:px-12">
+        <main className="max-w-6xl mx-auto w-full px-4 sm:px-8">
           <EditorialNocturneHero
             onOpenSample={handleOpenSample}
             onCreateEvent={() => {
@@ -199,18 +200,18 @@ export default function HomePage() {
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-neutral-border py-8 px-4 sm:px-8 mt-16 bg-neutral-surface/60">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-muted gap-3">
-          <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-center sm:text-left">
-            <p className="font-medium text-neutral-text">
+      <footer className="py-12 px-4 sm:px-8 mt-24 bg-neutral-surface">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-sm text-neutral-muted gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
+            <p className="font-semibold text-neutral-text">
               Event Pilot · Your celebration, thoughtfully planned.
             </p>
-            <span className="hidden sm:inline text-neutral-border-strong">·</span>
+            <span className="hidden sm:inline text-neutral-muted">·</span>
             <p>
               Thoughtful planning · Clear budgets · Your data stays in your browser.
             </p>
           </div>
-          <p className="font-mono tabular-nums text-neutral-text/90">
+          <p className="font-semibold text-secondary">
             Panchang &amp; Utsav Almanac
           </p>
         </div>

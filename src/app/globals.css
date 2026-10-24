@@ -72,30 +72,29 @@ body {
 
 /* Almanac Stationer & Micro-Interaction Utility Styles */
 .almanac-divider {
-  background: linear-gradient(90deg, transparent, #E7DFD5 20%, #E7DFD5 80%, transparent);
-  height: 1px;
+  background-color: #E7DFD5;
+  height: 2px;
 }
 
 .almanac-double-border {
-  border-top: 1px solid #E7DFD5;
-  border-bottom: 1px solid #E7DFD5;
-  box-shadow: 0 1px 0 0 #FFFFFF;
+  border-top: 2px solid #E7DFD5;
+  border-bottom: 2px solid #E7DFD5;
 }
 
 /* Tab animations and transition layers */
 @keyframes tabEnter {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
-    transform: none;
+    transform: translateY(0);
   }
 }
 
 .animate-tab-enter {
-  animation: tabEnter 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: tabEnter 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes pulseGently {
@@ -103,12 +102,55 @@ body {
     opacity: 1;
   }
   50% {
-    opacity: 0.7;
+    opacity: 0.75;
   }
 }
 
 .animate-pulse-gently {
   animation: pulseGently 3s ease-in-out infinite;
+}
+
+@keyframes floatSoft {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-float-soft {
+  animation: floatSoft 4s ease-in-out infinite;
+}
+
+@keyframes fadeInRise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-rise {
+  animation: fadeInRise 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes enterUp {
+  from {
+    opacity: 0.99;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.motion-enter {
+  animation: enterUp 350ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Respect user's reduced motion preferences */

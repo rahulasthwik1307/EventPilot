@@ -1,0 +1,1784 @@
+{
+ "url": "http://localhost:3000",
+ "at": "2026-10-24T12:10:50.757Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 6,
+   "filled": [
+    0.43,
+    0.7,
+    0.61,
+    0.61,
+    0.6,
+    0.58
+   ],
+   "motion": {
+    "elements": 29,
+    "css": 28,
+    "transitions": 0,
+    "scripted": 1,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 4936,
+     "screens": 5.5,
+     "words": 543,
+     "img": 6,
+     "video": 0,
+     "canvas": 0,
+     "svg": 20,
+     "sections": 6,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 6,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "hero_celebration.jpg",
+      "wedding_vivaha.jpg",
+      "wedding_vivaha.jpg",
+      "birthday_jubilee.jpg",
+      "community_mela.jpg",
+      "planner_atelier.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Every Milestone Celebration, Art-Directed & Audited",
+     "words": 6,
+     "chars": 51,
+     "lines": 2,
+     "size": 68,
+     "vw": 4.7,
+     "font": "Eczar",
+     "weight": 700,
+     "tracking": -0.025,
+     "leading": 1.18,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "center",
+     "position": "center",
+     "widthRatio": 0.76,
+     "top": 144,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Every Milestone Celebration, Art-Directed & Audited",
+     "words": 6,
+     "lines": 2,
+     "size": 68,
+     "font": "Eczar"
+    },
+    "headings": [
+     {
+      "text": "Every Milestone Celebration, Art-Directed & Audited",
+      "words": 6,
+      "chars": 51,
+      "lines": 2,
+      "size": 68,
+      "vw": 4.7,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": -0.025,
+      "leading": 1.18,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.76,
+      "top": 144,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Interactive Celebration Folios",
+      "words": 3,
+      "chars": 30,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.4,
+      "top": 1488,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Vivaha & Weddings",
+      "words": 3,
+      "chars": 17,
+      "lines": 1,
+      "size": 30,
+      "vw": 2.1,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.32,
+      "top": 1668,
+      "tag": "div",
+      "kind": "heading"
+     },
+     {
+      "text": "Interactive Banquet Seating Matrix",
+      "words": 4,
+      "chars": 34,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.53,
+      "top": 2196,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Three Grounded Planning Templates",
+      "words": 4,
+      "chars": 33,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.44,
+      "top": 2784,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Private Atelier Storage Sovereignty",
+      "words": 4,
+      "chars": 35,
+      "lines": 2,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.34,
+      "top": 3700,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Begin Your Celebration Almanac",
+      "words": 4,
+      "chars": 30,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.69,
+      "top": 4408,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 7,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 3,
+     "medianWords": 4,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Plus Jakarta Sans",
+       "share": 0.91,
+       "mono": false
+      },
+      {
+       "family": "Eczar",
+       "share": 0.09,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      14,
+      16,
+      18,
+      20,
+      24,
+      30,
+      36,
+      68
+     ],
+     "sizeCount": 8,
+     "notLoaded": [],
+     "body": {
+      "font": "Plus Jakarta Sans",
+      "size": 16,
+      "leading": 1.5,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 17.5
+     },
+     "measureChars": 85,
+     "max": {
+      "size": 68,
+      "vw": 4.7,
+      "font": "Eczar",
+      "text": "Every Milestone Celebration, Art-Directe"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.41,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#fdfbf7",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.6,
+      "l": 0.98
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#fdfbf7",
+       "top": 0,
+       "hsl": {
+        "h": 40,
+        "s": 0.6,
+        "l": 0.98
+       }
+      },
+      {
+       "color": "#ffffff",
+       "top": 672,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      },
+      {
+       "color": "#f5efeb",
+       "top": 1448,
+       "hsl": {
+        "h": 24,
+        "s": 0.33,
+        "l": 0.94
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#1c1917",
+       "share": 0.82
+      },
+      {
+       "color": "#c2410c",
+       "share": 0.09
+      },
+      {
+       "color": "#e7dfd5",
+       "share": 0.04
+      },
+      {
+       "color": "#78716c",
+       "share": 0.02
+      },
+      {
+       "color": "#065f46",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#d97706",
+      "hsl": {
+       "h": 32,
+       "s": 0.95,
+       "l": 0.44
+      },
+      "fg": "#1c1917"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 17,
+     "inHero": 3,
+     "radius": 8,
+     "height": 44,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "New Event",
+      "Create New Celebration",
+      "Explore Sample Event"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 15,
+     "boxRadius": 16,
+     "squareMedia": 0,
+     "roundedMedia": 6,
+     "mediaRadius": 12,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 1448
+      },
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 2908
+      }
+     ]
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.19
+     }
+    ],
+    "nav": {
+     "links": 0,
+     "fixed": false,
+     "height": 80,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "plus jakarta sans",
+     "plus jakarta sans fallback",
+     "eczar",
+     "eczar fallback"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 4936,
+    "margins": {
+     "left": 176,
+     "right": 176
+    },
+    "sections": [
+     {
+      "sel": "section.space-y-12",
+      "tag": "section",
+      "top": 144,
+      "height": 1208,
+      "words": 94,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Art-Directed & Audited",
+       "size": 68,
+       "tag": "h1"
+      },
+      "left": 176,
+      "right": 176,
+      "textLeft": 224,
+      "textRight": 268,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.space-y-8.bg-neutral-subtle",
+      "tag": "section",
+      "top": 1448,
+      "height": 652,
+      "words": 73,
+      "media": 1,
+      "middle": 19,
+      "heading": {
+       "text": "Interactive Celebration Folios",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 216,
+      "right": 222,
+      "textLeft": 216,
+      "textRight": 238,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.space-y-8",
+      "tag": "section",
+      "top": 2196,
+      "height": 492,
+      "words": 88,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 208,
+      "right": 237,
+      "textLeft": 224,
+      "textRight": 237,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.space-y-8",
+      "tag": "section",
+      "top": 2784,
+      "height": 780,
+      "words": 150,
+      "media": 3,
+      "middle": 32,
+      "heading": {
+       "text": "Vivaha & Weddings",
+       "size": 20,
+       "tag": "h3"
+      },
+      "left": 176,
+      "right": 176,
+      "textLeft": 176,
+      "textRight": 176,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.bg-neutral-surface.rounded-2xl",
+      "tag": "section",
+      "top": 3660,
+      "height": 604,
+      "words": 95,
+      "media": 1,
+      "middle": 34,
+      "heading": {
+       "text": "Private Atelier Storage Sovereignty",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 216,
+      "right": 216,
+      "textLeft": 216,
+      "textRight": 738,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.bg-neutral-text.text-neutral-bg",
+      "tag": "section",
+      "top": 4360,
+      "height": 300,
+      "words": 37,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Begin Your Celebration Almanac",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 392,
+      "right": 392,
+      "textLeft": 392,
+      "textRight": 392,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Every Milestone Celebration, Art-Directed & Audited",
+      "size": 68,
+      "top": 144,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 216,
+      "n": 5
+     },
+     {
+      "x": 248,
+      "n": 3
+     },
+     {
+      "x": 176,
+      "n": 2
+     },
+     {
+      "x": 200,
+      "n": 2
+     },
+     {
+      "x": 573,
+      "n": 2
+     },
+     {
+      "x": 947,
+      "n": 2
+     },
+     {
+      "x": 736,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 17,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0.1,
+    "voidBox": {
+     "x": 0,
+     "y": 120,
+     "w": 240,
+     "h": 540
+    }
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 6,
+   "filled": [
+    0.57,
+    0.85,
+    0.67,
+    0.77,
+    0.73,
+    0.68
+   ],
+   "motion": {
+    "elements": 29,
+    "css": 28,
+    "transitions": 0,
+    "scripted": 1,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 5795,
+     "screens": 5.7,
+     "words": 543,
+     "img": 6,
+     "video": 0,
+     "canvas": 0,
+     "svg": 20,
+     "sections": 6,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 6,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "hero_celebration.jpg",
+      "wedding_vivaha.jpg",
+      "wedding_vivaha.jpg",
+      "birthday_jubilee.jpg",
+      "community_mela.jpg",
+      "planner_atelier.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Every Milestone Celebration, Art-Directed & Audited",
+     "words": 6,
+     "chars": 51,
+     "lines": 2,
+     "size": 36,
+     "vw": 4.7,
+     "font": "Eczar",
+     "weight": 700,
+     "tracking": -0.025,
+     "leading": 1.2,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "center",
+     "position": "center",
+     "widthRatio": 0.92,
+     "top": 144,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Every Milestone Celebration, Art-Directed & Audited",
+     "words": 6,
+     "lines": 2,
+     "size": 36,
+     "font": "Eczar"
+    },
+    "headings": [
+     {
+      "text": "Every Milestone Celebration, Art-Directed & Audited",
+      "words": 6,
+      "chars": 51,
+      "lines": 2,
+      "size": 36,
+      "vw": 4.7,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": -0.025,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 144,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Interactive Celebration Folios",
+      "words": 3,
+      "chars": 30,
+      "lines": 2,
+      "size": 36,
+      "vw": 4.7,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.48,
+      "top": 1334,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Vivaha & Weddings",
+      "words": 3,
+      "chars": 17,
+      "lines": 1,
+      "size": 30,
+      "vw": 3.9,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.73,
+      "top": 1970,
+      "tag": "div",
+      "kind": "heading"
+     },
+     {
+      "text": "Interactive Banquet Seating Matrix",
+      "words": 4,
+      "chars": 34,
+      "lines": 1,
+      "size": 36,
+      "vw": 4.7,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 2448,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Three Grounded Planning Templates",
+      "words": 4,
+      "chars": 33,
+      "lines": 2,
+      "size": 36,
+      "vw": 4.7,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.64,
+      "top": 3120,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Private Atelier Storage Sovereignty",
+      "words": 4,
+      "chars": 35,
+      "lines": 1,
+      "size": 36,
+      "vw": 4.7,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.81,
+      "top": 4244,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Begin Your Celebration Almanac",
+      "words": 4,
+      "chars": 30,
+      "lines": 1,
+      "size": 36,
+      "vw": 4.7,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 5219,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 7,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 3,
+     "medianWords": 4,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Plus Jakarta Sans",
+       "share": 0.91,
+       "mono": false
+      },
+      {
+       "family": "Eczar",
+       "share": 0.09,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      14,
+      16,
+      18,
+      20,
+      24,
+      30,
+      36
+     ],
+     "sizeCount": 7,
+     "notLoaded": [],
+     "body": {
+      "font": "Plus Jakarta Sans",
+      "size": 16,
+      "leading": 1.5,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 17.5
+     },
+     "measureChars": 78,
+     "max": {
+      "size": 36,
+      "vw": 4.7,
+      "font": "Eczar",
+      "text": "Every Milestone Celebration, Art-Directe"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.41,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#fdfbf7",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.6,
+      "l": 0.98
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#fdfbf7",
+       "top": 0,
+       "hsl": {
+        "h": 40,
+        "s": 0.6,
+        "l": 0.98
+       }
+      },
+      {
+       "color": "#ffffff",
+       "top": 598,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      },
+      {
+       "color": "#f5efeb",
+       "top": 1294,
+       "hsl": {
+        "h": 24,
+        "s": 0.33,
+        "l": 0.94
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#1c1917",
+       "share": 0.82
+      },
+      {
+       "color": "#c2410c",
+       "share": 0.09
+      },
+      {
+       "color": "#e7dfd5",
+       "share": 0.04
+      },
+      {
+       "color": "#78716c",
+       "share": 0.02
+      },
+      {
+       "color": "#065f46",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#d97706",
+      "hsl": {
+       "h": 32,
+       "s": 0.95,
+       "l": 0.44
+      },
+      "fg": "#1c1917"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 17,
+     "inHero": 3,
+     "radius": 8,
+     "height": 36,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "New Event",
+      "Create New Celebration",
+      "Explore Sample Event"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 17,
+     "boxRadius": 12,
+     "squareMedia": 0,
+     "roundedMedia": 6,
+     "mediaRadius": 12,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 3284
+      }
+     ]
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.38
+     }
+    ],
+    "nav": {
+     "links": 0,
+     "fixed": false,
+     "height": 80,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "plus jakarta sans",
+     "plus jakarta sans fallback",
+     "eczar",
+     "eczar fallback"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 5795,
+    "margins": {
+     "left": 32,
+     "right": 37
+    },
+    "sections": [
+     {
+      "sel": "div",
+      "tag": "div",
+      "top": 0,
+      "height": 5563,
+      "words": 560,
+      "media": 6,
+      "middle": 0,
+      "heading": {
+       "text": "Every Milestone Celebration,",
+       "size": 36,
+       "tag": "h1"
+      },
+      "left": 32,
+      "right": 32,
+      "textLeft": 32,
+      "textRight": 43,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "footer.py-12.px-4",
+      "tag": "footer",
+      "top": 5659,
+      "height": 136,
+      "words": 24,
+      "media": 0,
+      "middle": 59,
+      "heading": null,
+      "left": 32,
+      "right": 37,
+      "textLeft": 32,
+      "textRight": 37,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Every Milestone Celebration, Art-Directed & Audited",
+      "size": 36,
+      "top": 144,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 72,
+      "n": 5
+     },
+     {
+      "x": 104,
+      "n": 4
+     },
+     {
+      "x": 32,
+      "n": 2
+     },
+     {
+      "x": 56,
+      "n": 2
+     },
+     {
+      "x": 301,
+      "n": 2
+     },
+     {
+      "x": 547,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 17,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 10,
+   "filled": [
+    0.62,
+    0.85,
+    0.91,
+    0.79,
+    0.8,
+    0.85,
+    0.91,
+    0.79,
+    0.79,
+    0.75
+   ],
+   "motion": {
+    "elements": 30,
+    "css": 29,
+    "transitions": 0,
+    "scripted": 1,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 7941,
+     "screens": 9.4,
+     "words": 536,
+     "img": 6,
+     "video": 0,
+     "canvas": 0,
+     "svg": 20,
+     "sections": 6,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 6,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "hero_celebration.jpg",
+      "wedding_vivaha.jpg",
+      "wedding_vivaha.jpg",
+      "birthday_jubilee.jpg",
+      "community_mela.jpg",
+      "planner_atelier.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Every Milestone Celebration, Art-Directed & Audited",
+     "words": 6,
+     "chars": 51,
+     "lines": 2,
+     "size": 26,
+     "vw": 6.7,
+     "font": "Eczar",
+     "weight": 700,
+     "tracking": -0.025,
+     "leading": 1.2,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "center",
+     "position": "center",
+     "widthRatio": 0.92,
+     "top": 136,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Every Milestone Celebration, Art-Directed & Audited",
+     "words": 6,
+     "lines": 2,
+     "size": 26,
+     "font": "Eczar"
+    },
+    "headings": [
+     {
+      "text": "Event Pilot",
+      "words": 2,
+      "chars": 11,
+      "lines": 2,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.33,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.29,
+      "top": 20,
+      "tag": "span",
+      "kind": "heading"
+     },
+     {
+      "text": "Every Milestone Celebration, Art-Directed & Audited",
+      "words": 6,
+      "chars": 51,
+      "lines": 2,
+      "size": 26,
+      "vw": 6.7,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": -0.025,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 136,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Interactive Celebration Folios",
+      "words": 3,
+      "chars": 30,
+      "lines": 2,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 1396,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Vivaha & Weddings",
+      "words": 3,
+      "chars": 17,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.33,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.67,
+      "top": 2084,
+      "tag": "div",
+      "kind": "heading"
+     },
+     {
+      "text": "Interactive Banquet Seating Matrix",
+      "words": 4,
+      "chars": 34,
+      "lines": 2,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 2724,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Three Grounded Planning Templates",
+      "words": 4,
+      "chars": 33,
+      "lines": 2,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 3852,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Private Atelier Storage Sovereignty",
+      "words": 4,
+      "chars": 35,
+      "lines": 2,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.79,
+      "top": 6168,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Begin Your Celebration Almanac",
+      "words": 4,
+      "chars": 30,
+      "lines": 2,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Eczar",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.33,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.75,
+      "top": 7187,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 8,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 3,
+     "medianWords": 4,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Plus Jakarta Sans",
+       "share": 0.91,
+       "mono": false
+      },
+      {
+       "family": "Eczar",
+       "share": 0.09,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      14,
+      16,
+      18,
+      20,
+      24,
+      26,
+      30
+     ],
+     "sizeCount": 7,
+     "notLoaded": [],
+     "body": {
+      "font": "Plus Jakarta Sans",
+      "size": 16,
+      "leading": 1.63,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 16.9
+     },
+     "measureChars": 45,
+     "max": {
+      "size": 30,
+      "vw": 7.7,
+      "font": "Eczar",
+      "text": "Interactive Celebration Folios"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.44,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#fdfbf7",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.6,
+      "l": 0.98
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#fdfbf7",
+       "top": 0,
+       "hsl": {
+        "h": 40,
+        "s": 0.6,
+        "l": 0.98
+       }
+      },
+      {
+       "color": "#ffffff",
+       "top": 776,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      },
+      {
+       "color": "#f5efeb",
+       "top": 1372,
+       "hsl": {
+        "h": 24,
+        "s": 0.33,
+        "l": 0.94
+       }
+      },
+      {
+       "color": "#1c1917",
+       "top": 7155,
+       "hsl": {
+        "h": 24,
+        "s": 0.1,
+        "l": 0.1
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#1c1917",
+       "share": 0.82
+      },
+      {
+       "color": "#c2410c",
+       "share": 0.09
+      },
+      {
+       "color": "#e7dfd5",
+       "share": 0.04
+      },
+      {
+       "color": "#78716c",
+       "share": 0.02
+      },
+      {
+       "color": "#065f46",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#d97706",
+      "hsl": {
+       "h": 32,
+       "s": 0.95,
+       "l": 0.44
+      },
+      "fg": "#1c1917"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 17,
+     "inHero": 3,
+     "radius": 8,
+     "height": 44,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "New Event",
+      "Create New Celebration",
+      "Explore Sample Event"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 17,
+     "boxRadius": 12,
+     "squareMedia": 0,
+     "roundedMedia": 6,
+     "mediaRadius": 12,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 0,
+     "fixed": false,
+     "height": 104,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "plus jakarta sans",
+     "plus jakarta sans fallback",
+     "eczar",
+     "eczar fallback"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 7941,
+    "margins": {
+     "left": 16,
+     "right": 16
+    },
+    "sections": [
+     {
+      "sel": "div",
+      "tag": "div",
+      "top": 0,
+      "height": 7645,
+      "words": 554,
+      "media": 6,
+      "middle": 0,
+      "heading": {
+       "text": "Interactive Celebration Folios",
+       "size": 30,
+       "tag": "h2"
+      },
+      "left": 16,
+      "right": 16,
+      "textLeft": 16,
+      "textRight": 22,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "footer.py-12.px-4",
+      "tag": "footer",
+      "top": 7741,
+      "height": 200,
+      "words": 24,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 17,
+      "right": 17,
+      "textLeft": 17,
+      "textRight": 17,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Every Milestone Celebration, Art-Directed & Audited",
+      "size": 26,
+      "top": 136,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 40,
+      "n": 11
+     },
+     {
+      "x": 64,
+      "n": 4
+     },
+     {
+      "x": 16,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 17,
+    "bodySize": 16,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "card-rows",
+   "width": 1440,
+   "message": "2 rows of identical boxed cards.",
+   "fix": "Vary the composition; not every section is a card grid."
+  },
+  {
+   "level": "WARN",
+   "id": "palette-cream",
+   "width": 1440,
+   "message": "Yellow-cream background (page background #fdfbf7, section #fdfbf7, section #f5efeb).",
+   "fix": "Use the drawn palette. If you want warmth, take a low-chroma stone or bone, not a yellow cream.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  },
+  {
+   "level": "WARN",
+   "id": "untitled-section",
+   "width": 1440,
+   "message": "A section carries text but no heading: section.space-y-8 at 2196px.",
+   "fix": "Name it with a short heading unless it is the continuation of the section above."
+  },
+  {
+   "level": "WARN",
+   "id": "ragged-edges",
+   "width": 1440,
+   "message": "Left-aligned text starts at 7 different lines (216px, 248px, 176px, 200px, 573px, 947px, 736px); the three most used hold only 59% of it.",
+   "fix": "Pick two or three anchor lines from the grid and start every heading and paragraph on one of them."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "E:\\EventPilot\\.taste-skill\\after\\desktop-fold.jpg",
+   "pages": [
+    "E:\\EventPilot\\.taste-skill\\after\\desktop-page-01.jpg",
+    "E:\\EventPilot\\.taste-skill\\after\\desktop-page-02.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "E:\\EventPilot\\.taste-skill\\after\\tablet-fold.jpg",
+   "pages": [
+    "E:\\EventPilot\\.taste-skill\\after\\tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "E:\\EventPilot\\.taste-skill\\after\\mobile-fold.jpg",
+   "pages": [
+    "E:\\EventPilot\\.taste-skill\\after\\mobile-page-01.jpg",
+    "E:\\EventPilot\\.taste-skill\\after\\mobile-page-02.jpg"
+   ],
+   "film": []
+  }
+ ]
+}
