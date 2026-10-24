@@ -154,7 +154,7 @@ export function QuotationComparisonView({
           <span>Add Quotation</span>
         </Button>
       }
-      maxWidth="3xl"
+      maxWidth="2xl"
       accentBar
       contentPadding={false}
     >

@@ -210,6 +210,38 @@ describe('Quotation UI Components', () => {
       const briefTextarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       expect(briefTextarea.value).toContain('Vendor Requirement Brief: Photography');
       expect(briefTextarea.value).toContain('250 guests');
+      // Must NOT contain raw Markdown headers
+      expect(briefTextarea.value).not.toContain('# Vendor Requirement Brief');
+      expect(briefTextarea.value).not.toContain('## Confirmed Requirements');
+    });
+
+    it('renders location card in the parameter strip and document letterhead without clipping', () => {
+      render(
+        <RequirementBriefModal
+          isOpen={true}
+          onClose={vi.fn()}
+          event={mockEvent}
+          initialCategory="photography"
+        />
+      );
+
+      expect(screen.getByText('Location')).toBeDefined();
+      expect(screen.getAllByText('Udaipur, Rajasthan').length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('renders Download as PDF, Download .txt, and Copy Brief action buttons', () => {
+      render(
+        <RequirementBriefModal
+          isOpen={true}
+          onClose={vi.fn()}
+          event={mockEvent}
+          initialCategory="photography"
+        />
+      );
+
+      expect(screen.getByRole('button', { name: /Download as PDF/i })).toBeDefined();
+      expect(screen.getByRole('button', { name: /Download \.txt/i })).toBeDefined();
+      expect(screen.getByRole('button', { name: /Copy Brief/i })).toBeDefined();
     });
   });
 

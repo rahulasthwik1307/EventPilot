@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { Event } from '@/features/events/types';
 import { VendorCategory } from '@/features/vendors/types';
 import { generateVendorRequirementBrief } from '@/features/vendors/quotations/brief-engine';
+import { downloadVendorBriefPdf } from '@/features/vendors/quotations/brief-pdf';
 import { VENDOR_CATEGORIES } from '@/features/vendors/vendor-engine';
 import { Button } from '../../ui/Button';
 import { Dialog } from '../../ui/Dialog';
@@ -66,7 +67,11 @@ export function RequirementBriefModal({
     }
   };
 
-  const handleDownload = () => {
+  const handleDownloadPdf = () => {
+    downloadVendorBriefPdf(brief);
+  };
+
+  const handleDownloadTxt = () => {
     const blob = new Blob([briefText], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -123,38 +128,40 @@ export function RequirementBriefModal({
           </span>
         </div>
 
-        {/* Parameter Strip (Single-Row Compact Cards) */}
+        {/* Parameter Strip (Single-Row Compact Cards - Fully responsive without clipping) */}
         <div className="px-6 py-3.5 bg-[#FAF8F5] border-b border-[#E7DFD5]">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
-            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-[#C2410C] shrink-0" />
-              <div className="min-w-0">
+            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-start gap-2.5 min-h-[58px]">
+              <Calendar className="w-4 h-4 text-[#C2410C] shrink-0 mt-0.5" />
+              <div className="min-w-0 flex-1">
                 <span className="text-[10px] uppercase font-bold text-[#78716C] block">Target Date</span>
-                <span className="text-[#1C1917] font-bold truncate block">{brief.eventDate}</span>
+                <span className="text-[#1C1917] font-bold text-[11px] sm:text-xs leading-snug break-words block">{brief.eventDate}</span>
               </div>
             </div>
 
-            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-center gap-2">
-              <Users className="w-4 h-4 text-[#D97706] shrink-0" />
-              <div className="min-w-0">
+            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-start gap-2.5 min-h-[58px]">
+              <Users className="w-4 h-4 text-[#D97706] shrink-0 mt-0.5" />
+              <div className="min-w-0 flex-1">
                 <span className="text-[10px] uppercase font-bold text-[#78716C] block">Headcount</span>
-                <span className="text-[#1C1917] font-bold truncate block">{brief.guestTarget} guests</span>
+                <span className="text-[#1C1917] font-bold text-[11px] sm:text-xs leading-snug break-words block">{brief.guestTarget} guests</span>
               </div>
             </div>
 
-            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#78716C] shrink-0" />
-              <div className="min-w-0">
+            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-start gap-2.5 min-h-[58px]">
+              <MapPin className="w-4 h-4 text-[#78716C] shrink-0 mt-0.5" />
+              <div className="min-w-0 flex-1">
                 <span className="text-[10px] uppercase font-bold text-[#78716C] block">Location</span>
-                <span className="text-[#1C1917] font-bold truncate block">{brief.location || 'To be finalized'}</span>
+                <span className="text-[#1C1917] font-bold text-[11px] sm:text-xs leading-snug break-words block">
+                  {brief.location || 'To be finalized'}
+                </span>
               </div>
             </div>
 
-            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-center gap-2">
-              <Wallet className="w-4 h-4 text-[#059669] shrink-0" />
-              <div className="min-w-0">
+            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-start gap-2.5 min-h-[58px]">
+              <Wallet className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
+              <div className="min-w-0 flex-1">
                 <span className="text-[10px] uppercase font-bold text-[#78716C] block">Category Budget</span>
-                <span className="text-[#059669] font-bold truncate block">
+                <span className="text-[#059669] font-bold text-[11px] sm:text-xs leading-snug break-words block">
                   {brief.allocatedCategoryBudgetFormatted || 'Envelope open'}
                 </span>
               </div>
@@ -192,7 +199,7 @@ export function RequirementBriefModal({
           </div>
 
           <span className="text-[11px] font-mono text-[#78716C] hidden sm:inline">
-            {activeTab === 'formatted' ? 'Clean letterhead preview' : 'Markdown formatted • Ready to copy & send'}
+            {activeTab === 'formatted' ? 'Clean letterhead preview' : 'Formatted plain text document • Ready to copy & send'}
           </span>
         </div>
 
@@ -211,6 +218,9 @@ export function RequirementBriefModal({
                 </h3>
                 <p className="text-xs text-[#78716C] mt-1 font-mono">
                   <strong>Celebration:</strong> {event.title} ({event.type || 'Celebration'}) · <strong>Date:</strong> {brief.eventDate}
+                  {brief.location ? (
+                    <> · <strong>Location:</strong> {brief.location}</>
+                  ) : null}
                 </p>
               </div>
 
@@ -330,13 +340,21 @@ export function RequirementBriefModal({
             Close
           </button>
 
-          <div className="flex gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
-              onClick={handleDownload}
-              className="text-xs font-mono border-[#E7DFD5] text-[#1C1917] bg-white hover:bg-[#FAF8F5]"
+              onClick={handleDownloadPdf}
+              className="text-xs font-mono font-semibold border-[#FED7AA] bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#9A3412] shadow-xs"
             >
-              <Download className="w-3.5 h-3.5 mr-1.5" />
+              <Download className="w-3.5 h-3.5 mr-1.5 text-[#C2410C]" />
+              <span>Download as PDF</span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleDownloadTxt}
+              className="text-xs font-mono border-[#E7DFD5] text-[#78716C] bg-white hover:bg-[#FAF8F5]"
+            >
+              <FileText className="w-3.5 h-3.5 mr-1.5" />
               <span>Download .txt</span>
             </Button>
             <Button

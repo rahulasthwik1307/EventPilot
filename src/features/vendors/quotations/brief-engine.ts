@@ -169,50 +169,58 @@ export function generateVendorRequirementBrief(
     openQuestions.push('Cancellation and force majeure postponement policy');
   }
 
-  // Construct formatted markdown/text representation
+  // Construct clean formatted text document representation without raw Markdown symbols
   const lines: string[] = [];
-  lines.push(`# Vendor Requirement Brief: ${categoryLabel}`);
-  lines.push(`**Event:** ${event.title} (${event.type || 'Event'})`);
-  lines.push(`**Date of Event:** ${event.date}`);
+  lines.push('================================================================================');
+  lines.push('OFFICIAL PROCUREMENT BRIEF');
+  lines.push(`Vendor Requirement Brief: ${categoryLabel}`);
+  lines.push('================================================================================');
+  lines.push('');
+  lines.push('Celebration Overview');
+  lines.push(`• Event: ${event.title} (${event.type || 'Celebration'})`);
+  lines.push(`• Date of Event: ${event.date}`);
   if (event.location) {
-    lines.push(`**Location / City:** ${event.location}`);
+    lines.push(`• Location: ${event.location}`);
   }
-  lines.push(`**Expected Attendance:** ${event.guestTarget} guests`);
+  lines.push(`• Expected Attendance: ${event.guestTarget} guests`);
   if (allocatedCategoryBudgetFormatted) {
-    lines.push(`**Allocated Category Budget Envelope:** ${allocatedCategoryBudgetFormatted}`);
+    lines.push(`• Allocated Category Budget Envelope: ${allocatedCategoryBudgetFormatted}`);
   }
   lines.push('');
 
-  lines.push('## Confirmed Requirements & Preferences');
+  lines.push('Confirmed Requirements & Preferences');
   confirmedPreferences.forEach((p) => {
-    lines.push(`- **${p.label}:** ${p.value}`);
+    lines.push(`• ${p.label}: ${p.value}`);
   });
   lines.push('');
 
   if (confirmedNonNegotiables.length > 0) {
-    lines.push('## Essential Non-Negotiables');
+    lines.push('Essential Non-Negotiables');
     confirmedNonNegotiables.forEach((item) => {
-      lines.push(`- ${item}`);
+      lines.push(`• ${item}`);
     });
     lines.push('');
   }
 
   if (timingConstraints.length > 0) {
-    lines.push('## Key Milestones & Timing');
+    lines.push('Key Milestones & Timing');
     timingConstraints.forEach((t) => {
-      lines.push(`- ${t.milestone}: Due by ${t.dueDate}`);
+      lines.push(`• ${t.milestone}: Due by ${t.dueDate}`);
     });
     lines.push('');
   }
 
-  lines.push('## Information Requested in Your Proposal');
+  lines.push('Information Requested in Your Proposal');
   lines.push('1. Scope of work and complete list of deliverables.');
   lines.push('2. Fully itemized pricing, specifying base charges and any applicable taxes/fees.');
   lines.push('3. Advance deposit requirements and payment milestone schedule.');
   lines.push('4. Quotation validity period.');
   lines.push('5. Standard cancellation and postponement provisions.');
   lines.push('');
-  lines.push('*(Note: Identifiable attendee names, personal contact numbers, and private family arrangements are reserved for contracted booking stages.)*');
+  lines.push('--------------------------------------------------------------------------------');
+  lines.push('Note: Identifiable attendee names, personal contact numbers, and private family');
+  lines.push('arrangements are reserved for contracted booking stages.');
+  lines.push('================================================================================');
 
   const formattedBriefText = lines.join('\n');
 
