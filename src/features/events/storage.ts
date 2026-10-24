@@ -4,7 +4,7 @@
  * while keeping sample event state strictly isolated.
  */
 
-import { Event, EventStorage, StorageError, StorageResult } from './types';
+import { Event, EventStorage, SaveEventOptions, StorageError, StorageResult } from './types';
 import { validateEvent } from './validation';
 import { createFreshSampleEvent } from './sample-event';
 import { generateStarterCategories } from './budget-engine';
@@ -202,7 +202,7 @@ export class LocalStorageEventStorage implements EventStorage {
     return { success: true, data: found };
   }
 
-  savePersonalEvent(event: Event): StorageResult<void> {
+  savePersonalEvent(event: Event, options?: SaveEventOptions): StorageResult<void> {
     if (!this.isAvailable()) {
       return { success: false, error: this.unavailableError() };
     }
@@ -236,6 +236,21 @@ export class LocalStorageEventStorage implements EventStorage {
     let nextList: Event[];
 
     if (existingIndex >= 0) {
+      // Optimistic concurrency check (W3-01)
+      if (options?.expectedUpdatedAt) {
+        const storedUpdatedAt = currentList[existingIndex].updatedAt;
+        if (storedUpdatedAt && storedUpdatedAt !== options.expectedUpdatedAt) {
+          return {
+            success: false,
+            error: {
+              code: 'CONCURRENCY_CONFLICT',
+              message:
+                'The event workspace has been updated in another session. Please reload to review the latest changes.',
+            },
+          };
+        }
+      }
+
       nextList = [...currentList];
       nextList[existingIndex] = sanitized;
     } else {
@@ -337,9 +352,33 @@ export class LocalStorageEventStorage implements EventStorage {
     }
   }
 
-  saveSampleEvent(event: Event): StorageResult<void> {
+  saveSampleEvent(event: Event, options?: SaveEventOptions): StorageResult<void> {
     if (!this.isAvailable()) {
       return { success: false, error: this.unavailableError() };
+    }
+
+    if (options?.expectedUpdatedAt) {
+      try {
+        const raw = window.localStorage.getItem(STORAGE_KEYS.SAMPLE_EVENT);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const currentSample = (parsed && typeof parsed === 'object' && 'payload' in parsed)
+            ? (parsed as StorageContainer<Event>).payload
+            : parsed as Event;
+          if (currentSample?.updatedAt && currentSample.updatedAt !== options.expectedUpdatedAt) {
+            return {
+              success: false,
+              error: {
+                code: 'CONCURRENCY_CONFLICT',
+                message:
+                  'The sample event workspace has been updated in another session. Please reload to review the latest changes.',
+              },
+            };
+          }
+        }
+      } catch {
+        // Parse error fallback proceeds to normal save
+      }
     }
 
     const sampleEvent: Event = {

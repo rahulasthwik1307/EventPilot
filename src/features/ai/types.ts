@@ -13,7 +13,8 @@ export type ProposalActionType =
   | 'add_task'
   | 'add_milestone'
   | 'add_checklist_item'
-  | 'suggest_vendor_followup';
+  | 'suggest_vendor_followup'
+  | 'update_preference';
 
 export type ProposalStatus = 'staged' | 'accepted' | 'dismissed' | 'conflict';
 
@@ -54,12 +55,25 @@ export interface SuggestVendorFollowupPayload {
   checklistNotes?: string;
 }
 
+export interface UpdatePreferencePayload {
+  actionType: 'update_preference';
+  category: 'priorities' | 'budget' | 'logistics' | 'tradition';
+  field: string;
+  currentValue?: unknown;
+  proposedValue: unknown;
+  provenance: 'explicit' | 'inferred';
+  rationale: string;
+  userEvidence?: string;
+  conflictsWith?: string;
+}
+
 export type ProposalPayload =
   | BudgetAdjustmentPayload
   | AddTaskPayload
   | AddMilestonePayload
   | AddChecklistItemPayload
-  | SuggestVendorFollowupPayload;
+  | SuggestVendorFollowupPayload
+  | UpdatePreferencePayload;
 
 export interface StagedProposal {
   id: string;
@@ -85,6 +99,15 @@ export interface ProjectedEventContext {
   culturalContext?: {
     traditionOrTheme?: string;
     notes?: string;
+  };
+  preferencesSummary?: {
+    priorities?: string[];
+    atmosphere?: string;
+    budgetFlexibility?: string;
+    spendingPriorities?: string[];
+    nonNegotiables?: string[];
+    dietaryStyle?: string;
+    accessibility?: string[];
   };
 }
 

@@ -7,6 +7,7 @@
 import {
   BudgetCategory,
   ChecklistTask,
+  CostModelType,
   CurrencyCode,
   Event,
   EventInput,
@@ -19,7 +20,9 @@ import {
   TimelineMilestone,
   ValidationResult,
   Vendor,
+  EventPreferences,
 } from './types';
+import { validateEventPreferences } from '../preferences/preferences';
 
 const VALID_EVENT_TYPES: EventType[] = ['wedding', 'birthday', 'community'];
 const VALID_CURRENCIES: CurrencyCode[] = ['INR', 'USD', 'EUR', 'GBP'];
@@ -206,6 +209,17 @@ export function validateEventInput(raw: unknown): ValidationResult<EventInput> {
     }
   }
 
+  // 9. Event Preferences (Optional)
+  let preferences: EventPreferences | undefined;
+  if (input.preferences !== undefined && input.preferences !== null) {
+    const prefVal = validateEventPreferences(input.preferences);
+    if (!prefVal.isValid) {
+      Object.assign(errors, prefVal.errors);
+    } else {
+      preferences = prefVal.data;
+    }
+  }
+
   if (Object.keys(errors).length > 0) {
     return {
       isValid: false,
@@ -225,6 +239,7 @@ export function validateEventInput(raw: unknown): ValidationResult<EventInput> {
       budgetCap,
       currency,
       culturalContext,
+      preferences,
     },
     errors: {},
   };
@@ -289,6 +304,11 @@ export function validateEvent(data: unknown): ValidationResult<Event> {
         const paymentStatus = ['projected', 'deposit_paid', 'settled'].includes(item.paymentStatus as string)
           ? (item.paymentStatus as Expense['paymentStatus'])
           : 'projected';
+        const costModel: CostModelType = item.costModel === 'per_guest' ? 'per_guest' : 'fixed';
+        const unitCost =
+          typeof item.unitCost === 'number' && Number.isFinite(item.unitCost) && item.unitCost >= 0
+            ? Math.max(0, Math.round(item.unitCost))
+            : undefined;
         return {
           id: typeof item.id === 'string' && item.id ? item.id : `exp-${i + 1}`,
           categoryId: typeof item.categoryId === 'string' ? item.categoryId : '',
@@ -298,6 +318,8 @@ export function validateEvent(data: unknown): ValidationResult<Event> {
             ? Math.max(0, Math.round(item.actualAmount))
             : undefined,
           paymentStatus,
+          costModel,
+          unitCost,
           notes: typeof item.notes === 'string' ? item.notes : undefined,
           createdAt: typeof item.createdAt === 'string' ? item.createdAt : createdAt,
           updatedAt: typeof item.updatedAt === 'string' ? item.updatedAt : createdAt,
@@ -367,7 +389,11 @@ export function validateEvent(data: unknown): ValidationResult<Event> {
             ? Math.max(0, Math.round(item.agreedCost))
             : undefined,
           depositPaid: Number.isFinite(item.depositPaid) ? Math.max(0, Math.round(Number(item.depositPaid))) : 0,
-          amountPaid: Number.isFinite(item.amountPaid) ? Math.max(0, Math.round(Number(item.amountPaid))) : 0,
+          amountPaid: (() => {
+            const dep = Number.isFinite(item.depositPaid) ? Math.max(0, Math.round(Number(item.depositPaid))) : 0;
+            const rawPaid = Number.isFinite(item.amountPaid) ? Math.max(0, Math.round(Number(item.amountPaid))) : undefined;
+            return rawPaid !== undefined ? Math.max(dep, rawPaid) : dep;
+          })(),
           linkedCategoryId: typeof item.linkedCategoryId === 'string' ? item.linkedCategoryId : undefined,
           notes: typeof item.notes === 'string' ? item.notes : undefined,
           createdAt: typeof item.createdAt === 'string' ? item.createdAt : createdAt,

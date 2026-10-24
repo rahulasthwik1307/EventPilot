@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   Calendar,
   Milestone,
+  Sparkles,
 } from 'lucide-react';
 import { StagedProposal } from '../../features/ai/types';
 import { CurrencyCode } from '../../features/events/types';
@@ -63,6 +64,11 @@ export function StagedProposalCard({
       label: 'Vendor Vetting',
       icon: Briefcase,
       badgeVariant: 'forest' as const,
+    },
+    update_preference: {
+      label: 'Preference Proposal',
+      icon: Sparkles,
+      badgeVariant: 'marigold' as const,
     },
   }[actionType] || {
     label: 'Planning Action',
@@ -227,6 +233,50 @@ export function StagedProposalCard({
 
             <p className="text-xs text-secondary-hover mt-1 font-medium">
               Action on accept: Adds this vendor qualification checklist as an actionable task to your Timeline. (Does not create fake vendor contacts).
+            </p>
+          </div>
+        )}
+
+        {actionType === 'update_preference' && payload.actionType === 'update_preference' && (
+          <div className="bg-neutral-subtle/70 rounded-md p-3.5 border border-neutral-border space-y-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+              <span className="font-semibold text-neutral-text uppercase tracking-wider">
+                Category: <strong className="capitalize text-primary">{payload.category}</strong> · Field: <strong>{payload.field}</strong>
+              </span>
+              <span
+                className={`px-2 py-0.5 rounded text-xs font-semibold ${
+                  payload.provenance === 'explicit'
+                    ? 'bg-status-success-subtle text-status-success border border-status-success/30'
+                    : 'bg-primary-subtle text-neutral-text border border-primary/30'
+                }`}
+              >
+                {payload.provenance === 'explicit' ? 'Explicit User Statement' : 'AI Inferred (Requires Confirmation)'}
+              </span>
+            </div>
+
+            <div className="bg-neutral-surface p-2.5 rounded border border-neutral-border text-xs">
+              <span className="text-neutral-muted block mb-1">Proposed Setting:</span>
+              <pre className="font-mono text-neutral-text text-xs whitespace-pre-wrap break-words">
+                {typeof payload.proposedValue === 'object'
+                  ? JSON.stringify(payload.proposedValue, null, 2)
+                  : String(payload.proposedValue)}
+              </pre>
+            </div>
+
+            {payload.userEvidence && (
+              <p className="text-xs text-neutral-muted italic border-l-2 border-primary/40 pl-2">
+                User Quote: &ldquo;{payload.userEvidence}&rdquo;
+              </p>
+            )}
+
+            {payload.rationale && (
+              <p className="text-xs text-neutral-muted">
+                <strong>Why this is suggested:</strong> {payload.rationale}
+              </p>
+            )}
+
+            <p className="text-xs text-neutral-muted pt-1">
+              Action on accept: Persists this verified preference to your canonical celebration record. (Does not modify financial contracts or expenses).
             </p>
           </div>
         )}

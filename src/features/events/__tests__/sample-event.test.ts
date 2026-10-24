@@ -44,8 +44,27 @@ describe('Sample Celebration Baseline (Aarav & Meera)', () => {
 
     expect(sample.vendors.length).toBe(6);
     expect(financials.totalAgreed).toBe(1775000);
-    expect(financials.totalPaid).toBe(1140000);
-    expect(financials.totalRemaining).toBe(635000);
+    expect(financials.totalPaid).toBe(1170000);
+    expect(financials.totalRemaining).toBe(605000);
+  });
+
+  it('reconciles sample music expense with vendor payment record while keeping contract status and agreed cost distinct', () => {
+    const musicExpense = sample.expenses.find((e) => e.id === 'sample-exp-music');
+    const musicVendor = sample.vendors.find((v) => v.id === 'sample-vnd-music');
+
+    expect(musicExpense).toBeDefined();
+    expect(musicVendor).toBeDefined();
+
+    // Verify payment reconciliation between expense actual paid amount and vendor deposit/amount paid
+    expect(musicExpense?.actualAmount).toBe(30000);
+    expect(musicExpense?.paymentStatus).toBe('deposit_paid');
+    expect(musicVendor?.depositPaid).toBe(musicExpense?.actualAmount);
+    expect(musicVendor?.amountPaid).toBe(musicExpense?.actualAmount);
+
+    // Verify domain boundary: payment does not unilaterally flip vendor contract status or erase agreed cost
+    expect(musicVendor?.status).toBe('negotiating');
+    expect(musicVendor?.agreedCost).toBe(70000);
+    expect(musicVendor?.quotedCost).toBe(80000);
   });
 
   it('has deterministic guest attendance counts and dietary records', () => {
@@ -94,5 +113,15 @@ describe('Sample Celebration Baseline (Aarav & Meera)', () => {
         expect(milestoneIds.has(t.milestoneId)).toBe(true);
       }
     }
+  });
+
+  it('contains verified canonical celebration preferences with confirmed provenance', () => {
+    expect(sample.preferences).toBeDefined();
+    expect(sample.preferences?.priorities?.provenance).toBe('confirmed');
+    expect(sample.preferences?.priorities?.value.atmosphere).toBe('intimate_traditional');
+    expect(sample.preferences?.budget?.provenance).toBe('confirmed');
+    expect(sample.preferences?.budget?.value.flexibility).toBe('strict_hard_limit');
+    expect(sample.preferences?.logistics?.value.accessibilityRequirements).toContain('wheelchair_access');
+    expect(sample.preferences?.tradition?.value.dietaryStyle).toBe('pure_vegetarian');
   });
 });

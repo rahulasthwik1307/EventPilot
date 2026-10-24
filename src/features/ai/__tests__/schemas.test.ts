@@ -135,4 +135,94 @@ describe('schemas (Zod Request and Proposal Validation)', () => {
     const res = AiAssistantResponseSchema.safeParse(fullResponse);
     expect(res.success).toBe(true);
   });
+
+  describe('UpdatePreferencePayloadSchema Runtime Precision', () => {
+    it('validates a correct update_preference proposal payload', () => {
+      const validPrefProposal = {
+        id: 'prop-pref-1',
+        actionType: 'update_preference',
+        title: 'Adjust Budget Flexibility',
+        explanation: 'Allow moderate buffer',
+        status: 'staged',
+        payload: {
+          actionType: 'update_preference',
+          category: 'budget',
+          field: 'flexibility',
+          proposedValue: 'moderate_flexibility',
+          provenance: 'inferred',
+          rationale: 'Planner expressed willingness to consider upgrades.',
+        },
+      };
+
+      const res = StagedProposalSchema.safeParse(validPrefProposal);
+      expect(res.success).toBe(true);
+    });
+
+    it('rejects update_preference with invalid enum value for flexibility', () => {
+      const invalidPref = {
+        id: 'prop-pref-err-1',
+        actionType: 'update_preference',
+        title: 'Invalid',
+        explanation: 'Error',
+        status: 'staged',
+        payload: {
+          actionType: 'update_preference',
+          category: 'budget',
+          field: 'flexibility',
+          proposedValue: 'unlimited_money_glitch', // Invalid enum!
+          provenance: 'inferred',
+          rationale: 'Invalid',
+        },
+      };
+
+      const res = StagedProposalSchema.safeParse(invalidPref);
+      expect(res.success).toBe(false);
+    });
+
+    it('rejects update_preference with unsupported category or field', () => {
+      const invalidField = {
+        id: 'prop-pref-err-2',
+        actionType: 'update_preference',
+        title: 'Invalid Field',
+        explanation: 'Error',
+        status: 'staged',
+        payload: {
+          actionType: 'update_preference',
+          category: 'budget',
+          field: 'secretCryptoAddress', // Invalid field!
+          proposedValue: '0x123',
+          provenance: 'inferred',
+          rationale: 'Invalid',
+        },
+      };
+
+      const res = StagedProposalSchema.safeParse(invalidField);
+      expect(res.success).toBe(false);
+    });
+
+    it('rejects model attempt to inject internal provenance or source metadata', () => {
+      const untrustedPayload = {
+        id: 'prop-pref-err-3',
+        actionType: 'update_preference',
+        title: 'Sneaky Model Injection',
+        explanation: 'Error',
+        status: 'staged',
+        payload: {
+          actionType: 'update_preference',
+          category: 'budget',
+          field: 'flexibility',
+          proposedValue: {
+            flexibility: 'moderate_flexibility',
+            provenance: 'confirmed', // Attempted forged confirmation!
+            source: 'user_onboarding',
+          },
+          provenance: 'inferred',
+          rationale: 'Testing forged metadata',
+        },
+      };
+
+      const res = StagedProposalSchema.safeParse(untrustedPayload);
+      expect(res.success).toBe(false);
+    });
+  });
 });

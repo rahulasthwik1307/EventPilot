@@ -135,4 +135,55 @@ describe('Storage & Domain Migration - Milestone 1, 2, and 3', () => {
     expect(migrated.assignments).toHaveLength(1);
     expect(migrated.assignments[0].id).toBe('a1');
   });
+
+  it('safely migrates legacy events without preferences and preserves existing preferences when present', () => {
+    // 1. Legacy event without preferences field
+    const legacyWithoutPrefs = {
+      id: 'legacy-no-prefs',
+      type: 'community' as const,
+      title: 'Koramangala Diwali Utsav',
+      date: '2026-11-01',
+      guestTarget: 500,
+      budgetCap: 300000,
+      currency: 'INR' as const,
+      categories: [],
+      expenses: [],
+      milestones: [],
+      tasks: [],
+      vendors: [],
+      households: [],
+      guests: [],
+      tables: [],
+      assignments: [],
+      createdAt: '2026-01-01',
+      updatedAt: '2026-01-01',
+    } as unknown as Event;
+
+    const migratedLegacy = migrateEventToM3(legacyWithoutPrefs);
+    // STRICT GUARD: Does NOT invent preferences or assume artificial choices
+    expect(migratedLegacy.preferences).toBeUndefined();
+
+    // 2. Event with existing confirmed preferences
+    const eventWithPrefs = {
+      ...legacyWithoutPrefs,
+      id: 'event-with-prefs',
+      preferences: {
+        budget: {
+          value: {
+            spendingPriorities: ['Stage & Sound'],
+            economizeAreas: ['Publicity'],
+            nonNegotiables: ['Civic Fire Safety'],
+            flexibility: 'strict_hard_limit' as const,
+          },
+          provenance: 'confirmed' as const,
+          source: 'user_edit' as const,
+        },
+      },
+    } as unknown as Event;
+
+    const migratedWithPrefs = migrateEventToM3(eventWithPrefs);
+    expect(migratedWithPrefs.preferences).toBeDefined();
+    expect(migratedWithPrefs.preferences?.budget?.value.flexibility).toBe('strict_hard_limit');
+    expect(migratedWithPrefs.preferences?.budget?.provenance).toBe('confirmed');
+  });
 });

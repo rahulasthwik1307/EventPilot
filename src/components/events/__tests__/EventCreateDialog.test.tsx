@@ -106,4 +106,50 @@ describe('EventCreateDialog Component', () => {
     expect(created.currency).toBe('INR');
     expect(created.isSample).toBe(false);
   });
+
+  it('allows advancing to step 2 personalization, tailoring questions, and saving explicit preferences', () => {
+    render(
+      <EventCreateDialog
+        isOpen={true}
+        onClose={handleClose}
+        onSuccess={handleSuccess}
+        initialType="wedding"
+      />
+    );
+
+    // Fill valid Step 1 details
+    fireEvent.change(screen.getByLabelText(/Celebration Title/i), {
+      target: { value: "Kavya & Arjun's Vivaha" },
+    });
+    fireEvent.change(screen.getByLabelText(/Celebration Date/i), {
+      target: { value: '2026-12-20' },
+    });
+    fireEvent.change(screen.getByLabelText(/Expected Guests/i), {
+      target: { value: '250' },
+    });
+    fireEvent.change(screen.getByLabelText(/Total Budget Cap/i), {
+      target: { value: '2000000' },
+    });
+
+    // Advance to Step 2
+    fireEvent.click(screen.getByRole('button', { name: /Next: Personalize/i }));
+
+    // Verify Step 2 UI is displayed
+    expect(screen.getByText(/Celebration Priorities & Focus/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Financial Flexibility/i })).toBeInTheDocument();
+    expect(screen.getByText(/Guest Comfort & Accessibility/i)).toBeInTheDocument();
+
+    // Select Wheelchair Ramp Access
+    fireEvent.click(screen.getByRole('button', { name: /Wheelchair Ramp Access/i }));
+
+    // Click Save & Create Celebration Plan
+    fireEvent.click(screen.getByRole('button', { name: /Save & Create Celebration Plan/i }));
+
+    expect(handleSuccess).toHaveBeenCalledTimes(1);
+    const created = handleSuccess.mock.calls[0][0];
+    expect(created.title).toBe("Kavya & Arjun's Vivaha");
+    expect(created.preferences).toBeDefined();
+    expect(created.preferences?.logistics?.provenance).toBe('explicit');
+    expect(created.preferences?.logistics?.value.accessibilityRequirements).toContain('wheelchair_access');
+  });
 });

@@ -18,6 +18,8 @@ export interface EventCulturalContext {
 
 export type PaymentStatus = 'projected' | 'deposit_paid' | 'settled';
 
+export type CostModelType = 'fixed' | 'per_guest';
+
 export interface BudgetCategory {
   id: string;
   name: string;
@@ -32,6 +34,8 @@ export interface Expense {
   estimatedAmount: number;
   actualAmount?: number;
   paymentStatus: PaymentStatus;
+  costModel?: CostModelType;
+  unitCost?: number;
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -87,14 +91,16 @@ export interface ChecklistTask {
   updatedAt: string;
 }
 
-// --- Re-export M3 Domain Types ---
+// --- Re-export M3 Domain Types & Preferences ---
 export * from '../vendors/types';
 export * from '../guests/types';
 export * from '../seating/types';
+export * from '../preferences/types';
 
 import { Vendor } from '../vendors/types';
 import { Guest, GuestHousehold } from '../guests/types';
 import { SeatingAssignment, SeatingTable } from '../seating/types';
+import { EventPreferences } from '../preferences/types';
 
 // --- Core Event Entity ---
 
@@ -108,6 +114,7 @@ export interface Event {
   budgetCap: number;
   currency: CurrencyCode;
   culturalContext?: EventCulturalContext;
+  preferences?: EventPreferences;
   isSample?: boolean;
   categories: BudgetCategory[];
   expenses: Expense[];
@@ -165,6 +172,7 @@ export type StorageErrorCode =
   | 'VERSION_MISMATCH'
   | 'NOT_FOUND'
   | 'VALIDATION_FAILED'
+  | 'CONCURRENCY_CONFLICT'
   | 'UNKNOWN';
 
 export interface StorageError {
@@ -179,13 +187,17 @@ export interface StorageResult<T> {
   error?: StorageError;
 }
 
+export interface SaveEventOptions {
+  expectedUpdatedAt?: string;
+}
+
 export interface EventStorage {
   getPersonalEvents(): StorageResult<Event[]>;
   getPersonalEvent(id: string): StorageResult<Event | null>;
-  savePersonalEvent(event: Event): StorageResult<void>;
+  savePersonalEvent(event: Event, options?: SaveEventOptions): StorageResult<void>;
   deletePersonalEvent(id: string): StorageResult<void>;
   getSampleEvent(): StorageResult<Event>;
-  saveSampleEvent(event: Event): StorageResult<void>;
+  saveSampleEvent(event: Event, options?: SaveEventOptions): StorageResult<void>;
   resetSampleEvent(): StorageResult<Event>;
   getActiveEventId(): StorageResult<string | null>;
   setActiveEventId(id: string | null): StorageResult<void>;

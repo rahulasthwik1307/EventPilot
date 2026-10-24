@@ -1,6 +1,13 @@
 import { ChecklistTask, Event, TimelineMilestone } from '../events/types';
 import { calculateMilestoneDate } from '../events/timeline-engine';
-import { StagedProposal } from './types';
+import { StagedProposal, UpdatePreferencePayload } from './types';
+import {
+  createDefaultPreferenceRecord,
+  createEmptyPreferences,
+  detectPreferenceConflict,
+  mergePreferences,
+  mergeSinglePreferenceField,
+} from '../preferences/preferences';
 
 export interface ApplyProposalResult {
   success: boolean;
@@ -74,6 +81,22 @@ export function detectProposalConflicts(
           ...proposal,
           status: 'conflict',
           conflictReason: `Budget category "${payload.categoryName}" no longer exists in this celebration.`,
+        };
+      }
+    }
+
+    if (proposal.actionType === 'update_preference') {
+      const payload = proposal.payload as UpdatePreferencePayload;
+      const conflict = detectPreferenceConflict(
+        event.preferences,
+        payload.category,
+        payload.proposedValue
+      );
+      if (conflict.hasConflict) {
+        return {
+          ...proposal,
+          status: 'conflict',
+          conflictReason: conflict.reason,
         };
       }
     }
@@ -260,6 +283,38 @@ export function applyProposalToEvent(
         event: {
           ...event,
           tasks: [...(event.tasks || []), newVendorTask],
+          updatedAt: now,
+        },
+      };
+    }
+
+    case 'update_preference': {
+      const payload = proposal.payload as UpdatePreferencePayload;
+      const currentPrefs = event.preferences || createEmptyPreferences();
+
+      // Proposals when accepted become confirmed preferences, recording ai_inference source
+      const mergeResult = mergeSinglePreferenceField(
+        currentPrefs,
+        payload.category,
+        payload.field,
+        payload.proposedValue,
+        'confirmed',
+        'ai_inference'
+      );
+
+      if (!mergeResult.success || !mergeResult.preferences) {
+        return {
+          success: false,
+          event,
+          error: mergeResult.error || 'Failed to merge preference update.',
+        };
+      }
+
+      return {
+        success: true,
+        event: {
+          ...event,
+          preferences: mergeResult.preferences,
           updatedAt: now,
         },
       };

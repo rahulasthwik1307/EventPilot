@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, ArrowRight } from 'lucide-react';
-import { BudgetCategory, CurrencyCode, Expense, PaymentStatus } from '../../features/events/types';
+import { AlertCircle, ArrowRight, Users, Calculator } from 'lucide-react';
+import { BudgetCategory, CurrencyCode, Expense, PaymentStatus, CostModelType } from '../../features/events/types';
 import { formatCurrency } from '../../features/events/validation';
 import { Dialog } from '../ui/Dialog';
 
@@ -13,6 +13,7 @@ export interface ExpenseDialogProps {
   categories: BudgetCategory[];
   defaultCategoryId?: string;
   currency: CurrencyCode;
+  guestTarget?: number;
   onSave: (expense: {
     id: string;
     categoryId: string;
@@ -21,6 +22,8 @@ export interface ExpenseDialogProps {
     actualAmount?: number;
     paymentStatus: PaymentStatus;
     notes?: string;
+    costModel?: CostModelType;
+    unitCost?: number;
   }) => void;
 }
 
@@ -31,10 +34,13 @@ export function ExpenseDialog({
   categories,
   defaultCategoryId,
   currency,
+  guestTarget,
   onSave,
 }: ExpenseDialogProps) {
   const [categoryId, setCategoryId] = useState('');
   const [title, setTitle] = useState('');
+  const [costModel, setCostModel] = useState<CostModelType>('fixed');
+  const [unitCost, setUnitCost] = useState('');
   const [estimatedAmount, setEstimatedAmount] = useState('');
   const [actualAmount, setActualAmount] = useState('');
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('projected');
@@ -46,6 +52,8 @@ export function ExpenseDialog({
       if (expense) {
         setCategoryId(expense.categoryId);
         setTitle(expense.title);
+        setCostModel(expense.costModel || 'fixed');
+        setUnitCost(typeof expense.unitCost === 'number' ? String(expense.unitCost) : '');
         setEstimatedAmount(String(expense.estimatedAmount));
         setActualAmount(
           typeof expense.actualAmount === 'number' ? String(expense.actualAmount) : ''
@@ -57,6 +65,8 @@ export function ExpenseDialog({
           defaultCategoryId || (categories.length > 0 ? categories[0].id : '')
         );
         setTitle('');
+        setCostModel('fixed');
+        setUnitCost('');
         setEstimatedAmount('');
         setActualAmount('');
         setPaymentStatus('projected');
@@ -65,6 +75,24 @@ export function ExpenseDialog({
       setErrors({});
     }
   }, [isOpen, expense, categories, defaultCategoryId]);
+
+  const handleUnitCostChange = (val: string) => {
+    setUnitCost(val);
+    const num = Number(val);
+    if (Number.isFinite(num) && num >= 0 && typeof guestTarget === 'number' && guestTarget > 0) {
+      setEstimatedAmount(String(Math.round(num * guestTarget)));
+    }
+  };
+
+  const handleCostModelToggle = (model: CostModelType) => {
+    setCostModel(model);
+    if (model === 'per_guest') {
+      const est = Number(estimatedAmount);
+      if (Number.isFinite(est) && est > 0 && typeof guestTarget === 'number' && guestTarget > 0) {
+        setUnitCost(String(Math.round(est / guestTarget)));
+      }
+    }
+  };
 
   const handleCopyEstimateToActual = () => {
     const est = Number(estimatedAmount);
@@ -88,6 +116,16 @@ export function ExpenseDialog({
       newErrors.title = 'Title must be at least 2 characters.';
     } else if (trimmedTitle.length > 120) {
       newErrors.title = 'Title cannot exceed 120 characters.';
+    }
+
+    let parsedUnitCost: number | undefined = undefined;
+    if (costModel === 'per_guest') {
+      const uNum = Number(unitCost);
+      if (!Number.isFinite(uNum) || uNum < 0) {
+        newErrors.unitCost = 'Rate per guest must be a positive number or zero.';
+      } else {
+        parsedUnitCost = Math.round(uNum);
+      }
     }
 
     const estNum = Number(estimatedAmount);
@@ -117,6 +155,8 @@ export function ExpenseDialog({
       estimatedAmount: Math.round(estNum),
       actualAmount: parsedActual,
       paymentStatus,
+      costModel,
+      unitCost: parsedUnitCost,
       notes: notes.trim() || undefined,
     });
 
@@ -186,6 +226,85 @@ export function ExpenseDialog({
             </p>
           )}
         </div>
+
+        {/* Cost Model Selection */}
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-text mb-1.5">
+            Cost Model
+          </label>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <button
+              type="button"
+              onClick={() => handleCostModelToggle('fixed')}
+              className={`p-2.5 rounded-md border text-left font-medium transition-all ${
+                costModel === 'fixed'
+                  ? 'border-primary bg-primary-subtle text-neutral-text font-semibold shadow-xs'
+                  : 'border-neutral-border bg-neutral-surface text-neutral-muted hover:bg-neutral-subtle'
+              }`}
+            >
+              <div className="font-semibold text-neutral-text">Fixed Lump Sum</div>
+              <div className="text-[11px] text-neutral-muted mt-0.5">Fixed commitment (e.g. Venue, Photography)</div>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleCostModelToggle('per_guest')}
+              className={`p-2.5 rounded-md border text-left font-medium transition-all ${
+                costModel === 'per_guest'
+                  ? 'border-primary bg-primary-subtle text-neutral-text font-semibold shadow-xs'
+                  : 'border-neutral-border bg-neutral-surface text-neutral-muted hover:bg-neutral-subtle'
+              }`}
+            >
+              <div className="font-semibold text-neutral-text flex items-center gap-1">
+                <Users className="w-3.5 h-3.5 text-primary" />
+                <span>Per-Guest Rate</span>
+              </div>
+              <div className="text-[11px] text-neutral-muted mt-0.5">Scales with headcount (e.g. Catering)</div>
+            </button>
+          </div>
+        </div>
+
+        {/* Per-Guest Unit Cost input if costModel === 'per_guest' */}
+        {costModel === 'per_guest' && (
+          <div className="bg-neutral-subtle/60 p-3 rounded-md border border-neutral-border text-xs space-y-2">
+            <div className="flex items-center justify-between">
+              <label htmlFor="expense-unit-cost" className="font-semibold text-neutral-text">
+                Rate per Guest ({currency}) <span className="text-secondary">*</span>
+              </label>
+              {typeof guestTarget === 'number' && guestTarget > 0 && (
+                <span className="text-neutral-muted font-mono text-[11px]">
+                  Target: {guestTarget} guests
+                </span>
+              )}
+            </div>
+            <input
+              id="expense-unit-cost"
+              type="number"
+              min="0"
+              step="50"
+              placeholder="e.g. 2400"
+              value={unitCost}
+              onChange={(e) => handleUnitCostChange(e.target.value)}
+              className="w-full bg-neutral-surface border border-neutral-border px-3 py-1.5 rounded-md text-sm text-neutral-text font-mono focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            {errors.unitCost && (
+              <p className="text-xs text-status-danger flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5" />
+                <span>{errors.unitCost}</span>
+              </p>
+            )}
+            {typeof guestTarget === 'number' && guestTarget > 0 && unitCost && (
+              <p className="text-[11px] text-neutral-muted flex items-center gap-1">
+                <Calculator className="w-3.5 h-3.5 text-primary" />
+                <span>
+                  Projected total: {guestTarget} guests × {formatCurrency(Number(unitCost) || 0, currency)} ={' '}
+                  <strong className="text-neutral-text font-mono">
+                    {formatCurrency(Math.round((Number(unitCost) || 0) * guestTarget), currency)}
+                  </strong>
+                </span>
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Amounts */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

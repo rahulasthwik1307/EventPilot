@@ -4,6 +4,7 @@ import {
   extractCloudflareContent,
   generateCloudflareAssistantResponse,
   isVerifiedFreeModel,
+  normalizeStagedProposal,
   VERIFIED_FREE_CLOUDFLARE_MODELS,
 } from '../cloudflare-provider';
 import { AiAssistantRequest } from '../types';
@@ -311,5 +312,47 @@ describe('cloudflare-provider (Server Provider Adapter)', () => {
     expect(res.success).toBe(false);
     expect(res.error?.code).toBe('TIMEOUT');
     expect(res.error?.status).toBe(504);
+  });
+
+  it('normalizes update_preference proposal from Cloudflare output and rejects invalid categories', () => {
+    const rawProposal = {
+      actionType: 'update_preference',
+      title: 'Prioritize Pure Vegetarian Sadya',
+      explanation: 'User indicated strict vegetarian dietary rituals.',
+      payload: {
+        actionType: 'update_preference',
+        category: 'tradition',
+        field: 'dietaryStyle',
+        proposedValue: 'pure_vegetarian',
+        provenance: 'explicit',
+        rationale: 'Traditional celebration standard.',
+        userEvidence: 'We only serve pure vegetarian food.',
+      },
+    };
+
+    const normalized = normalizeStagedProposal(rawProposal, 0);
+    expect(normalized).not.toBeNull();
+    expect(normalized?.actionType).toBe('update_preference');
+    expect(normalized?.payload.actionType).toBe('update_preference');
+    if (normalized?.payload.actionType === 'update_preference') {
+      expect(normalized.payload.category).toBe('tradition');
+      expect(normalized.payload.field).toBe('dietaryStyle');
+      expect(normalized.payload.proposedValue).toBe('pure_vegetarian');
+      // Model-supplied provenance is untrusted and must be normalized to 'inferred'
+      expect(normalized.payload.provenance).toBe('inferred');
+    }
+
+    // Invalid category should be rejected
+    const invalidCategoryProposal = {
+      actionType: 'update_preference',
+      title: 'Invalid',
+      payload: {
+        actionType: 'update_preference',
+        category: 'secret_universe',
+        field: 'foo',
+        proposedValue: 'bar',
+      },
+    };
+    expect(normalizeStagedProposal(invalidCategoryProposal, 1)).toBeNull();
   });
 });

@@ -55,7 +55,21 @@ export function buildPrompt(request: AiAssistantRequest): string {
     contextDescription += `\nExpected Confirmed Attendance: ${context.expectedAttendance} attendees`;
   }
 
-  return `Intent: ${intent}\n\nEvent Context:\n${contextDescription}\n\nUser Question:\n"${userPrompt}"\n\nPlease provide a clear answer, summary, practical recommendation bullet points, and any relevant staged proposals (budget adjustment, timeline task, milestone, or vendor checklist).`;
+  if (context.preferencesSummary) {
+    const ps = context.preferencesSummary;
+    const prefLines: string[] = [];
+    if (ps.atmosphere) prefLines.push(`- Atmosphere: ${ps.atmosphere}`);
+    if (ps.budgetFlexibility) prefLines.push(`- Budget Flexibility: ${ps.budgetFlexibility}`);
+    if (ps.spendingPriorities?.length) prefLines.push(`- Spending Priorities: ${ps.spendingPriorities.join(', ')}`);
+    if (ps.nonNegotiables?.length) prefLines.push(`- Non-Negotiables: ${ps.nonNegotiables.join(', ')}`);
+    if (ps.dietaryStyle) prefLines.push(`- Dietary Style: ${ps.dietaryStyle}`);
+    if (ps.accessibility?.length) prefLines.push(`- Accessibility: ${ps.accessibility.join(', ')}`);
+    if (prefLines.length > 0) {
+      contextDescription += `\nConfirmed Preferences:\n${prefLines.join('\n')}`;
+    }
+  }
+
+  return `Intent: ${intent}\n\nEvent Context:\n${contextDescription}\n\nUser Question:\n"${userPrompt}"\n\nPlease provide a clear answer, summary, practical recommendation bullet points, and any relevant staged proposals (budget adjustment, timeline task, milestone, vendor checklist, or update preference).`;
 }
 
 /**

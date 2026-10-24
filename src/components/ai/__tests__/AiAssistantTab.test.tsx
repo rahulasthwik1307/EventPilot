@@ -276,4 +276,132 @@ describe('AiAssistantTab Component', () => {
     expect(screen.getByRole('button', { name: /Retry Request/i })).toBeDefined();
     expect(screen.getByText(/Your local planning data is completely secure/i)).toBeDefined();
   });
+
+  it('handles preference proposals with provenance tags and applies confirmed preferences safely', async () => {
+    const onUpdateMock = vi.fn();
+    const mockResponse = {
+      answer: 'Based on your preference for elder hospitality, here is a structured proposal.',
+      proposals: [
+        {
+          id: 'prop-pref-test',
+          actionType: 'update_preference',
+          title: 'Confirm Wheelchair Ramp Arrangements',
+          explanation: 'Ensure barrier-free mandap access.',
+          status: 'staged',
+          payload: {
+            actionType: 'update_preference',
+            category: 'logistics',
+            field: 'accessibilityRequirements',
+            proposedValue: {
+              guestCountFlexibility: 'strict_cap',
+              accessibilityRequirements: ['wheelchair_access'],
+            },
+            provenance: 'explicit',
+            rationale: 'Planner mentioned elder comfort',
+            userEvidence: 'Grandmother needs wheelchair access',
+          },
+        },
+      ],
+    };
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockResponse,
+    });
+
+    render(
+      <AiAssistantTab
+        event={mockEvent}
+        onUpdateEvent={onUpdateMock}
+      />
+    );
+
+    const textarea = screen.getByPlaceholderText(/Ask the planning assistant for advice/i);
+    fireEvent.change(textarea, { target: { value: 'We need wheelchair access for elderly guests' } });
+    fireEvent.click(screen.getByRole('button', { name: /Ask Assistant/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Confirm Wheelchair Ramp Arrangements')).toBeDefined();
+    });
+
+    // Check provenance badge and user evidence
+    expect(screen.getByText('Explicit User Statement')).toBeDefined();
+    expect(screen.getByText(/Grandmother needs wheelchair access/i)).toBeDefined();
+
+    // Accept proposal
+    fireEvent.click(screen.getByRole('button', { name: /Accept & Apply/i }));
+
+    expect(onUpdateMock).toHaveBeenCalled();
+    const updatedEvent: Event = onUpdateMock.mock.calls[0][0];
+    expect(updatedEvent.preferences?.logistics?.provenance).toBe('confirmed');
+    expect(updatedEvent.preferences?.logistics?.value.accessibilityRequirements).toContain('wheelchair_access');
+  });
+
+  it('prevents stale in-flight response from populating when user switches events during request', async () => {
+    let resolveEventAFetch: (value: any) => void;
+    const pendingFetchPromise = new Promise((resolve) => {
+      resolveEventAFetch = resolve;
+    });
+
+    global.fetch = vi.fn().mockImplementation(() => pendingFetchPromise);
+
+    const { rerender } = render(
+      <AiAssistantTab
+        event={mockEvent}
+        onUpdateEvent={vi.fn()}
+      />
+    );
+
+    // Submit question for Event A (mockEvent: 'test-event-ai')
+    const textarea = screen.getByPlaceholderText(/Ask the planning assistant for advice/i);
+    fireEvent.change(textarea, { target: { value: 'Question for Event A' } });
+    fireEvent.click(screen.getByRole('button', { name: /Ask Assistant/i }));
+
+    expect(screen.getByText(/Consulting AI Planning Assistant/i)).toBeDefined();
+
+    // Now switch event prop to Event B
+    const eventB: Event = {
+      ...mockEvent,
+      id: 'event-b-bangalore-bday',
+      title: 'Kabir 10th Birthday Adventure',
+      type: 'birthday',
+    };
+
+    rerender(
+      <AiAssistantTab
+        event={eventB}
+        onUpdateEvent={vi.fn()}
+      />
+    );
+
+    // Resolve the in-flight request from Event A
+    resolveEventAFetch!({
+      ok: true,
+      json: async () => ({
+        answer: 'Secret Answer specifically for Event A Wedding',
+        proposals: [
+          {
+            id: 'prop-event-a',
+            actionType: 'adjust_budget_allocation',
+            title: 'Event A Specific Mandap Proposal',
+            explanation: 'Specific to Wedding',
+            status: 'staged',
+            payload: {
+              actionType: 'adjust_budget_allocation',
+              categoryName: 'Venue & Banquets',
+              currentAllocated: 500000,
+              proposedAllocated: 600000,
+            },
+          },
+        ],
+      }),
+    });
+
+    // Wait a tick for async promise to flush
+    await new Promise((r) => setTimeout(r, 50));
+
+    // Event B must NOT display Event A's answer or proposals!
+    expect(screen.queryByText(/Secret Answer specifically for Event A Wedding/i)).toBeNull();
+    expect(screen.queryByText(/Event A Specific Mandap Proposal/i)).toBeNull();
+  });
 });

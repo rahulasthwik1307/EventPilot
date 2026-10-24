@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Sparkles,
   Send,
@@ -62,6 +62,13 @@ interface CachedAiResponse {
   latencyMs: number;
 }
 
+export interface SessionChatMessage {
+  id: string;
+  sender: 'user' | 'assistant';
+  text: string;
+  timestamp: string;
+}
+
 const memoryResponseCache = new Map<string, CachedAiResponse>();
 
 export function AiAssistantTab({
@@ -74,6 +81,11 @@ export function AiAssistantTab({
   const [isLoading, setIsLoading] = useState(false);
   const [lastSubmittedPrompt, setLastSubmittedPrompt] = useState<string | null>(null);
 
+  const [sessionMessages, setSessionMessages] = useState<SessionChatMessage[]>([]);
+  const [activeEventId, setActiveEventId] = useState(event.id);
+  const activeEventIdRef = useRef(event.id);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   const [conversationalAnswer, setConversationalAnswer] = useState<string | null>(null);
   const [activeModel, setActiveModel] = useState<string | null>(null);
   const [activeProvider, setActiveProvider] = useState<'cloudflare' | 'gemini' | null>(null);
@@ -85,6 +97,33 @@ export function AiAssistantTab({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [is503DemandError, setIs503DemandError] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+
+  // Synchronize active event reference and cancel in-flight queries when user switches event
+  useEffect(() => {
+    activeEventIdRef.current = event.id;
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    if (event.id !== activeEventId) {
+      setActiveEventId(event.id);
+      setIsLoading(false);
+      setSessionMessages([]);
+      setConversationalAnswer(null);
+      setProposals([]);
+      setErrorMessage(null);
+    }
+  }, [event.id, activeEventId]);
+
+  // Cleanup pending controller on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
+    };
+  }, []);
 
   // High-precision live elapsed timer during active assistant inference
   useEffect(() => {
@@ -168,12 +207,13 @@ export function AiAssistantTab({
     return isWedding
       ? [
           'Conduct a holistic review of our wedding plan and identify the top 3 priority areas.',
-          'Help us review our overall readiness across budget, milestones, and guest hospitality.',
-          'What are common unexpected pitfalls during South Indian weddings and how do we prevent them?',
+          'Guest comfort matters more than elaborate decoration; how should we balance our budget?',
+          'The budget is a hard limit; help us review our non-negotiables.',
         ]
       : [
           'Provide a comprehensive review of our celebration plan and recommend next steps.',
           'Review our timeline and budget for any potential gaps or schedule crunches.',
+          'We need wheelchair-accessible arrangements and ground-floor seating.',
         ];
   }, [event.type, intent]);
 
@@ -181,6 +221,15 @@ export function AiAssistantTab({
   const handleSubmit = async (customPrompt?: string) => {
     const textToSubmit = (customPrompt || prompt).trim();
     if (!textToSubmit || isLoading) return;
+
+    // Record user message in session-only history
+    const userMsg: SessionChatMessage = {
+      id: `usr_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      sender: 'user',
+      text: textToSubmit,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+    setSessionMessages((prev) => [...prev, userMsg]);
 
     const cacheKey = `${event.id}:${intent}:${textToSubmit.toLowerCase().trim()}`;
     const cached = memoryResponseCache.get(cacheKey);
@@ -197,8 +246,24 @@ export function AiAssistantTab({
       setErrorMessage(null);
       setIs503DemandError(false);
       setLastSubmittedPrompt(textToSubmit);
+
+      const cachedAssistantMsg: SessionChatMessage = {
+        id: `asst_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+        sender: 'assistant',
+        text: cached.answer,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setSessionMessages((prev) => [...prev, cachedAssistantMsg]);
       return;
     }
+
+    // Cancel any prior in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const targetEventId = event.id;
 
     setIsLoading(true);
     setErrorMessage(null);
@@ -213,15 +278,22 @@ export function AiAssistantTab({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          eventId: event.id,
+          eventId: targetEventId,
           intent,
           userPrompt: textToSubmit,
           context: projectPrivacySafeContext(event, intent),
         }),
+        signal: controller.signal,
       });
 
       const data = await response.json();
       const elapsed = Date.now() - startTime;
+
+      // Identity guard: if user switched events while fetch was pending, drop result
+      if (activeEventIdRef.current !== targetEventId || controller.signal.aborted) {
+        return;
+      }
+
       setResponseLatencyMs(elapsed);
 
       if (!response.ok) {
@@ -250,6 +322,15 @@ export function AiAssistantTab({
       setProposals(validated);
       setProposalFilter('all');
 
+      // Record assistant reply in session-only history
+      const asstMsg: SessionChatMessage = {
+        id: `asst_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+        sender: 'assistant',
+        text: data.answer,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setSessionMessages((prev) => [...prev, asstMsg]);
+
       // Cache successful response for instant re-retrieval
       memoryResponseCache.set(cacheKey, {
         answer: data.answer,
@@ -261,18 +342,34 @@ export function AiAssistantTab({
         latencyMs: elapsed,
       });
     } catch (err: any) {
+      if (err.name === 'AbortError' || controller.signal.aborted || activeEventIdRef.current !== targetEventId) {
+        return;
+      }
       setErrorMessage(
         err?.message || 'A network error occurred while connecting to the assistant.'
       );
     } finally {
-      setIsLoading(false);
+      if (activeEventIdRef.current === targetEventId) {
+        setIsLoading(false);
+      }
     }
   };
 
   // User accepts a staged proposal -> deterministic application
   const handleAcceptProposal = (id: string) => {
+    if (activeEventIdRef.current !== event.id) return;
     const proposal = proposals.find((p) => p.id === id);
     if (!proposal || proposal.status !== 'staged') return;
+
+    // Stale proposal protection: re-validate proposal against current event state
+    const checked = detectProposalConflicts(event, [proposal]);
+    if (checked[0].status === 'conflict') {
+      setProposals((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, status: 'conflict', conflictReason: checked[0].conflictReason } : p))
+      );
+      setErrorMessage(checked[0].conflictReason || 'Proposal is stale and conflicts with current celebration state.');
+      return;
+    }
 
     const result = applyProposalToEvent(event, proposal);
     if (result.success) {
@@ -547,6 +644,43 @@ export function AiAssistantTab({
                 Retry Request
               </Button>
             )}
+          </div>
+        )}
+
+        {/* Session Conversation History Stream (Prior turns in this session) */}
+        {sessionMessages.length > 1 && (
+          <div className="pt-4 border-t border-neutral-border/60 space-y-3">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-semibold text-neutral-text uppercase tracking-wider flex items-center gap-1.5">
+                <Compass className="w-3.5 h-3.5 text-primary" />
+                Previous Turns in this Session ({sessionMessages.length - 1})
+              </span>
+              <span className="text-[11px] text-neutral-muted font-mono">Session-only · Never Persisted</span>
+            </div>
+            <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+              {sessionMessages.slice(0, -1).map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
+                >
+                  <div
+                    className={`max-w-[88%] rounded-lg p-3 text-xs leading-relaxed ${
+                      msg.sender === 'user'
+                        ? 'bg-primary-subtle/60 text-neutral-text border border-primary/20'
+                        : 'bg-neutral-subtle/70 text-neutral-text border border-neutral-border'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3 text-[10px] text-neutral-muted mb-1 font-mono">
+                      <span className="font-semibold text-neutral-text">
+                        {msg.sender === 'user' ? 'You' : 'Planning Assistant'}
+                      </span>
+                      <span>{msg.timestamp}</span>
+                    </div>
+                    <div className="whitespace-pre-line">{msg.text}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </section>

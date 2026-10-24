@@ -193,4 +193,134 @@ describe('proposal-engine (Deterministic Proposal Dispatcher)', () => {
     expect(accepted[0].status).toBe('dismissed');
     expect(accepted[1].status).toBe('accepted');
   });
+
+  it('applies a preference proposal deterministically with confirmed provenance without altering financial contracts', () => {
+    const proposal: StagedProposal = {
+      id: 'prop-pref-1',
+      actionType: 'update_preference',
+      title: 'Prioritize Wheelchair Accessibility',
+      explanation: 'Elderly relatives require barrier-free ramp access and ground floor seating.',
+      status: 'staged',
+      payload: {
+        actionType: 'update_preference',
+        category: 'logistics',
+        field: 'accessibilityRequirements',
+        proposedValue: {
+          guestCountFlexibility: 'strict_cap',
+          accessibilityRequirements: ['wheelchair_access', 'elderly_friendly_seating'],
+          venueTypePreference: 'temple_mandapam',
+          timeOfDay: 'morning_auspicious',
+        },
+        provenance: 'explicit',
+        rationale: 'User specifically requested ramp access.',
+        userEvidence: 'My grandmother uses a wheelchair.',
+      },
+    };
+
+    const initialVendors = [...baseEvent.vendors];
+    const initialCategories = [...baseEvent.categories];
+    const initialExpenses = [...baseEvent.expenses];
+
+    const res = applyProposalToEvent(baseEvent, proposal);
+    expect(res.success).toBe(true);
+    expect(res.event.preferences?.logistics?.provenance).toBe('confirmed');
+    expect(res.event.preferences?.logistics?.value.accessibilityRequirements).toContain('wheelchair_access');
+
+    // CRITICAL: Must NOT alter vendor contracts, categories, or expenses
+    expect(res.event.vendors).toEqual(initialVendors);
+    expect(res.event.categories).toEqual(initialCategories);
+    expect(res.event.expenses).toEqual(initialExpenses);
+  });
+
+  it('applies a partial preference field update preserving sibling preference fields and accurate provenance', () => {
+    const eventWithFullBudget = {
+      ...baseEvent,
+      preferences: {
+        ...baseEvent.preferences,
+        budget: {
+          value: {
+            spendingPriorities: ['Catering', 'Photography'],
+            economizeAreas: ['Invitations'],
+            nonNegotiables: ['Mandap'],
+            flexibility: 'strict_hard_limit' as const,
+          },
+          provenance: 'confirmed' as const,
+          source: 'user_onboarding' as const,
+        },
+      },
+    };
+
+    const partialProposal: StagedProposal = {
+      id: 'prop-pref-partial',
+      actionType: 'update_preference',
+      title: 'Adjust Budget Flexibility',
+      explanation: 'Allow moderate buffer for high-priority items.',
+      status: 'staged',
+      payload: {
+        actionType: 'update_preference',
+        category: 'budget',
+        field: 'flexibility',
+        proposedValue: 'moderate_flexibility',
+        provenance: 'inferred',
+        rationale: 'Planner expressed willingness to consider upgrades.',
+      },
+    };
+
+    const res = applyProposalToEvent(eventWithFullBudget, partialProposal);
+    expect(res.success).toBe(true);
+
+    const budgetVal = res.event.preferences?.budget?.value;
+    expect(budgetVal?.flexibility).toBe('moderate_flexibility');
+    // Sibling fields MUST be preserved!
+    expect(budgetVal?.spendingPriorities).toEqual(['Catering', 'Photography']);
+    expect(budgetVal?.economizeAreas).toEqual(['Invitations']);
+    expect(budgetVal?.nonNegotiables).toEqual(['Mandap']);
+
+    // Provenance must be confirmed, source reflects ai_inference
+    expect(res.event.preferences?.budget?.provenance).toBe('confirmed');
+    expect(res.event.preferences?.budget?.source).toBe('ai_inference');
+  });
+
+  it('flags preference conflict when AI proposes flexible budget while user confirmed strict hard limit', () => {
+    const eventWithStrictBudget = {
+      ...baseEvent,
+      preferences: {
+        budget: {
+          value: {
+            spendingPriorities: ['Catering'],
+            economizeAreas: ['Decor'],
+            nonNegotiables: ['Muhurtham feast'],
+            flexibility: 'strict_hard_limit' as const,
+          },
+          provenance: 'confirmed' as const,
+          source: 'user_edit' as const,
+        },
+      },
+    };
+
+    const conflictingProposal: StagedProposal = {
+      id: 'prop-pref-conflict',
+      actionType: 'update_preference',
+      title: 'Make Budget Flexible',
+      explanation: 'Allow spending overflow for floral decor.',
+      status: 'staged',
+      payload: {
+        actionType: 'update_preference',
+        category: 'budget',
+        field: 'flexibility',
+        proposedValue: {
+          spendingPriorities: ['Catering'],
+          economizeAreas: [],
+          nonNegotiables: [],
+          flexibility: 'flexible_target',
+        },
+        provenance: 'inferred',
+        rationale: 'Inferred flexibility.',
+      },
+    };
+
+    const checked = detectProposalConflicts(eventWithStrictBudget, [conflictingProposal]);
+    expect(checked[0].status).toBe('conflict');
+    expect(checked[0].conflictReason).toContain('Budget Flexibility conflict');
+  });
 });

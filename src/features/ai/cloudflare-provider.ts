@@ -104,12 +104,26 @@ You MUST output ONLY a valid raw JSON object strictly conforming to this schema 
         "suggestedQuestions": ["string"],
         "checklistNotes": "string"
       }
+    },
+    {
+      "actionType": "update_preference",
+      "title": "string",
+      "explanation": "string",
+      "payload": {
+        "actionType": "update_preference",
+        "category": "priorities" | "budget" | "logistics" | "tradition",
+        "field": "string",
+        "proposedValue": {},
+        "provenance": "explicit" | "inferred",
+        "rationale": "string",
+        "userEvidence": "string"
+      }
     }
   ]
 }
 
 CRITICAL RULES:
-1. Every proposal MUST have a valid "actionType" matching one of: 'adjust_budget_allocation', 'add_task', 'add_milestone', 'add_checklist_item', 'suggest_vendor_followup'.
+1. Every proposal MUST have a valid "actionType" matching one of: 'adjust_budget_allocation', 'add_task', 'add_milestone', 'add_checklist_item', 'suggest_vendor_followup', 'update_preference'.
 2. The proposal's "payload" object MUST contain "actionType" identical to the proposal's actionType.
 3. Output strictly valid JSON without markdown formatting backticks.`;
 
@@ -198,6 +212,29 @@ export function normalizeStagedProposal(p: any, idx: number): StagedProposal | n
       vendorCategory: String(rawPayload.vendorCategory || 'Catering & Dining'),
       suggestedQuestions: questions,
       checklistNotes: rawPayload.checklistNotes,
+    };
+  } else if (actionType === 'update_preference') {
+    const validCategories = ['priorities', 'budget', 'logistics', 'tradition'];
+    const category = rawPayload.category;
+    if (!validCategories.includes(category)) {
+      return null;
+    }
+
+    const field = String(rawPayload.field || '').trim();
+    if (!field || rawPayload.proposedValue === undefined) {
+      return null;
+    }
+
+    normalizedPayload = {
+      actionType: 'update_preference',
+      category,
+      field,
+      currentValue: rawPayload.currentValue,
+      proposedValue: rawPayload.proposedValue,
+      provenance: 'inferred', // Model-supplied provenance is untrusted; always inferred
+      rationale: String(rawPayload.rationale || p.explanation || 'Refined preference recommendation'),
+      userEvidence: typeof rawPayload.userEvidence === 'string' ? rawPayload.userEvidence : undefined,
+      conflictsWith: typeof rawPayload.conflictsWith === 'string' ? rawPayload.conflictsWith : undefined,
     };
   }
 

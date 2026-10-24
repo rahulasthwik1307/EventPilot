@@ -34,6 +34,17 @@ export const ProjectedContextSchema = z.object({
       notes: z.string().optional(),
     })
     .optional(),
+  preferencesSummary: z
+    .object({
+      priorities: z.array(z.string()).optional(),
+      atmosphere: z.string().optional(),
+      budgetFlexibility: z.string().optional(),
+      spendingPriorities: z.array(z.string()).optional(),
+      nonNegotiables: z.array(z.string()).optional(),
+      dietaryStyle: z.string().optional(),
+      accessibility: z.array(z.string()).optional(),
+    })
+    .optional(),
 });
 
 export const AiAssistantRequestSchema = z.object({
@@ -84,12 +95,193 @@ export const SuggestVendorFollowupPayloadSchema = z.object({
   checklistNotes: z.string().optional(),
 });
 
+export const VALID_PREFERENCE_CATEGORIES = ['priorities', 'budget', 'logistics', 'tradition'] as const;
+
+export const UpdatePreferencePayloadSchema = z
+  .object({
+    actionType: z.literal('update_preference'),
+    category: z.enum(VALID_PREFERENCE_CATEGORIES),
+    field: z.string().min(1),
+    currentValue: z.unknown().optional(),
+    proposedValue: z.unknown(),
+    provenance: z.enum(['explicit', 'inferred']),
+    rationale: z.string().min(1),
+    userEvidence: z.string().optional(),
+    conflictsWith: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const { category, field, proposedValue } = data;
+
+    // Reject undefined or null proposedValue
+    if (proposedValue === undefined || proposedValue === null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['proposedValue'],
+        message: 'proposedValue cannot be null or undefined',
+      });
+      return;
+    }
+
+    // Reject untrusted attempts to set internal provenance or confirmation metadata through model payloads
+    if (typeof proposedValue === 'object' && proposedValue !== null) {
+      const obj = proposedValue as Record<string, unknown>;
+      if ('provenance' in obj || 'source' in obj || 'confidence' in obj) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['proposedValue'],
+          message: 'Model payloads may not inject internal provenance or source metadata',
+        });
+        return;
+      }
+    }
+
+    // Validate supported field and value per category
+    if (category === 'budget') {
+      const validBudgetFields = ['flexibility', 'spendingPriorities', 'economizeAreas', 'nonNegotiables', 'all'];
+      if (!validBudgetFields.includes(field)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['field'],
+          message: `Unsupported field "${field}" for category "budget"`,
+        });
+        return;
+      }
+
+      if (field === 'flexibility') {
+        const validFlex = ['strict_hard_limit', 'moderate_flexibility', 'flexible_target'];
+        const val = typeof proposedValue === 'object' && proposedValue !== null && 'flexibility' in proposedValue
+          ? (proposedValue as any).flexibility
+          : proposedValue;
+        if (!validFlex.includes(val)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['proposedValue'],
+            message: `Budget flexibility must be one of: ${validFlex.join(', ')}`,
+          });
+        }
+      } else if (['spendingPriorities', 'economizeAreas', 'nonNegotiables'].includes(field)) {
+        const val = typeof proposedValue === 'object' && proposedValue !== null && field in proposedValue
+          ? (proposedValue as any)[field]
+          : proposedValue;
+        if (!Array.isArray(val) || !val.every((item) => typeof item === 'string')) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['proposedValue'],
+            message: `${field} must be an array of strings`,
+          });
+        }
+      }
+    } else if (category === 'priorities') {
+      const validPriorityFields = ['primaryFocus', 'atmosphere', 'experienceNotes', 'all'];
+      if (!validPriorityFields.includes(field)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['field'],
+          message: `Unsupported field "${field}" for category "priorities"`,
+        });
+        return;
+      }
+
+      if (field === 'atmosphere') {
+        const validAtmospheres = [
+          'intimate_traditional',
+          'grand_festive',
+          'relaxed_contemporary',
+          'minimalist_sacred',
+          'vibrant_celebratory',
+          'custom',
+        ];
+        const val = typeof proposedValue === 'object' && proposedValue !== null && 'atmosphere' in proposedValue
+          ? (proposedValue as any).atmosphere
+          : proposedValue;
+        if (!validAtmospheres.includes(val)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['proposedValue'],
+            message: `Atmosphere must be one of: ${validAtmospheres.join(', ')}`,
+          });
+        }
+      } else if (field === 'primaryFocus') {
+        const val = typeof proposedValue === 'object' && proposedValue !== null && 'primaryFocus' in proposedValue
+          ? (proposedValue as any).primaryFocus
+          : proposedValue;
+        if (!Array.isArray(val) || !val.every((item) => typeof item === 'string')) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['proposedValue'],
+            message: 'primaryFocus must be an array of strings',
+          });
+        }
+      }
+    } else if (category === 'logistics') {
+      const validLogisticsFields = ['guestCountFlexibility', 'accessibilityRequirements', 'venueTypePreference', 'timeOfDay', 'all'];
+      if (!validLogisticsFields.includes(field)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['field'],
+          message: `Unsupported field "${field}" for category "logistics"`,
+        });
+        return;
+      }
+
+      if (field === 'guestCountFlexibility') {
+        const validFlex = ['strict_cap', 'small_buffer', 'open_estimate'];
+        const val = typeof proposedValue === 'object' && proposedValue !== null && 'guestCountFlexibility' in proposedValue
+          ? (proposedValue as any).guestCountFlexibility
+          : proposedValue;
+        if (!validFlex.includes(val)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['proposedValue'],
+            message: `guestCountFlexibility must be one of: ${validFlex.join(', ')}`,
+          });
+        }
+      } else if (field === 'accessibilityRequirements') {
+        const val = typeof proposedValue === 'object' && proposedValue !== null && 'accessibilityRequirements' in proposedValue
+          ? (proposedValue as any).accessibilityRequirements
+          : proposedValue;
+        if (!Array.isArray(val) || !val.every((item) => typeof item === 'string')) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['proposedValue'],
+            message: 'accessibilityRequirements must be an array of strings',
+          });
+        }
+      }
+    } else if (category === 'tradition') {
+      const validTraditionFields = ['dietaryStyle', 'musicStyle', 'customRequirements', 'notes', 'all'];
+      if (!validTraditionFields.includes(field)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['field'],
+          message: `Unsupported field "${field}" for category "tradition"`,
+        });
+        return;
+      }
+
+      if (field === 'dietaryStyle') {
+        const validDiet = ['pure_vegetarian', 'sattvic_jain', 'vegetarian_and_non_veg', 'multi_cuisine', 'custom'];
+        const val = typeof proposedValue === 'object' && proposedValue !== null && 'dietaryStyle' in proposedValue
+          ? (proposedValue as any).dietaryStyle
+          : proposedValue;
+        if (!validDiet.includes(val)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['proposedValue'],
+            message: `dietaryStyle must be one of: ${validDiet.join(', ')}`,
+          });
+        }
+      }
+    }
+  });
+
 export const ProposalPayloadSchema = z.discriminatedUnion('actionType', [
   BudgetAdjustmentPayloadSchema,
   AddTaskPayloadSchema,
   AddMilestonePayloadSchema,
   AddChecklistItemPayloadSchema,
   SuggestVendorFollowupPayloadSchema,
+  UpdatePreferencePayloadSchema,
 ]);
 
 export const ProposalActionTypeSchema = z.enum([
@@ -98,6 +290,7 @@ export const ProposalActionTypeSchema = z.enum([
   'add_milestone',
   'add_checklist_item',
   'suggest_vendor_followup',
+  'update_preference',
 ]);
 
 export const ProposalStatusSchema = z.enum([
@@ -162,6 +355,7 @@ export const GEMINI_STRUCTURED_RESPONSE_SCHEMA = {
               'add_milestone',
               'add_checklist_item',
               'suggest_vendor_followup',
+              'update_preference',
             ],
           },
           title: { type: 'string', description: 'Brief human-readable proposal title.' },
@@ -187,6 +381,11 @@ export const GEMINI_STRUCTURED_RESPONSE_SCHEMA = {
               vendorCategory: { type: 'string' },
               suggestedQuestions: { type: 'array', items: { type: 'string' } },
               checklistNotes: { type: 'string' },
+              category: { type: 'string', enum: ['priorities', 'budget', 'logistics', 'tradition'] },
+              field: { type: 'string' },
+              proposedValue: { type: 'object' },
+              provenance: { type: 'string', enum: ['explicit', 'inferred'] },
+              userEvidence: { type: 'string' },
             },
             required: ['actionType'],
           },

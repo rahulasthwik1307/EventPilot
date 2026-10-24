@@ -215,6 +215,38 @@ describe('LocalStorageEventStorage Adapter', () => {
       expect(window.localStorage.getItem(STORAGE_KEYS.PERSONAL_EVENTS)).toBe('{"corrupted raw user data');
     });
 
+    it('saves and restores preferences round-trip while keeping personal and sample events strictly isolated', () => {
+      const personalWithPrefs = createTestEvent({
+        preferences: {
+          priorities: {
+            value: {
+              primaryFocus: ['guest_hospitality'],
+              atmosphere: 'intimate_traditional',
+            },
+            provenance: 'confirmed',
+            source: 'user_edit',
+          },
+        },
+      });
+
+      storage.savePersonalEvent(personalWithPrefs);
+      const retrieved = storage.getPersonalEvent(personalWithPrefs.id);
+      expect(retrieved.success).toBe(true);
+      expect(retrieved.data?.preferences?.priorities?.value.atmosphere).toBe('intimate_traditional');
+      expect(retrieved.data?.preferences?.priorities?.provenance).toBe('confirmed');
+
+      // Sample event isolation check
+      const sample = storage.getSampleEvent();
+      expect(sample.success).toBe(true);
+      expect(sample.data?.id).not.toBe(personalWithPrefs.id);
+
+      // Resetting sample event does not touch personal event or its preferences
+      storage.resetSampleEvent();
+      const stillThere = storage.getPersonalEvent(personalWithPrefs.id);
+      expect(stillThere.success).toBe(true);
+      expect(stillThere.data?.preferences?.priorities?.value.atmosphere).toBe('intimate_traditional');
+    });
+
     it('handles QuotaExceededError gracefully', () => {
       const quotaErr = new DOMException('Quota exceeded', 'QuotaExceededError');
       const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string) => {
@@ -238,6 +270,80 @@ describe('LocalStorageEventStorage Adapter', () => {
       expect(res.error?.message).toContain('quota exceeded');
 
       spy.mockRestore();
+    });
+
+    it('rejects stale saves with CONCURRENCY_CONFLICT when expectedUpdatedAt does not match (W3-01)', () => {
+      const concurrencyEvent = createTestEvent({ id: 'evt-concurrency-test' });
+      // 1. Initial save
+      const initialSaveRes = storage.savePersonalEvent(concurrencyEvent);
+      expect(initialSaveRes.success).toBe(true);
+
+      const savedSnapshot = storage.getPersonalEvent(concurrencyEvent.id).data!;
+      const originalTimestamp = savedSnapshot.updatedAt;
+
+      // 2. Simulate a concurrent background update (e.g. vendor payment recorded in another session)
+      const concurrentUpdate: Event = {
+        ...savedSnapshot,
+        title: 'Concurrent Workspace Edit',
+      };
+      const concurrentSaveRes = storage.savePersonalEvent(concurrentUpdate);
+      expect(concurrentSaveRes.success).toBe(true);
+
+      const latestSnapshot = storage.getPersonalEvent(concurrencyEvent.id).data!;
+      expect(latestSnapshot.title).toBe('Concurrent Workspace Edit');
+      expect(latestSnapshot.updatedAt).not.toBe(originalTimestamp);
+
+      // 3. Attempt to save using the old snapshot timestamp as expectedUpdatedAt
+      const staleSaveAttempt: Event = {
+        ...savedSnapshot,
+        guestTarget: 999, // Stale edit
+      };
+
+      const conflictRes = storage.savePersonalEvent(staleSaveAttempt, {
+        expectedUpdatedAt: originalTimestamp,
+      });
+
+      expect(conflictRes.success).toBe(false);
+      expect(conflictRes.error?.code).toBe('CONCURRENCY_CONFLICT');
+      expect(conflictRes.error?.message).toContain('updated in another session');
+
+      // 4. Verify the stored event remains the concurrent update, not overwritten by the stale attempt
+      const preserved = storage.getPersonalEvent(concurrencyEvent.id).data!;
+      expect(preserved.title).toBe('Concurrent Workspace Edit');
+      expect(preserved.guestTarget).toBe(concurrencyEvent.guestTarget); // Unchanged!
+    });
+
+    it('accepts save when expectedUpdatedAt matches latest stored event', () => {
+      const concurrencyEvent = createTestEvent({ id: 'evt-concurrency-valid' });
+      storage.savePersonalEvent(concurrencyEvent);
+      const savedSnapshot = storage.getPersonalEvent(concurrencyEvent.id).data!;
+
+      const validSaveRes = storage.savePersonalEvent(
+        { ...savedSnapshot, title: 'Updated With Matching Timestamp' },
+        { expectedUpdatedAt: savedSnapshot.updatedAt }
+      );
+
+      expect(validSaveRes.success).toBe(true);
+      const updated = storage.getPersonalEvent(concurrencyEvent.id).data!;
+      expect(updated.title).toBe('Updated With Matching Timestamp');
+    });
+
+    it('rejects stale sample event save with CONCURRENCY_CONFLICT', () => {
+      const freshSample = storage.getSampleEvent().data!;
+      const originalTimestamp = freshSample.updatedAt;
+
+      // Concurrent update on sample event
+      storage.saveSampleEvent({ ...freshSample, title: 'Concurrent Sample Edit' });
+
+      // Attempt to save sample with old timestamp
+      const staleRes = storage.saveSampleEvent(
+        { ...freshSample, title: 'Stale Sample Edit' },
+        { expectedUpdatedAt: originalTimestamp }
+      );
+
+      expect(staleRes.success).toBe(false);
+      expect(staleRes.error?.code).toBe('CONCURRENCY_CONFLICT');
+      expect(storage.getSampleEvent().data?.title).toBe('Concurrent Sample Edit');
     });
   });
 });

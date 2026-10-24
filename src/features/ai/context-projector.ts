@@ -62,6 +62,20 @@ export function projectEventContextForAI(
     };
   }
 
+  // 4. Preferences context: allowlisted high-level planning constraints only (no private guest details)
+  if (event.preferences) {
+    const prefs = event.preferences;
+    projected.preferencesSummary = {
+      priorities: prefs.priorities?.value?.primaryFocus,
+      atmosphere: prefs.priorities?.value?.atmosphere,
+      budgetFlexibility: prefs.budget?.value?.flexibility,
+      spendingPriorities: prefs.budget?.value?.spendingPriorities,
+      nonNegotiables: prefs.budget?.value?.nonNegotiables,
+      dietaryStyle: prefs.tradition?.value?.dietaryStyle,
+      accessibility: prefs.logistics?.value?.accessibilityRequirements,
+    };
+  }
+
   return projected;
 }
 

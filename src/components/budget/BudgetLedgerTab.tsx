@@ -12,6 +12,7 @@ import {
   Clock,
   Layers,
   FileSpreadsheet,
+  Sliders,
 } from 'lucide-react';
 import {
   BudgetCategory,
@@ -28,6 +29,7 @@ import { CouponBadge } from '../ui/Badge';
 import { CategoryDialog } from './CategoryDialog';
 import { CategoryDeleteDialog } from './CategoryDeleteDialog';
 import { ExpenseDialog } from './ExpenseDialog';
+import { ScenarioSimulationModal } from '../tradeoffs/ScenarioSimulationModal';
 
 export interface BudgetLedgerTabProps {
   event: Event;
@@ -45,6 +47,7 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [defaultExpenseCatId, setDefaultExpenseCatId] = useState<string | undefined>(undefined);
+  const [isScenarioSimulationOpen, setIsScenarioSimulationOpen] = useState(false);
 
   // Filters
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
@@ -195,6 +198,14 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => setIsScenarioSimulationOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border rounded-md transition-all active:scale-[0.98] shadow-xs"
+          >
+            <Sliders className="w-3.5 h-3.5 text-primary" />
+            <span>What-If Simulation</span>
+          </button>
           <button
             type="button"
             onClick={() => {
@@ -767,7 +778,15 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
         categories={categories}
         defaultCategoryId={defaultExpenseCatId}
         currency={event.currency}
+        guestTarget={event.guestTarget}
         onSave={handleSaveExpense}
+      />
+
+      <ScenarioSimulationModal
+        isOpen={isScenarioSimulationOpen}
+        onClose={() => setIsScenarioSimulationOpen(false)}
+        event={event}
+        onApplyScenario={(updated) => onUpdateEvent(updated)}
       />
     </div>
   );

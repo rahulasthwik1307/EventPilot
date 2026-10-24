@@ -119,4 +119,13 @@ describe('BudgetLedgerTab Component', () => {
 
     expect(screen.getByRole('heading', { name: 'Add Expense Item' })).toBeInTheDocument();
   });
+
+  it('opens what-if simulation modal when clicking What-If Simulation', () => {
+    render(<BudgetLedgerTab event={mockEvent} onUpdateEvent={vi.fn()} />);
+
+    const simBtn = screen.getByRole('button', { name: /what-if simulation/i });
+    fireEvent.click(simBtn);
+
+    expect(screen.getByRole('heading', { name: 'What-If Scenario Simulation' })).toBeInTheDocument();
+  });
 });

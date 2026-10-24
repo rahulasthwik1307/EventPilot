@@ -92,4 +92,56 @@ describe('POST /api/assistant (App Router API Route)', () => {
     expect(body.code).toBe('MODEL_UNAVAILABLE');
     expect(body.error).toContain('high demand');
   });
+
+  it('validates and accepts request context with preference summary and returns update_preference proposals', async () => {
+    vi.spyOn(orchestrator, 'orchestrateAssistantResponse').mockResolvedValueOnce({
+      success: true,
+      data: {
+        answer: 'Wheelchair access arrangements proposed.',
+        summary: 'Confirm logistics preference.',
+        recommendations: ['Check venue ramp width.'],
+        proposals: [
+          {
+            id: 'prop-pref-route',
+            actionType: 'update_preference',
+            title: 'Ramp Access',
+            explanation: 'Elderly guest mobility.',
+            status: 'staged',
+            payload: {
+              actionType: 'update_preference',
+              category: 'logistics',
+              field: 'accessibilityRequirements',
+              proposedValue: { accessibilityRequirements: ['wheelchair_access'] },
+              provenance: 'explicit',
+              rationale: 'Accessibility needs',
+            },
+          },
+        ],
+        modelUsed: '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+        provider: 'cloudflare',
+        timestamp: '2026-10-21T17:00:00.000Z',
+      },
+    });
+
+    const payloadWithPreferences = {
+      ...validPayload,
+      context: {
+        ...validPayload.context,
+        preferencesSummary: {
+          priorities: ['guest_hospitality'],
+          accessibility: ['wheelchair_access'],
+        },
+      },
+    };
+
+    const req = {
+      json: vi.fn().mockResolvedValue(payloadWithPreferences),
+    } as unknown as NextRequest;
+
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.success).toBe(true);
+    expect(body.proposals[0].actionType).toBe('update_preference');
+  });
 });

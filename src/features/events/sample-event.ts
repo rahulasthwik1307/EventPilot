@@ -14,6 +14,7 @@ import {
 import { Vendor } from '../vendors/types';
 import { Guest, GuestHousehold } from '../guests/types';
 import { SeatingAssignment, SeatingTable } from '../seating/types';
+import { createDefaultPreferenceRecord } from '../preferences/preferences';
 
 /**
  * Returns a dynamically computed target date roughly 90 days in the future
@@ -229,8 +230,8 @@ export function createFreshSampleEvent(): Event {
       status: 'negotiating',
       quotedCost: 80000,
       agreedCost: 70000,
-      depositPaid: 0,
-      amountPaid: 0,
+      depositPaid: 30000,
+      amountPaid: 30000,
       linkedCategoryId: categories[4]?.id,
       notes: 'Nadaswaram accompaniment for Muhurtham + acoustic flute & sitar for high tea.',
       createdAt: now,
@@ -564,6 +565,47 @@ export function createFreshSampleEvent(): Event {
     culturalContext: {
       traditionOrTheme: 'South Indian Vivaha with Contemporary Evening Reception',
       notes: 'Traditional morning Muhurtham followed by garden banquet and musical evening.',
+    },
+    preferences: {
+      priorities: createDefaultPreferenceRecord(
+        {
+          primaryFocus: ['food_and_beverage', 'ceremonial_rituals', 'guest_hospitality'],
+          atmosphere: 'intimate_traditional',
+          experienceNotes: 'Traditional morning Muhurtham with authentic South Indian breakfast and high-touch hospitality for out-of-town elders.',
+        },
+        'confirmed',
+        'user_onboarding'
+      ),
+      budget: createDefaultPreferenceRecord(
+        {
+          spendingPriorities: ['Catering & Dining', 'Venue & Heritage Ambiance'],
+          economizeAreas: ['Invitations & Stationery'],
+          nonNegotiables: ['Authentic South Indian Muhurtham feast', 'Traditional Nadaswaram troupe'],
+          flexibility: 'strict_hard_limit',
+        },
+        'confirmed',
+        'user_onboarding'
+      ),
+      logistics: createDefaultPreferenceRecord(
+        {
+          guestCountFlexibility: 'small_buffer',
+          accessibilityRequirements: ['wheelchair_access', 'elderly_friendly_seating'],
+          venueTypePreference: 'temple_mandapam',
+          timeOfDay: 'morning_auspicious',
+        },
+        'confirmed',
+        'user_onboarding'
+      ),
+      tradition: createDefaultPreferenceRecord(
+        {
+          customRequirements: ['Muhurtham timing before 8:30 AM'],
+          dietaryStyle: 'pure_vegetarian',
+          musicStyle: ['traditional_nadaswaram', 'classical_acoustic'],
+          notes: 'Strict sattvic breakfast for traditional ceremony, grand multi-cuisine dinner for reception.',
+        },
+        'confirmed',
+        'user_onboarding'
+      ),
     },
     isSample: true,
     categories,
