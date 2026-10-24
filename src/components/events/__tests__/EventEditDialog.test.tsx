@@ -261,7 +261,10 @@ describe('EventEditDialog Component', () => {
 
     expect(saveSpy).toHaveBeenCalledWith(
       expect.anything(),
-      { expectedUpdatedAt: mockEvent.updatedAt }
+      {
+        expectedUpdatedAt: mockEvent.updatedAt,
+        expectedVersion: 1,
+      }
     );
     expect(handleSuccess).not.toHaveBeenCalled();
     expect(handleClose).not.toHaveBeenCalled();

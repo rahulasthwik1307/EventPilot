@@ -13,6 +13,7 @@ import {
   Briefcase,
   AlertTriangle,
   Armchair,
+  Sliders,
 } from 'lucide-react';
 import { Event } from '../../features/events/types';
 import {
@@ -34,6 +35,7 @@ import { WorkspaceTab } from './WorkspaceNavigation';
 export interface OverviewTabProps {
   event: Event;
   onEdit: () => void;
+  onReplan?: () => void;
   onNavigateTab?: (tab: WorkspaceTab) => void;
   lastSavedAt?: string;
 }
@@ -41,6 +43,7 @@ export interface OverviewTabProps {
 export function OverviewTab({
   event,
   onEdit,
+  onReplan,
   onNavigateTab,
   lastSavedAt,
 }: OverviewTabProps) {
@@ -216,7 +219,7 @@ export function OverviewTab({
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-neutral-border/60 flex items-center justify-between text-xs">
+            <div className="mt-4 pt-3 border-t border-neutral-border/60 flex items-center justify-between text-xs flex-wrap gap-2">
               <button
                 type="button"
                 onClick={onEdit}
@@ -225,6 +228,17 @@ export function OverviewTab({
                 <span>Edit Celebration Baseline</span>
                 <ArrowRight className="w-3 h-3" />
               </button>
+
+              {onReplan && (
+                <button
+                  type="button"
+                  onClick={onReplan}
+                  className="font-semibold text-primary hover:text-primary-hover flex items-center gap-1"
+                >
+                  <Sliders className="w-3.5 h-3.5" />
+                  <span>Dynamic Replan</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

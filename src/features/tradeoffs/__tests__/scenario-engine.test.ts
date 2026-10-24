@@ -343,4 +343,29 @@ describe('scenario-engine (Deterministic Financial & Variable Cost Engine)', () 
     expect(fin.totalPaidToDate).toBe(30000);
     expect(fin.remainingContractBalance).toBe(60000); // 90,000 - 30,000
   });
+
+  it('does NOT fall back to depositPaid when amountPaid is explicitly 0 (zero paid)', () => {
+    const eventWithZeroPaidVendor: Event = {
+      ...baseEvent,
+      vendors: [
+        {
+          id: 'vnd-zero-paid',
+          name: 'Zero Paid Vendor',
+          category: 'venue',
+          status: 'booked',
+          quotedCost: 100000,
+          agreedCost: 90000,
+          depositPaid: 20000,
+          amountPaid: 0, // Explicitly 0 paid!
+          linkedCategoryId: 'cat-venue',
+          createdAt: '2026-01-01',
+          updatedAt: '2026-01-01',
+        },
+      ],
+    };
+
+    const fin = calculateScenarioFinancials(eventWithZeroPaidVendor, {});
+    expect(fin.totalPaidToDate).toBe(0); // Must be 0, not fallen back to 20,000!
+    expect(fin.remainingContractBalance).toBe(90000); // 90,000 - 0
+  });
 });

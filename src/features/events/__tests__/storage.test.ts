@@ -345,5 +345,90 @@ describe('LocalStorageEventStorage Adapter', () => {
       expect(staleRes.error?.code).toBe('CONCURRENCY_CONFLICT');
       expect(storage.getSampleEvent().data?.title).toBe('Concurrent Sample Edit');
     });
+
+    it('reliably advances concurrency version and rejects stale expectedVersion under frozen wall-clock timestamps', () => {
+      vi.useFakeTimers();
+      const fixedTime = new Date('2026-10-24T12:00:00.000Z');
+      vi.setSystemTime(fixedTime);
+
+      const testEvt = createTestEvent({ id: 'evt-frozen-clock' });
+
+      // 1. The first save succeeds
+      const firstSave = storage.savePersonalEvent(testEvt);
+      expect(firstSave.success).toBe(true);
+
+      const v1Snapshot = storage.getPersonalEvent(testEvt.id).data!;
+      expect(v1Snapshot.version).toBe(1);
+
+      // 2. The successful save advances the concurrency version even when wall clock is identical
+      const concurrentUpdate: Event = {
+        ...v1Snapshot,
+        title: 'Concurrent Workspace Edit Under Same Clock',
+      };
+      const secondSave = storage.savePersonalEvent(concurrentUpdate, {
+        expectedVersion: 1,
+      });
+      expect(secondSave.success).toBe(true);
+
+      const v2Snapshot = storage.getPersonalEvent(testEvt.id).data!;
+      expect(v2Snapshot.version).toBe(2);
+
+      // 3. A second save with the stale version (expectedVersion: 1) is rejected
+      const staleSaveAttempt: Event = {
+        ...v1Snapshot,
+        guestTarget: 999,
+      };
+      const conflictRes = storage.savePersonalEvent(staleSaveAttempt, {
+        expectedVersion: 1,
+      });
+      expect(conflictRes.success).toBe(false);
+      expect(conflictRes.error?.code).toBe('CONCURRENCY_CONFLICT');
+
+      // 4. A save with the current version (expectedVersion: 2) succeeds
+      const validSaveAttempt: Event = {
+        ...v2Snapshot,
+        guestTarget: 450,
+      };
+      const validRes = storage.savePersonalEvent(validSaveAttempt, {
+        expectedVersion: 2,
+      });
+      expect(validRes.success).toBe(true);
+
+      const v3Snapshot = storage.getPersonalEvent(testEvt.id).data!;
+      expect(v3Snapshot.version).toBe(3);
+      expect(v3Snapshot.guestTarget).toBe(450);
+
+      vi.useRealTimers();
+    });
+
+    it('reads legacy records without version and safely initializes version on update', () => {
+      // Directly inject a legacy container without 'version' field into localStorage
+      const legacyEvent = createTestEvent({ id: 'evt-legacy-no-version' });
+      delete (legacyEvent as unknown as Record<string, unknown>).version;
+
+      const container = {
+        schemaVersion: 1,
+        payload: [legacyEvent],
+        timestamp: '2026-01-01T00:00:00.000Z',
+      };
+      window.localStorage.setItem(STORAGE_KEYS.PERSONAL_EVENTS, JSON.stringify(container));
+
+      // 5. Existing legacy records remain readable and can be safely updated
+      const loadedRes = storage.getPersonalEvent(legacyEvent.id);
+      expect(loadedRes.success).toBe(true);
+      expect(loadedRes.data).toBeDefined();
+      expect(loadedRes.data?.version).toBe(1); // Defaulted safely
+
+      // Update legacy record using expectedVersion: 1
+      const updateRes = storage.savePersonalEvent(
+        { ...loadedRes.data!, title: 'Migrated from Legacy' },
+        { expectedVersion: 1 }
+      );
+      expect(updateRes.success).toBe(true);
+
+      const updatedSnapshot = storage.getPersonalEvent(legacyEvent.id).data!;
+      expect(updatedSnapshot.title).toBe('Migrated from Legacy');
+      expect(updatedSnapshot.version).toBe(2);
+    });
   });
 });

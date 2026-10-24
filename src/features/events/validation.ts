@@ -22,6 +22,7 @@ import {
   Vendor,
   EventPreferences,
 } from './types';
+import { VendorCategory, VendorQuotation } from '../vendors/types';
 import { validateEventPreferences } from '../preferences/preferences';
 
 const VALID_EVENT_TYPES: EventType[] = ['wedding', 'birthday', 'community'];
@@ -278,6 +279,9 @@ export function validateEvent(data: unknown): ValidationResult<Event> {
 
   const createdAt = typeof obj.createdAt === 'string' ? obj.createdAt : new Date().toISOString();
   const updatedAt = typeof obj.updatedAt === 'string' ? obj.updatedAt : createdAt;
+  const version = typeof obj.version === 'number' && Number.isFinite(obj.version) && obj.version > 0
+    ? Math.round(obj.version)
+    : 1;
   const isSample = Boolean(obj.isSample);
 
   let categories: BudgetCategory[] = [];
@@ -483,6 +487,99 @@ export function validateEvent(data: unknown): ValidationResult<Event> {
       });
   }
 
+  let quotations: VendorQuotation[] = [];
+  if (Array.isArray(obj.quotations)) {
+    quotations = obj.quotations
+      .filter((q) => q && typeof q === 'object' && typeof (q as Record<string, unknown>).title === 'string')
+      .map((q, i) => {
+        const item = q as Record<string, unknown>;
+        const quotedTotal = Number.isFinite(item.quotedTotal)
+          ? Math.max(0, Math.round(Number(item.quotedTotal)))
+          : 0;
+        const currency = ['INR', 'USD', 'EUR', 'GBP'].includes(item.currency as string)
+          ? (item.currency as CurrencyCode)
+          : 'INR';
+        const provenance = item.provenance === 'ai_extracted' ? 'ai_extracted' : 'user_manual';
+        const status = ['active', 'archived', 'accepted', 'declined'].includes(item.status as string)
+          ? (item.status as VendorQuotation['status'])
+          : 'active';
+
+        return {
+          id: typeof item.id === 'string' && item.id ? item.id : `quote_${i + 1}`,
+          vendorId: typeof item.vendorId === 'string' ? item.vendorId : '',
+          vendorName: typeof item.vendorName === 'string' ? item.vendorName.trim() : 'Vendor',
+          serviceCategory: (item.serviceCategory as VendorCategory) || 'other',
+          title: String(item.title).trim() || 'Quotation',
+          quotedTotal,
+          currency,
+          quoteDate: typeof item.quoteDate === 'string' ? item.quoteDate : createdAt.slice(0, 10),
+          validUntilDate: typeof item.validUntilDate === 'string' ? item.validUntilDate : undefined,
+          includedServices: Array.isArray(item.includedServices)
+            ? item.includedServices
+                .map((s: any) => ({
+                  description: String(s?.description || '').trim(),
+                  quantity: Number.isFinite(s?.quantity) ? Number(s.quantity) : undefined,
+                  unit: typeof s?.unit === 'string' ? s.unit : undefined,
+                  itemizedCost: Number.isFinite(s?.itemizedCost)
+                    ? Math.max(0, Math.round(Number(s.itemizedCost)))
+                    : undefined,
+                }))
+                .filter((s: any) => s.description.length > 0)
+            : [],
+          exclusions: Array.isArray(item.exclusions)
+            ? item.exclusions
+                .map((e: any) => String(e).trim())
+                .filter((e: string) => e.length > 0)
+            : [],
+          optionalAddOns: Array.isArray(item.optionalAddOns)
+            ? item.optionalAddOns
+                .map((a: any) => ({
+                  title: String(a?.title || '').trim(),
+                  additionalCost: Number.isFinite(a?.additionalCost)
+                    ? Math.max(0, Math.round(Number(a.additionalCost)))
+                    : 0,
+                  description: typeof a?.description === 'string' ? a.description : undefined,
+                }))
+                .filter((a: any) => a.title.length > 0)
+            : [],
+          taxesAndFees: Array.isArray(item.taxesAndFees)
+            ? item.taxesAndFees
+                .map((t: any) => ({
+                  name: String(t?.name || '').trim(),
+                  amount: Number.isFinite(t?.amount) ? Math.max(0, Math.round(Number(t.amount))) : 0,
+                  isIncludedInTotal: Boolean(t?.isIncludedInTotal),
+                }))
+                .filter((t: any) => t.name.length > 0)
+            : [],
+          depositRequired: Number.isFinite(item.depositRequired)
+            ? Math.max(0, Math.round(Number(item.depositRequired)))
+            : undefined,
+          paymentMilestones: Array.isArray(item.paymentMilestones)
+            ? item.paymentMilestones
+                .map((m: any) => ({
+                  stage: String(m?.stage || '').trim(),
+                  amount: Number.isFinite(m?.amount) ? Math.max(0, Math.round(Number(m.amount))) : 0,
+                  dueDate: typeof m?.dueDate === 'string' ? m.dueDate : undefined,
+                }))
+                .filter((m: any) => m.stage.length > 0)
+            : [],
+          cancellationPolicy:
+            typeof item.cancellationPolicy === 'string' ? item.cancellationPolicy.trim() : undefined,
+          guestCountAssumption: Number.isFinite(item.guestCountAssumption)
+            ? Math.max(0, Math.round(Number(item.guestCountAssumption)))
+            : undefined,
+          capacityConstraint:
+            typeof item.capacityConstraint === 'string' ? item.capacityConstraint.trim() : undefined,
+          notes: typeof item.notes === 'string' ? item.notes.trim() : undefined,
+          sourceText: typeof item.sourceText === 'string' ? item.sourceText : undefined,
+          provenance,
+          status,
+          createdAt: typeof item.createdAt === 'string' ? item.createdAt : createdAt,
+          updatedAt: typeof item.updatedAt === 'string' ? item.updatedAt : createdAt,
+        };
+      });
+  }
+
   return {
     isValid: true,
     data: {
@@ -498,8 +595,10 @@ export function validateEvent(data: unknown): ValidationResult<Event> {
       guests,
       tables,
       assignments,
+      quotations,
       createdAt,
       updatedAt,
+      version,
     },
     errors: {},
   };

@@ -130,6 +130,7 @@ export function EventCreateDialog({
         isSample: false,
         createdAt: now,
         updatedAt: now,
+        version: 1,
       };
 
       const saveRes = eventStorage.savePersonalEvent(newEvent);

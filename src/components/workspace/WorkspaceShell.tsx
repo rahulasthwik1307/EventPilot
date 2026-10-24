@@ -13,6 +13,7 @@ import { GuestsTab } from '../guests/GuestsTab';
 import { SeatingTab } from '../seating/SeatingTab';
 import { AiAssistantTab } from '../ai/AiAssistantTab';
 import { EventEditDialog } from '../events/EventEditDialog';
+import { DynamicReplanningModal } from '../replanning/DynamicReplanningModal';
 import { Dialog } from '../ui/Dialog';
 
 export interface WorkspaceShellProps {
@@ -32,6 +33,7 @@ export function WorkspaceShell({
 }: WorkspaceShellProps) {
   const [activeTab, setActiveTab] = useState<WorkspaceTab>('overview');
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isReplanningOpen, setIsReplanningOpen] = useState(false);
   const [isShortcutsDialogOpen, setIsShortcutsDialogOpen] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<string>(
     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
@@ -94,6 +96,7 @@ export function WorkspaceShell({
         <WorkspaceHeader
           event={event}
           onEdit={() => setIsEditDialogOpen(true)}
+          onReplan={() => setIsReplanningOpen(true)}
           onBackToWelcome={onBackToWelcome}
           onDeleteEvent={onDeleteEvent}
         />
@@ -116,6 +119,7 @@ export function WorkspaceShell({
                   <OverviewTab
                     event={event}
                     onEdit={() => setIsEditDialogOpen(true)}
+                    onReplan={() => setIsReplanningOpen(true)}
                     onNavigateTab={setActiveTab}
                     lastSavedAt={lastSavedAt}
                   />
@@ -203,6 +207,14 @@ export function WorkspaceShell({
         onClose={() => setIsEditDialogOpen(false)}
         event={event}
         onSuccess={handleEventUpdated}
+      />
+
+      {/* Dynamic Celebration Replanner Studio */}
+      <DynamicReplanningModal
+        isOpen={isReplanningOpen}
+        onClose={() => setIsReplanningOpen(false)}
+        event={event}
+        onApplyPlan={handleEventUpdated}
       />
 
       {/* Keyboard Shortcuts Cheatsheet Modal */}

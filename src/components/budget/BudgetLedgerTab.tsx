@@ -30,6 +30,7 @@ import { CategoryDialog } from './CategoryDialog';
 import { CategoryDeleteDialog } from './CategoryDeleteDialog';
 import { ExpenseDialog } from './ExpenseDialog';
 import { ScenarioSimulationModal } from '../tradeoffs/ScenarioSimulationModal';
+import { DynamicReplanningModal } from '../replanning/DynamicReplanningModal';
 
 export interface BudgetLedgerTabProps {
   event: Event;
@@ -48,6 +49,7 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [defaultExpenseCatId, setDefaultExpenseCatId] = useState<string | undefined>(undefined);
   const [isScenarioSimulationOpen, setIsScenarioSimulationOpen] = useState(false);
+  const [isDynamicReplanningOpen, setIsDynamicReplanningOpen] = useState(false);
 
   // Filters
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
@@ -200,10 +202,18 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
         <div className="flex flex-wrap items-center gap-2.5">
           <button
             type="button"
+            onClick={() => setIsDynamicReplanningOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-primary-subtle text-primary hover:bg-primary hover:text-white border border-primary/30 rounded-md transition-all active:scale-[0.98] shadow-xs"
+          >
+            <Sliders className="w-3.5 h-3.5" />
+            <span>Dynamic Replan</span>
+          </button>
+          <button
+            type="button"
             onClick={() => setIsScenarioSimulationOpen(true)}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border rounded-md transition-all active:scale-[0.98] shadow-xs"
           >
-            <Sliders className="w-3.5 h-3.5 text-primary" />
+            <Sliders className="w-3.5 h-3.5 text-neutral-muted" />
             <span>What-If Simulation</span>
           </button>
           <button
@@ -787,6 +797,13 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
         onClose={() => setIsScenarioSimulationOpen(false)}
         event={event}
         onApplyScenario={(updated) => onUpdateEvent(updated)}
+      />
+
+      <DynamicReplanningModal
+        isOpen={isDynamicReplanningOpen}
+        onClose={() => setIsDynamicReplanningOpen(false)}
+        event={event}
+        onApplyPlan={(updated) => onUpdateEvent(updated)}
       />
     </div>
   );

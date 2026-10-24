@@ -97,7 +97,7 @@ export * from '../guests/types';
 export * from '../seating/types';
 export * from '../preferences/types';
 
-import { Vendor } from '../vendors/types';
+import { Vendor, VendorQuotation } from '../vendors/types';
 import { Guest, GuestHousehold } from '../guests/types';
 import { SeatingAssignment, SeatingTable } from '../seating/types';
 import { EventPreferences } from '../preferences/types';
@@ -126,8 +126,10 @@ export interface Event {
   guests: Guest[];
   tables: SeatingTable[];
   assignments: SeatingAssignment[];
+  quotations?: VendorQuotation[];
   createdAt: string; // ISO timestamp
   updatedAt: string; // ISO timestamp
+  version?: number; // Monotonic mutation sequence counter for optimistic concurrency
 }
 
 export type EventInput = Omit<
@@ -135,6 +137,7 @@ export type EventInput = Omit<
   | 'id'
   | 'createdAt'
   | 'updatedAt'
+  | 'version'
   | 'isSample'
   | 'categories'
   | 'expenses'
@@ -145,6 +148,7 @@ export type EventInput = Omit<
   | 'guests'
   | 'tables'
   | 'assignments'
+  | 'quotations'
 >;
 
 // --- Validation & Result Types ---
@@ -189,6 +193,7 @@ export interface StorageResult<T> {
 
 export interface SaveEventOptions {
   expectedUpdatedAt?: string;
+  expectedVersion?: number;
 }
 
 export interface EventStorage {

@@ -143,10 +143,10 @@ export function calculateScenarioFinancials(
         : 0;
 
     // W3-08: Canonical paid amount resolution.
-    // If amountPaid is defined and > 0, use it. Otherwise fall back to depositPaid.
+    // If amountPaid is defined as a finite number, use it. Otherwise fall back to depositPaid.
     const paid = Math.max(
       0,
-      typeof v.amountPaid === 'number' && Number.isFinite(v.amountPaid) && v.amountPaid > 0
+      typeof v.amountPaid === 'number' && Number.isFinite(v.amountPaid)
         ? Math.round(v.amountPaid)
         : typeof v.depositPaid === 'number' && Number.isFinite(v.depositPaid)
         ? Math.round(v.depositPaid)

@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   CalendarClock,
   Sparkles,
+  Sliders,
 } from 'lucide-react';
 import {
   ChecklistTask,
@@ -37,6 +38,7 @@ import {
 import { CouponBadge } from '../ui/Badge';
 import { MilestoneDialog } from './MilestoneDialog';
 import { TaskDialog } from './TaskDialog';
+import { DynamicReplanningModal } from '../replanning/DynamicReplanningModal';
 
 export interface TimelineTasksTabProps {
   event: Event;
@@ -53,6 +55,7 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
   const [defaultTaskMilestoneId, setDefaultTaskMilestoneId] = useState<string | undefined>(
     undefined
   );
+  const [isReplanningOpen, setIsReplanningOpen] = useState(false);
 
   // Filter states
   const [statusFilter, setStatusFilter] = useState<TaskFilter>('all');
@@ -241,6 +244,14 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => setIsReplanningOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-primary-subtle text-primary hover:bg-primary hover:text-white border border-primary/30 rounded-md transition-all active:scale-[0.98] shadow-xs"
+          >
+            <Sliders className="w-3.5 h-3.5" />
+            <span>Replan Schedule</span>
+          </button>
           <button
             type="button"
             onClick={() => {
@@ -660,6 +671,14 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
         eventDate={event.date}
         defaultMilestoneId={defaultTaskMilestoneId}
         onSave={handleSaveTask}
+      />
+
+      <DynamicReplanningModal
+        isOpen={isReplanningOpen}
+        onClose={() => setIsReplanningOpen(false)}
+        event={event}
+        onApplyPlan={onUpdateEvent}
+        initialView="summary"
       />
     </div>
   );

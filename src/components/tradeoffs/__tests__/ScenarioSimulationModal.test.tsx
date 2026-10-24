@@ -164,7 +164,10 @@ describe('ScenarioSimulationModal Component', () => {
 
     expect(saveSpy).toHaveBeenCalledWith(
       expect.anything(),
-      { expectedUpdatedAt: mockEvent.updatedAt }
+      {
+        expectedUpdatedAt: mockEvent.updatedAt,
+        expectedVersion: 1,
+      }
     );
     expect(handleApplyScenario).not.toHaveBeenCalled();
     expect(handleClose).not.toHaveBeenCalled();

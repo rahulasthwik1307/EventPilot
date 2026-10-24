@@ -29,7 +29,11 @@ export function ScenarioSimulationModal({
   const [applyError, setApplyError] = useState<string | null>(null);
 
   const initialEventUpdatedAtRef = useRef(event.updatedAt);
-  const isStale = Boolean(event.updatedAt && event.updatedAt !== initialEventUpdatedAtRef.current);
+  const initialEventVersionRef = useRef(event.version ?? 1);
+  const isStale = Boolean(
+    (event.updatedAt && event.updatedAt !== initialEventUpdatedAtRef.current) ||
+    (typeof event.version === 'number' && event.version !== initialEventVersionRef.current)
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -38,6 +42,7 @@ export function ScenarioSimulationModal({
       setSelectedTradeOffIds([]);
       setApplyError(null);
       initialEventUpdatedAtRef.current = event.updatedAt;
+      initialEventVersionRef.current = event.version ?? 1;
     }
   }, [isOpen, event]);
 
@@ -121,7 +126,10 @@ export function ScenarioSimulationModal({
       updatedAt: new Date().toISOString(),
     };
 
-    const saveOptions = { expectedUpdatedAt: initialEventUpdatedAtRef.current };
+    const saveOptions = {
+      expectedUpdatedAt: initialEventUpdatedAtRef.current,
+      expectedVersion: initialEventVersionRef.current,
+    };
     let saveRes;
     if (event.isSample) {
       saveRes = eventStorage.saveSampleEvent(updated, saveOptions);
@@ -241,6 +249,7 @@ export function ScenarioSimulationModal({
           isStale={isStale}
           onRefreshStale={() => {
             initialEventUpdatedAtRef.current = event.updatedAt;
+            initialEventVersionRef.current = event.version ?? 1;
           }}
         />
 

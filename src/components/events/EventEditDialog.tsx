@@ -49,7 +49,11 @@ export function EventEditDialog({
   const [selectedTradeOffIds, setSelectedTradeOffIds] = useState<string[]>([]);
   const [showImpactPreview, setShowImpactPreview] = useState(false);
   const initialEventUpdatedAtRef = useRef(event.updatedAt);
-  const isStale = Boolean(event.updatedAt && event.updatedAt !== initialEventUpdatedAtRef.current);
+  const initialEventVersionRef = useRef(event.version ?? 1);
+  const isStale = Boolean(
+    (event.updatedAt && event.updatedAt !== initialEventUpdatedAtRef.current) ||
+    (typeof event.version === 'number' && event.version !== initialEventVersionRef.current)
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -68,6 +72,7 @@ export function EventEditDialog({
       setSelectedTradeOffIds([]);
       setShowImpactPreview(false);
       initialEventUpdatedAtRef.current = event.updatedAt;
+      initialEventVersionRef.current = event.version ?? 1;
     }
   }, [isOpen, event]);
 
@@ -100,6 +105,7 @@ export function EventEditDialog({
 
   const handleRefreshStale = () => {
     initialEventUpdatedAtRef.current = event.updatedAt;
+    initialEventVersionRef.current = event.version ?? 1;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -198,7 +204,10 @@ export function EventEditDialog({
       updatedAt: new Date().toISOString(),
     };
 
-    const saveOptions = { expectedUpdatedAt: initialEventUpdatedAtRef.current };
+    const saveOptions = {
+      expectedUpdatedAt: initialEventUpdatedAtRef.current,
+      expectedVersion: initialEventVersionRef.current,
+    };
     let saveRes;
     if (event.isSample) {
       saveRes = eventStorage.saveSampleEvent(updated, saveOptions);

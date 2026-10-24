@@ -76,14 +76,17 @@ export function migrateEventToM3(event: Event): Event {
   const assignments = rawAssignments.filter(
     (a) => a && validTableIds.has(a.tableId) && validGuestIds.has(a.guestId)
   );
+  const quotations = Array.isArray(m2.quotations) ? m2.quotations : [];
 
   return {
     ...m2,
+    version: typeof m2.version === 'number' && m2.version > 0 ? m2.version : 1,
     vendors,
     households,
     guests,
     tables,
     assignments,
+    quotations,
   };
 }
 
@@ -207,12 +210,66 @@ export class LocalStorageEventStorage implements EventStorage {
       return { success: false, error: this.unavailableError() };
     }
 
+    const currentListRes = this.getPersonalEvents();
+    if (!currentListRes.success) {
+      return { success: false, error: currentListRes.error };
+    }
+    const currentList = currentListRes.data || [];
+
+    const existingIndex = currentList.findIndex((e) => e.id === event.id);
+    let nextVersion = 1;
+    let nextUpdatedAt = new Date().toISOString();
+
+    if (existingIndex >= 0) {
+      const storedEvent = currentList[existingIndex];
+      const storedVersion =
+        typeof storedEvent.version === 'number' && storedEvent.version > 0
+          ? storedEvent.version
+          : 1;
+      const storedUpdatedAt = storedEvent.updatedAt;
+
+      // Optimistic concurrency check: version-first, fallback to timestamp
+      if (options?.expectedVersion !== undefined) {
+        if (storedVersion !== options.expectedVersion) {
+          return {
+            success: false,
+            error: {
+              code: 'CONCURRENCY_CONFLICT',
+              message:
+                'The event workspace has been updated in another session. Please reload to review the latest changes.',
+            },
+          };
+        }
+      }
+
+      if (options?.expectedUpdatedAt) {
+        if (storedUpdatedAt && storedUpdatedAt !== options.expectedUpdatedAt) {
+          return {
+            success: false,
+            error: {
+              code: 'CONCURRENCY_CONFLICT',
+              message:
+                'The event workspace has been updated in another session. Please reload to review the latest changes.',
+            },
+          };
+        }
+      }
+
+      nextVersion = storedVersion + 1;
+      // Monotonic timestamp advancement guarantees distinct updatedAt even on sub-millisecond saves
+      const nowMs = Date.now();
+      const storedMs = storedUpdatedAt ? new Date(storedUpdatedAt).getTime() : 0;
+      const nextTimeMs = Math.max(nowMs, Number.isFinite(storedMs) ? storedMs + 1 : nowMs);
+      nextUpdatedAt = new Date(nextTimeMs).toISOString();
+    }
+
     // Force isSample = false for personal events and ensure M3 integrity
     const migrated = migrateEventToM3(event);
     const sanitized: Event = {
       ...migrated,
       isSample: false,
-      updatedAt: new Date().toISOString(),
+      version: nextVersion,
+      updatedAt: nextUpdatedAt,
     };
 
     const val = validateEvent(sanitized);
@@ -226,31 +283,8 @@ export class LocalStorageEventStorage implements EventStorage {
       };
     }
 
-    const currentListRes = this.getPersonalEvents();
-    if (!currentListRes.success) {
-      return { success: false, error: currentListRes.error };
-    }
-    const currentList = currentListRes.data || [];
-
-    const existingIndex = currentList.findIndex((e) => e.id === sanitized.id);
     let nextList: Event[];
-
     if (existingIndex >= 0) {
-      // Optimistic concurrency check (W3-01)
-      if (options?.expectedUpdatedAt) {
-        const storedUpdatedAt = currentList[existingIndex].updatedAt;
-        if (storedUpdatedAt && storedUpdatedAt !== options.expectedUpdatedAt) {
-          return {
-            success: false,
-            error: {
-              code: 'CONCURRENCY_CONFLICT',
-              message:
-                'The event workspace has been updated in another session. Please reload to review the latest changes.',
-            },
-          };
-        }
-      }
-
       nextList = [...currentList];
       nextList[existingIndex] = sanitized;
     } else {
@@ -357,34 +391,69 @@ export class LocalStorageEventStorage implements EventStorage {
       return { success: false, error: this.unavailableError() };
     }
 
-    if (options?.expectedUpdatedAt) {
-      try {
-        const raw = window.localStorage.getItem(STORAGE_KEYS.SAMPLE_EVENT);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          const currentSample = (parsed && typeof parsed === 'object' && 'payload' in parsed)
+    let currentSample: Event | null = null;
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEYS.SAMPLE_EVENT);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        currentSample =
+          parsed && typeof parsed === 'object' && 'payload' in parsed
             ? (parsed as StorageContainer<Event>).payload
-            : parsed as Event;
-          if (currentSample?.updatedAt && currentSample.updatedAt !== options.expectedUpdatedAt) {
-            return {
-              success: false,
-              error: {
-                code: 'CONCURRENCY_CONFLICT',
-                message:
-                  'The sample event workspace has been updated in another session. Please reload to review the latest changes.',
-              },
-            };
-          }
-        }
-      } catch {
-        // Parse error fallback proceeds to normal save
+            : (parsed as Event);
       }
+    } catch {
+      // Parse error fallback proceeds to normal save
+    }
+
+    let nextVersion = 1;
+    let nextUpdatedAt = new Date().toISOString();
+
+    if (currentSample) {
+      const storedVersion =
+        typeof currentSample.version === 'number' && currentSample.version > 0
+          ? currentSample.version
+          : 1;
+      const storedUpdatedAt = currentSample.updatedAt;
+
+      // Optimistic concurrency check: version-first, fallback to timestamp
+      if (options?.expectedVersion !== undefined) {
+        if (storedVersion !== options.expectedVersion) {
+          return {
+            success: false,
+            error: {
+              code: 'CONCURRENCY_CONFLICT',
+              message:
+                'The sample event workspace has been updated in another session. Please reload to review the latest changes.',
+            },
+          };
+        }
+      }
+
+      if (options?.expectedUpdatedAt) {
+        if (storedUpdatedAt && storedUpdatedAt !== options.expectedUpdatedAt) {
+          return {
+            success: false,
+            error: {
+              code: 'CONCURRENCY_CONFLICT',
+              message:
+                'The sample event workspace has been updated in another session. Please reload to review the latest changes.',
+            },
+          };
+        }
+      }
+
+      nextVersion = storedVersion + 1;
+      const nowMs = Date.now();
+      const storedMs = storedUpdatedAt ? new Date(storedUpdatedAt).getTime() : 0;
+      const nextTimeMs = Math.max(nowMs, Number.isFinite(storedMs) ? storedMs + 1 : nowMs);
+      nextUpdatedAt = new Date(nextTimeMs).toISOString();
     }
 
     const sampleEvent: Event = {
       ...migrateEventToM3(event),
       isSample: true,
-      updatedAt: new Date().toISOString(),
+      version: nextVersion,
+      updatedAt: nextUpdatedAt,
     };
 
     const container: StorageContainer<Event> = {

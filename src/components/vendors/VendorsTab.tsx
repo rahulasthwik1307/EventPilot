@@ -6,6 +6,7 @@ import {
   VendorCategory,
   VendorInput,
   VendorStatus,
+  VendorQuotation,
 } from '../../features/vendors/types';
 import { Event } from '../../features/events/types';
 import {
@@ -20,16 +21,25 @@ import { CouponBadge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { VendorDialog } from './VendorDialog';
 import { VendorDeleteDialog } from './VendorDeleteDialog';
+import { QuotationDialog } from './quotations/QuotationDialog';
+import { QuotationComparisonView } from './quotations/QuotationComparisonView';
+import { RequirementBriefModal } from './quotations/RequirementBriefModal';
+import { MessageDrafterModal } from './quotations/MessageDrafterModal';
+import { QuoteProposalReviewModal } from './quotations/QuoteProposalReviewModal';
 import {
   AlertCircle,
   Briefcase,
   CheckCircle2,
   Clock,
   ExternalLink,
+  FileText,
   Mail,
+  MessageSquare,
   Phone,
   Plus,
+  Scale,
   Search,
+  Sparkles,
   Tag,
   User,
   XCircle,
@@ -48,6 +58,21 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
   const [isVendorDialogOpen, setIsVendorDialogOpen] = useState(false);
   const [editingVendor, setEditingVendor] = useState<Vendor | null>(null);
   const [deletingVendor, setDeletingVendor] = useState<Vendor | null>(null);
+
+  // Quotations and vendor coordination state
+  const quotations = useMemo(() => event.quotations || [], [event.quotations]);
+  const [isComparisonOpen, setIsComparisonOpen] = useState(false);
+  const [isBriefOpen, setIsBriefOpen] = useState(false);
+  const [isMessageDrafterOpen, setIsMessageDrafterOpen] = useState(false);
+  const [isQuotationDialogOpen, setIsQuotationDialogOpen] = useState(false);
+  const [isProposalReviewOpen, setIsProposalReviewOpen] = useState(false);
+
+  const [activeQuoteForProposal, setActiveQuoteForProposal] = useState<VendorQuotation | null>(null);
+  const [activeQuoteForMessage, setActiveQuoteForMessage] = useState<VendorQuotation | null>(null);
+  const [activeQuoteForEdit, setActiveQuoteForEdit] = useState<VendorQuotation | null>(null);
+  const [defaultVendorIdForQuote, setDefaultVendorIdForQuote] = useState<string | undefined>(undefined);
+  const [defaultCategoryForQuote, setDefaultCategoryForQuote] = useState<VendorCategory | undefined>(undefined);
+  const [activeCategoryForBrief, setActiveCategoryForBrief] = useState<VendorCategory | undefined>(undefined);
 
   const vendors = useMemo(() => event.vendors || [], [event.vendors]);
   const categories = useMemo(() => event.categories || [], [event.categories]);
@@ -118,6 +143,58 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
     setDeletingVendor(null);
   };
 
+  const handleSaveQuotation = (savedQuote: VendorQuotation) => {
+    const now = new Date().toISOString();
+    const existingQuotations = event.quotations || [];
+    const existingIdx = existingQuotations.findIndex((q) => q.id === savedQuote.id);
+
+    let nextQuotations: VendorQuotation[];
+    if (existingIdx >= 0) {
+      nextQuotations = existingQuotations.map((q, idx) =>
+        idx === existingIdx ? { ...savedQuote, updatedAt: now } : q
+      );
+    } else {
+      nextQuotations = [savedQuote, ...existingQuotations];
+    }
+
+    const nextVersion = (event.version ?? 0) + 1;
+    onUpdateEvent({
+      ...event,
+      quotations: nextQuotations,
+      version: nextVersion,
+      updatedAt: now,
+    });
+  };
+
+  const handlePromoteQuote = (quote: VendorQuotation) => {
+    setActiveQuoteForProposal(quote);
+    setIsProposalReviewOpen(true);
+  };
+
+  const handleDraftMessage = (quote?: VendorQuotation) => {
+    setActiveQuoteForMessage(quote || null);
+    setIsMessageDrafterOpen(true);
+  };
+
+  const handleEditQuote = (quote: VendorQuotation) => {
+    setActiveQuoteForEdit(quote);
+    setDefaultVendorIdForQuote(quote.vendorId);
+    setDefaultCategoryForQuote(quote.serviceCategory);
+    setIsQuotationDialogOpen(true);
+  };
+
+  const handleAddNewQuote = (category?: VendorCategory, vendorId?: string) => {
+    setActiveQuoteForEdit(null);
+    setDefaultCategoryForQuote(category);
+    setDefaultVendorIdForQuote(vendorId);
+    setIsQuotationDialogOpen(true);
+  };
+
+  const handleOpenBrief = (category?: VendorCategory) => {
+    setActiveCategoryForBrief(category || 'photography');
+    setIsBriefOpen(true);
+  };
+
   const getStatusBadge = (status: VendorStatus) => {
     switch (status) {
       case 'booked':
@@ -155,17 +232,46 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
             </p>
           </div>
 
-          <Button
-            variant="primary"
-            onClick={() => {
-              setEditingVendor(null);
-              setIsVendorDialogOpen(true);
-            }}
-            className="self-start sm:self-center"
-          >
-            <Plus className="w-4 h-4 mr-1.5" />
-            <span>Record Vendor</span>
-          </Button>
+          <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
+            <Button
+              variant="secondary"
+              onClick={() => setIsComparisonOpen(true)}
+              className="text-xs font-mono"
+            >
+              <Scale className="w-3.5 h-3.5 mr-1.5 text-secondary" />
+              <span>Compare Quotes ({quotations.length})</span>
+            </Button>
+
+            <Button
+              variant="secondary"
+              onClick={() => handleOpenBrief()}
+              className="text-xs font-mono"
+            >
+              <FileText className="w-3.5 h-3.5 mr-1.5 text-secondary" />
+              <span>Requirement Brief</span>
+            </Button>
+
+            <Button
+              variant="secondary"
+              onClick={() => handleAddNewQuote()}
+              className="text-xs font-mono"
+            >
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              <span>Record Quote</span>
+            </Button>
+
+            <Button
+              variant="primary"
+              onClick={() => {
+                setEditingVendor(null);
+                setIsVendorDialogOpen(true);
+              }}
+              className="text-xs font-mono"
+            >
+              <Plus className="w-4 h-4 mr-1.5" />
+              <span>Record Vendor</span>
+            </Button>
+          </div>
         </div>
 
         {/* 4 Financial Metric Cards */}
@@ -345,6 +451,10 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
             const paid = vendor.amountPaid;
             const percentPaid = agreed > 0 ? Math.min(100, Math.round((paid / agreed) * 100)) : 0;
 
+            const vendorQuoteCount = quotations.filter(
+              (q) => q.vendorId === vendor.id || q.vendorName.toLowerCase() === vendor.name.toLowerCase()
+            ).length;
+
             return (
               <div
                 key={vendor.id}
@@ -360,7 +470,40 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
+                      {vendorQuoteCount > 0 ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveCategoryForBrief(vendor.category);
+                            setIsComparisonOpen(true);
+                          }}
+                          className="px-2 py-0.5 rounded text-[11px] font-mono bg-amber-500/10 border border-amber-500/30 text-secondary hover:bg-amber-500/20 transition-colors"
+                        >
+                          {vendorQuoteCount} quote{vendorQuoteCount !== 1 ? 's' : ''}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleAddNewQuote(vendor.category, vendor.id)}
+                          className="px-2 py-0.5 rounded text-[11px] font-mono bg-neutral-subtle text-neutral-muted hover:text-neutral-text transition-colors"
+                        >
+                          + Quote
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const vQuote = quotations.find((q) => q.vendorId === vendor.id);
+                          handleDraftMessage(vQuote);
+                        }}
+                        title="Draft coordination message"
+                        className="p-1 rounded text-neutral-muted hover:text-secondary hover:bg-neutral-subtle transition-colors"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                      </button>
+
                       <Button
                         variant="ghost"
                         size="sm"
@@ -549,6 +692,59 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
           }
         }}
         vendor={deletingVendor}
+      />
+
+      {/* Quotation & Coordination Modals */}
+      <QuotationComparisonView
+        isOpen={isComparisonOpen}
+        onClose={() => setIsComparisonOpen(false)}
+        event={event}
+        initialCategory={activeCategoryForBrief}
+        onPromoteQuote={handlePromoteQuote}
+        onDraftMessage={handleDraftMessage}
+        onEditQuote={handleEditQuote}
+        onAddNewQuote={(cat) => handleAddNewQuote(cat)}
+      />
+
+      <QuotationDialog
+        isOpen={isQuotationDialogOpen}
+        onClose={() => {
+          setIsQuotationDialogOpen(false);
+          setActiveQuoteForEdit(null);
+        }}
+        event={event}
+        editingQuote={activeQuoteForEdit}
+        defaultVendorId={defaultVendorIdForQuote}
+        defaultCategory={defaultCategoryForQuote}
+        onSave={handleSaveQuotation}
+      />
+
+      <RequirementBriefModal
+        isOpen={isBriefOpen}
+        onClose={() => setIsBriefOpen(false)}
+        event={event}
+        initialCategory={activeCategoryForBrief}
+      />
+
+      <MessageDrafterModal
+        isOpen={isMessageDrafterOpen}
+        onClose={() => {
+          setIsMessageDrafterOpen(false);
+          setActiveQuoteForMessage(null);
+        }}
+        event={event}
+        initialQuotation={activeQuoteForMessage || undefined}
+      />
+
+      <QuoteProposalReviewModal
+        isOpen={isProposalReviewOpen}
+        onClose={() => {
+          setIsProposalReviewOpen(false);
+          setActiveQuoteForProposal(null);
+        }}
+        event={event}
+        quote={activeQuoteForProposal}
+        onUpdateEvent={onUpdateEvent}
       />
     </div>
   );

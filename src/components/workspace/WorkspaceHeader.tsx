@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Users, Wallet, Edit3, ArrowLeft, Trash2, MapPin, Sparkles } from 'lucide-react';
+import { Calendar, Users, Wallet, Edit3, ArrowLeft, Trash2, MapPin, Sparkles, Sliders } from 'lucide-react';
 import { Event } from '../../features/events/types';
 import { calculateDaysRemaining, formatCurrency, formatDateDisplay } from '../../features/events/validation';
 import { CouponBadge } from '../ui/Badge';
@@ -8,6 +8,7 @@ import { Dialog } from '../ui/Dialog';
 export interface WorkspaceHeaderProps {
   event: Event;
   onEdit: () => void;
+  onReplan?: () => void;
   onBackToWelcome: () => void;
   onDeleteEvent?: () => void;
 }
@@ -15,6 +16,7 @@ export interface WorkspaceHeaderProps {
 export function WorkspaceHeader({
   event,
   onEdit,
+  onReplan,
   onBackToWelcome,
   onDeleteEvent,
 }: WorkspaceHeaderProps) {
@@ -91,6 +93,17 @@ export function WorkspaceHeader({
 
           {/* Right: Actions */}
           <div className="flex items-center gap-2 pt-2 md:pt-0 self-start md:self-auto flex-shrink-0">
+            {onReplan && (
+              <button
+                type="button"
+                onClick={onReplan}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold bg-primary-subtle text-primary border border-primary/30 hover:bg-primary hover:text-white px-3.5 py-2 rounded-md transition-all shadow-xs active:translate-y-0.5"
+              >
+                <Sliders className="w-3.5 h-3.5" />
+                <span>Dynamic Replan</span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={onEdit}
