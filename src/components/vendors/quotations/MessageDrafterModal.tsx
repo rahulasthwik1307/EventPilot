@@ -8,6 +8,7 @@ import {
 } from '@/features/vendors/types';
 import { generateVendorMessageDraft } from '@/features/vendors/quotations/message-drafts';
 import { Button } from '../../ui/Button';
+import { Dialog } from '../../ui/Dialog';
 import { CouponBadge } from '../../ui/Badge';
 import {
   AlertCircle,
@@ -115,44 +116,39 @@ export function MessageDrafterModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-slate-900 border border-amber-500/30 rounded-xl shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col my-auto text-amber-50">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-6 border-b border-slate-800 gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-semibold">
-                Vendor Coordination
-              </span>
-              <CouponBadge variant="marigold">Message Drafter</CouponBadge>
-            </div>
-            <h2 className="font-serif text-2xl font-medium text-amber-100">
-              Vendor Coordination Message Drafter
-            </h2>
-            <p className="text-xs text-slate-400 mt-1">
-              Context-aware message templates for 6 procurement scenarios with customizable terms.
-            </p>
+    <Dialog
+      isOpen={isOpen}
+      onClose={onClose}
+      title={
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#B45309] font-semibold">
+              Vendor Coordination
+            </span>
+            <CouponBadge variant="marigold">Message Drafter</CouponBadge>
           </div>
-
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-amber-200 transition-colors p-2 rounded-lg hover:bg-slate-800 self-end sm:self-center"
-            aria-label="Close dialog"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <span className="font-serif text-xl font-medium text-[#1C1917]">
+            Vendor Coordination Message Drafter
+          </span>
         </div>
+      }
+      description="Context-aware message templates for 6 procurement scenarios with customizable terms."
+      maxWidth="xl"
+      accentBar
+      contentPadding={false}
+    >
+      <div className="flex flex-col flex-1 min-h-0 bg-white">
 
         {/* Controls row */}
-        <div className="p-6 border-b border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-950/40">
+        <div className="px-6 py-3.5 border-b border-[#E7DFD5] grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#FDFBF7]">
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5">
+            <label className="block text-[10px] font-mono uppercase tracking-widest text-[#78716C] font-semibold mb-1">
               Select Coordination Scenario
             </label>
             <select
               value={selectedScenario}
               onChange={(e) => setSelectedScenario(e.target.value as VendorMessageScenario)}
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs font-mono text-amber-100 focus:outline-none focus:border-amber-400"
+              className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2.5 text-xs font-mono text-[#1C1917] focus:outline-none focus:border-[#D97706] focus:ring-1 focus:ring-[#D97706]/20 transition-all shadow-sm"
             >
               {SCENARIO_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -163,13 +159,13 @@ export function MessageDrafterModal({
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5">
+            <label className="block text-[10px] font-mono uppercase tracking-widest text-[#78716C] font-semibold mb-1">
               Associated Quotation / Vendor
             </label>
             <select
               value={selectedQuoteId}
               onChange={(e) => setSelectedQuoteId(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs font-mono text-amber-100 focus:outline-none focus:border-amber-400"
+              className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2.5 text-xs font-mono text-[#1C1917] focus:outline-none focus:border-[#D97706] focus:ring-1 focus:ring-[#D97706]/20 transition-all shadow-sm"
             >
               <option value="">-- Generic / No specific quote --</option>
               {quotations.map((q) => (
@@ -182,20 +178,20 @@ export function MessageDrafterModal({
         </div>
 
         {/* Body content */}
-        <div className="p-6 overflow-y-auto space-y-5 flex-1">
+        <div className="p-6 overflow-y-auto space-y-4 flex-1 bg-white">
           {/* Placeholder alert banner */}
           {remainingPlaceholders.length > 0 && (
-            <div className="p-3.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs font-mono text-amber-200 flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-lg bg-amber-50 border border-amber-200 text-xs text-[#78716C] flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <span className="font-semibold block mb-1">
+                <span className="font-semibold text-amber-900 block mb-1">
                   {remainingPlaceholders.length} Placeholder{remainingPlaceholders.length > 1 ? 's' : ''} to Fill:
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {remainingPlaceholders.map((p, idx) => (
                     <span
                       key={idx}
-                      className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[11px]"
+                      className="px-2 py-0.5 rounded bg-amber-100 border border-amber-300 text-amber-900 font-mono text-[11px]"
                     >
                       {p}
                     </span>
@@ -207,45 +203,45 @@ export function MessageDrafterModal({
 
           {/* Subject field */}
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5">
+            <label className="block text-[10px] font-mono uppercase tracking-widest text-[#78716C] font-semibold mb-1">
               Email / Message Subject Line
             </label>
             <input
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 font-mono text-xs text-amber-100 focus:outline-none focus:border-amber-400"
+              className="w-full bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg p-2.5 font-mono text-xs text-[#1C1917] focus:bg-white focus:outline-none focus:border-[#D97706] focus:ring-1 focus:ring-[#D97706]/20 transition-all"
             />
           </div>
 
           {/* Body field */}
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5">
+            <label className="block text-[10px] font-mono uppercase tracking-widest text-[#78716C] font-semibold mb-1">
               Message Body (Editable)
             </label>
             <textarea
-              rows={12}
+              rows={10}
               value={body}
               onChange={(e) => setBody(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3.5 font-mono text-xs text-amber-100 leading-relaxed focus:outline-none focus:border-amber-400"
+              className="w-full bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg p-3.5 font-mono text-xs text-[#1C1917] leading-relaxed focus:bg-white focus:outline-none focus:border-[#D97706] focus:ring-1 focus:ring-[#D97706]/20 transition-all"
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div className="px-6 py-3.5 border-t border-[#E7DFD5] flex items-center justify-between bg-[#FAF8F5]">
           <button
             type="button"
             onClick={onClose}
-            className="text-xs font-mono text-slate-400 hover:text-slate-200"
+            className="text-xs font-mono text-[#78716C] hover:text-[#1C1917] transition-colors"
           >
             Cancel
           </button>
 
-          <Button variant="primary" onClick={handleCopyMessage} className="text-xs font-mono">
+          <Button variant="primary" onClick={handleCopyMessage} className="text-xs font-mono shadow-sm">
             {copied ? (
               <>
-                <Check className="w-3.5 h-3.5 mr-1.5 text-emerald-300" />
+                <Check className="w-3.5 h-3.5 mr-1.5 text-emerald-600" />
                 <span>Copied Subject &amp; Body!</span>
               </>
             ) : (
@@ -257,6 +253,6 @@ export function MessageDrafterModal({
           </Button>
         </div>
       </div>
-    </div>
+    </Dialog>
   );
 }

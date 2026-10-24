@@ -43,11 +43,38 @@ import {
   Tag,
   User,
   XCircle,
+  MapPin,
+  Utensils,
+  Layers,
+  ArrowRight,
+  TrendingUp,
+  ShieldCheck,
+  Check,
 } from 'lucide-react';
 
 export interface VendorsTabProps {
   event: Event;
   onUpdateEvent: (updated: Event) => void;
+}
+
+function getVendorCategoryIcon(category: string) {
+  switch (category) {
+    case 'venue':
+      return <MapPin className="w-3.5 h-3.5 text-primary" />;
+    case 'catering':
+      return <Utensils className="w-3.5 h-3.5 text-secondary" />;
+    case 'photography':
+      return <Layers className="w-3.5 h-3.5 text-primary" />;
+    case 'decor':
+      return <Sparkles className="w-3.5 h-3.5 text-secondary" />;
+    case 'music':
+      return <Sparkles className="w-3.5 h-3.5 text-primary" />;
+    case 'attire':
+    case 'makeup':
+      return <Sparkles className="w-3.5 h-3.5 text-secondary" />;
+    default:
+      return <Briefcase className="w-3.5 h-3.5 text-neutral-muted" />;
+  }
 }
 
 export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
@@ -212,132 +239,184 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
     }
   };
 
+  const overallSettlementPct =
+    financials.totalAgreed > 0
+      ? Math.min(100, Math.round((financials.totalPaid / financials.totalAgreed) * 100))
+      : 0;
+
   return (
-    <div className="space-y-8">
-      {/* 1. Header & Financial Overview */}
-      <div className="bg-neutral-surface border border-neutral-border rounded-lg p-6 sm:p-8 shadow-card">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div className="space-y-7">
+      {/* =========================================================================
+          1. HEADER & COMMERCIAL COMMITMENTS MASTER DECK
+      ========================================================================= */}
+      <section className="bg-neutral-surface border border-neutral-border rounded-xl p-5 sm:p-7 shadow-card relative overflow-hidden space-y-5">
+        {/* Panchang Ceremonial Accent Header Hairline */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-primary" />
+
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-neutral-border/60 pb-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono uppercase tracking-wider text-secondary font-semibold">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-secondary font-bold">
                 Celebration Operations
               </span>
-              <CouponBadge variant="marigold">Contracts &amp; Balances</CouponBadge>
+              <CouponBadge variant="marigold">Contracts &amp; Commitments</CouponBadge>
             </div>
             <h2 className="font-display text-2xl sm:text-3xl font-semibold text-neutral-text">
               Vendor Directory &amp; Contracts
             </h2>
-            <p className="text-xs text-neutral-muted mt-1">
-              Authoritative tracking of quotes, contract commitments, and deposits. Separated from budget actuals.
+            <p className="text-xs text-neutral-muted mt-1 max-w-2xl leading-relaxed">
+              Authoritative tracking of quotations, contract commitments, and deposit disbursements. Isolated from internal budget ledgers.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
-            <Button
-              variant="secondary"
+          <div className="flex flex-wrap items-center gap-2 self-start lg:self-center">
+            <button
+              type="button"
               onClick={() => setIsComparisonOpen(true)}
-              className="text-xs font-mono"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border rounded-md transition-all active:scale-[0.98] shadow-xs"
             >
-              <Scale className="w-3.5 h-3.5 mr-1.5 text-secondary" />
+              <Scale className="w-3.5 h-3.5 text-secondary" />
               <span>Compare Quotes ({quotations.length})</span>
-            </Button>
+            </button>
 
-            <Button
-              variant="secondary"
+            <button
+              type="button"
               onClick={() => handleOpenBrief()}
-              className="text-xs font-mono"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border rounded-md transition-all active:scale-[0.98] shadow-xs"
             >
-              <FileText className="w-3.5 h-3.5 mr-1.5 text-secondary" />
+              <FileText className="w-3.5 h-3.5 text-secondary" />
               <span>Requirement Brief</span>
-            </Button>
+            </button>
 
-            <Button
-              variant="secondary"
+            <button
+              type="button"
               onClick={() => handleAddNewQuote()}
-              className="text-xs font-mono"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border rounded-md transition-all active:scale-[0.98] shadow-xs"
             >
-              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              <Plus className="w-3.5 h-3.5 text-primary" />
               <span>Record Quote</span>
-            </Button>
+            </button>
 
-            <Button
-              variant="primary"
+            <button
+              type="button"
               onClick={() => {
                 setEditingVendor(null);
                 setIsVendorDialogOpen(true);
               }}
-              className="text-xs font-mono"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-neutral-text bg-primary hover:bg-primary-hover rounded-md transition-all active:scale-[0.98] shadow-sm"
             >
-              <Plus className="w-4 h-4 mr-1.5" />
+              <Plus className="w-3.5 h-3.5" />
               <span>Record Vendor</span>
-            </Button>
+            </button>
           </div>
         </div>
 
-        {/* 4 Financial Metric Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+        {/* 4 Commercial Metrics Stations */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          {/* Card 1: Total Quotes Received */}
+          <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
-                Total Quotes Received
-              </span>
-              <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+                  Total Quotes Received
+                </span>
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-neutral-surface border border-neutral-border text-neutral-muted">
+                  Market
+                </span>
+              </div>
+              <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text tracking-tight">
                 {formatCurrency(financials.totalQuoted, event.currency)}
               </p>
             </div>
-            <span className="text-xs text-neutral-muted font-mono mt-2 block">
-              {financials.vendorCount} tracked vendors
+            <span className="text-[11px] text-neutral-muted font-mono mt-2 block">
+              {financials.vendorCount} tracked suppliers
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          {/* Card 2: Agreed Commitments */}
+          <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
-                Agreed Commitments
-              </span>
-              <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+                  Agreed Commitments
+                </span>
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-primary-subtle border border-primary/30 text-primary">
+                  {financials.bookedCount} Booked
+                </span>
+              </div>
+              <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text tracking-tight">
                 {formatCurrency(financials.totalAgreed, event.currency)}
               </p>
             </div>
-            <span className="text-xs text-status-success font-mono mt-2 block">
-              {financials.bookedCount} booked / contracted
+            <span className="text-[11px] text-primary font-mono mt-2 block">
+              Contractually committed
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          {/* Card 3: Total Paid to Date */}
+          <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
-                Total Paid to Date
-              </span>
-              <p className="font-mono text-xl sm:text-2xl font-bold text-status-success">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+                  Total Paid to Date
+                </span>
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-status-success-subtle border border-status-success/30 text-status-success">
+                  {overallSettlementPct}%
+                </span>
+              </div>
+              <p className="font-mono text-xl sm:text-2xl font-bold text-status-success tracking-tight">
                 {formatCurrency(financials.totalPaid, event.currency)}
               </p>
             </div>
-            <span className="text-xs text-neutral-muted font-mono mt-2 block">
+            <span className="text-[11px] text-neutral-muted font-mono mt-2 block">
               Includes all recorded advances
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-4 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          {/* Card 4: Outstanding Balances */}
+          <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
-                Outstanding Balances
-              </span>
-              <p className="font-mono text-xl sm:text-2xl font-bold text-secondary">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+                  Outstanding Balances
+                </span>
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-secondary-subtle border border-secondary/30 text-secondary">
+                  Payable
+                </span>
+              </div>
+              <p className="font-mono text-xl sm:text-2xl font-bold text-secondary tracking-tight">
                 {formatCurrency(financials.totalRemaining, event.currency)}
               </p>
             </div>
-            <span className="text-xs text-neutral-muted font-mono mt-2 block">
-              Remaining under agreed contracts
+            <span className="text-[11px] text-neutral-muted font-mono mt-2 block">
+              Remaining under contracts
             </span>
           </div>
         </div>
+
+        {/* Overall Commercial Settlement Bar */}
+        {financials.totalAgreed > 0 && (
+          <div className="pt-2 border-t border-neutral-border/60 space-y-1.5">
+            <div className="flex items-center justify-between text-xs font-mono text-neutral-muted">
+              <span>Overall Contract Settlement Progress</span>
+              <span>
+                <strong>{overallSettlementPct}%</strong> settled ({formatCurrency(financials.totalPaid, event.currency)} of {formatCurrency(financials.totalAgreed, event.currency)})
+              </span>
+            </div>
+            <div className="w-full bg-neutral-subtle rounded-full h-2 overflow-hidden border border-neutral-border/60">
+              <div
+                className="h-full bg-status-success transition-all duration-500 rounded-full"
+                style={{ width: `${overallSettlementPct}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Overpaid Warning Alert if applicable */}
         {financials.overpaidCount > 0 && (
           <div
             role="alert"
-            className="mt-4 bg-status-danger-subtle text-status-danger border border-status-danger/30 p-3.5 rounded-md text-xs flex items-center gap-2"
+            className="bg-status-danger-subtle text-status-danger border border-status-danger/30 p-3.5 rounded-lg text-xs flex items-center gap-2 shadow-xs"
           >
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span>
@@ -345,10 +424,12 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
             </span>
           </div>
         )}
-      </div>
+      </section>
 
-      {/* 2. Filters & Search Bar */}
-      <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 sm:p-5 shadow-card space-y-3">
+      {/* =========================================================================
+          2. FILTERS & SEARCH COMMAND BAR
+      ========================================================================= */}
+      <div className="bg-neutral-surface border border-neutral-border rounded-xl p-4 shadow-card space-y-3">
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           <div className="relative flex-1">
             <Search className="w-4 h-4 absolute left-3 top-3 text-neutral-muted" />
@@ -357,7 +438,7 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search vendors by name, contact, notes, phone, or email..."
-              className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-neutral-subtle/50 border border-neutral-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-neutral-subtle/50 border border-neutral-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary shadow-xs"
             />
           </div>
 
@@ -365,7 +446,7 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-3 py-2 text-xs sm:text-sm bg-neutral-surface border border-neutral-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+              className="px-3 py-2 text-xs sm:text-sm bg-neutral-surface border border-neutral-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary font-medium shadow-xs"
               aria-label="Filter by vendor category"
             >
               <option value="all">All Categories</option>
@@ -379,7 +460,7 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 text-xs sm:text-sm bg-neutral-surface border border-neutral-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+              className="px-3 py-2 text-xs sm:text-sm bg-neutral-surface border border-neutral-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary font-medium shadow-xs"
               aria-label="Filter by engagement status"
             >
               <option value="all">All Statuses</option>
@@ -392,7 +473,7 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between text-xs text-neutral-muted pt-2 border-t border-neutral-border/40">
+        <div className="flex items-center justify-between text-xs text-neutral-muted pt-2 border-t border-neutral-border/50 font-mono">
           <span>
             Showing {filteredVendors.length} of {vendors.length} vendors
           </span>
@@ -404,7 +485,7 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
                 setCategoryFilter('all');
                 setStatusFilter('all');
               }}
-              className="text-secondary hover:underline font-semibold"
+              className="text-secondary hover:underline font-semibold font-sans"
             >
               Clear filters
             </button>
@@ -412,11 +493,13 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
         </div>
       </div>
 
-      {/* 3. Vendor Cards List */}
+      {/* =========================================================================
+          3. VENDOR DOSSIER CARDS GRID
+      ========================================================================= */}
       {filteredVendors.length === 0 ? (
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-12 text-center shadow-card">
+        <div className="bg-neutral-surface border border-neutral-border rounded-xl p-12 text-center shadow-card">
           <Briefcase className="w-12 h-12 text-neutral-muted mx-auto mb-3 opacity-60" />
-          <h3 className="font-display text-lg font-semibold text-neutral-text mb-1">
+          <h3 className="font-display text-lg font-bold text-neutral-text mb-1">
             {vendors.length === 0 ? 'No Vendors Recorded Yet' : 'No Vendors Match Your Filter'}
           </h3>
           <p className="text-xs text-neutral-muted max-w-md mx-auto mb-5 leading-relaxed">
@@ -425,16 +508,17 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
               : 'Try clearing your search query or selecting a different category/status filter.'}
           </p>
           {vendors.length === 0 && (
-            <Button
-              variant="primary"
+            <button
+              type="button"
               onClick={() => {
                 setEditingVendor(null);
                 setIsVendorDialogOpen(true);
               }}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-neutral-text bg-primary hover:bg-primary-hover rounded-md transition-all shadow-sm active:scale-[0.98]"
             >
               <Plus className="w-4 h-4 mr-1.5" />
               <span>Record First Vendor</span>
-            </Button>
+            </button>
           )}
         </div>
       ) : (
@@ -458,19 +542,20 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
             return (
               <div
                 key={vendor.id}
-                className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card flex flex-col justify-between hover:border-neutral-border-strong transition-all"
+                className="bg-neutral-surface border border-neutral-border rounded-xl p-5 shadow-card flex flex-col justify-between hover:border-primary/40 hover:shadow-sm transition-all"
               >
                 <div>
-                  {/* Card Top: Badges & Actions */}
-                  <div className="flex items-start justify-between gap-2 mb-2">
+                  {/* Card Header: Category Icon, Status Badge, Quick Actions */}
+                  <div className="flex items-start justify-between gap-2 mb-2.5">
                     <div className="flex flex-wrap items-center gap-1.5">
                       {getStatusBadge(vendor.status)}
-                      <span className="text-xs font-mono px-2 py-0.5 rounded bg-neutral-subtle border border-neutral-border text-neutral-muted">
-                        {categoryLabel}
+                      <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-neutral-subtle border border-neutral-border text-neutral-text">
+                        {getVendorCategoryIcon(vendor.category)}
+                        <span>{categoryLabel}</span>
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1 shrink-0">
                       {vendorQuoteCount > 0 ? (
                         <button
                           type="button"
@@ -478,7 +563,7 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
                             setActiveCategoryForBrief(vendor.category);
                             setIsComparisonOpen(true);
                           }}
-                          className="px-2 py-0.5 rounded text-[11px] font-mono bg-amber-500/10 border border-amber-500/30 text-secondary hover:bg-amber-500/20 transition-colors"
+                          className="px-2 py-0.5 rounded text-[11px] font-mono bg-primary-subtle border border-primary/30 text-primary-hover hover:bg-primary hover:text-neutral-text transition-colors"
                         >
                           {vendorQuoteCount} quote{vendorQuoteCount !== 1 ? 's' : ''}
                         </button>
@@ -486,7 +571,7 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
                         <button
                           type="button"
                           onClick={() => handleAddNewQuote(vendor.category, vendor.id)}
-                          className="px-2 py-0.5 rounded text-[11px] font-mono bg-neutral-subtle text-neutral-muted hover:text-neutral-text transition-colors"
+                          className="px-2 py-0.5 rounded text-[11px] font-mono bg-neutral-subtle border border-neutral-border text-neutral-muted hover:text-neutral-text transition-colors"
                         >
                           + Quote
                         </button>
@@ -499,57 +584,57 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
                           handleDraftMessage(vQuote);
                         }}
                         title="Draft coordination message"
-                        className="p-1 rounded text-neutral-muted hover:text-secondary hover:bg-neutral-subtle transition-colors"
+                        className="p-1.5 rounded-md text-neutral-muted hover:text-secondary hover:bg-neutral-subtle transition-colors"
                       >
                         <MessageSquare className="w-3.5 h-3.5" />
                       </button>
 
-                      <Button
-                        variant="ghost"
-                        size="sm"
+                      <button
+                        type="button"
                         onClick={() => {
                           setEditingVendor(vendor);
                           setIsVendorDialogOpen(true);
                         }}
+                        className="px-2.5 py-1 text-xs font-semibold text-neutral-text hover:text-primary bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border rounded-md transition-colors"
                       >
                         Edit
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
+                      </button>
+
+                      <button
+                        type="button"
                         onClick={() => setDeletingVendor(vendor)}
-                        className="text-status-danger hover:bg-status-danger-subtle"
+                        className="px-2.5 py-1 text-xs font-semibold text-status-danger hover:bg-status-danger-subtle border border-transparent hover:border-status-danger/30 rounded-md transition-colors"
                       >
                         Delete
-                      </Button>
+                      </button>
                     </div>
                   </div>
 
                   {/* Vendor Name */}
-                  <h3 className="font-display text-lg font-semibold text-neutral-text mb-2">
+                  <h3 className="font-display text-lg font-bold text-neutral-text mb-2 leading-tight">
                     {vendor.name}
                   </h3>
 
-                  {/* Contact Info Row */}
+                  {/* Contact Info Pills */}
                   {(vendor.contactPerson || vendor.phone || vendor.email || vendor.website) && (
-                    <div className="flex flex-wrap items-center gap-3 text-xs text-neutral-muted mb-4 font-sans">
+                    <div className="flex flex-wrap items-center gap-2.5 text-xs text-neutral-muted mb-3.5 font-sans">
                       {vendor.contactPerson && (
-                        <div className="flex items-center gap-1 text-neutral-text">
-                          <User className="w-3.5 h-3.5 text-secondary" />
+                        <div className="flex items-center gap-1 text-neutral-text font-medium">
+                          <User className="w-3.5 h-3.5 text-secondary shrink-0" />
                           <span>{vendor.contactPerson}</span>
                         </div>
                       )}
                       {vendor.phone && (
-                        <div className="flex items-center gap-1 font-mono">
-                          <Phone className="w-3.5 h-3.5 text-secondary" />
+                        <div className="flex items-center gap-1 font-mono text-neutral-text">
+                          <Phone className="w-3.5 h-3.5 text-secondary shrink-0" />
                           <a href={`tel:${vendor.phone}`} className="hover:underline">
                             {vendor.phone}
                           </a>
                         </div>
                       )}
                       {vendor.email && (
-                        <div className="flex items-center gap-1">
-                          <Mail className="w-3.5 h-3.5 text-secondary" />
+                        <div className="flex items-center gap-1 text-neutral-text">
+                          <Mail className="w-3.5 h-3.5 text-secondary shrink-0" />
                           <a href={`mailto:${vendor.email}`} className="hover:underline">
                             {vendor.email}
                           </a>
@@ -557,7 +642,7 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
                       )}
                       {vendor.website && (
                         <div className="flex items-center gap-1">
-                          <ExternalLink className="w-3.5 h-3.5 text-secondary" />
+                          <ExternalLink className="w-3.5 h-3.5 text-secondary shrink-0" />
                           <a
                             href={vendor.website}
                             target="_blank"
@@ -571,18 +656,18 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
                     </div>
                   )}
 
-                  {/* Financial Breakdown Table */}
-                  <div className="bg-neutral-subtle/60 border border-neutral-border rounded p-3 text-xs space-y-2 mb-3">
+                  {/* Financial Breakdown Card */}
+                  <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3 text-xs space-y-2 mb-3">
                     <div className="flex justify-between items-center text-neutral-muted">
                       <span>Initial Quote:</span>
-                      <span className="font-mono font-semibold text-neutral-text">
+                      <span className="font-mono font-bold text-neutral-text">
                         {formatCurrency(vendor.quotedCost, event.currency)}
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center text-neutral-muted">
                       <span>Agreed Contract:</span>
-                      <span className="font-mono font-semibold text-neutral-text">
+                      <span className="font-mono font-bold text-neutral-text">
                         {vendor.agreedCost != null
                           ? formatCurrency(vendor.agreedCost, event.currency)
                           : 'Not established'}
@@ -591,10 +676,10 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
 
                     <div className="flex justify-between items-center text-neutral-muted">
                       <span>Total Paid to Date:</span>
-                      <span className="font-mono font-semibold text-status-success">
+                      <span className="font-mono font-bold text-status-success">
                         {formatCurrency(vendor.amountPaid, event.currency)}
                         {vendor.depositPaid > 0 && (
-                          <span className="text-neutral-muted font-normal text-xs ml-1">
+                          <span className="text-neutral-muted font-normal text-[11px] ml-1">
                             (incl. {formatCurrency(vendor.depositPaid, event.currency)} deposit)
                           </span>
                         )}
@@ -605,11 +690,11 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
                       <span>Remaining Balance:</span>
                       {balance.isEstablished ? (
                         balance.isOverpaid ? (
-                          <span className="font-mono text-status-danger">
+                          <span className="font-mono text-status-danger font-bold">
                             Overpaid by {formatCurrency(balance.overpaidAmount, event.currency)}
                           </span>
                         ) : (
-                          <span className="font-mono text-secondary">
+                          <span className="font-mono text-secondary font-bold">
                             {formatCurrency(balance.remaining, event.currency)}
                           </span>
                         )
@@ -620,20 +705,20 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
                       )}
                     </div>
 
-                    {/* Progress Bar */}
+                    {/* Progress Bar for Paid Settlement */}
                     {vendor.agreedCost != null && vendor.agreedCost > 0 && (
-                      <div className="pt-1">
-                        <div className="w-full bg-neutral-border/60 rounded-full h-1.5 overflow-hidden">
+                      <div className="pt-1 space-y-1">
+                        <div className="w-full bg-neutral-border/60 rounded-full h-2 overflow-hidden">
                           <div
-                            className={`h-full transition-all ${
+                            className={`h-full transition-all duration-500 rounded-full ${
                               percentPaid >= 100 ? 'bg-status-success' : 'bg-primary'
                             }`}
                             style={{ width: `${Math.min(100, percentPaid)}%` }}
                           />
                         </div>
-                        <div className="flex justify-between text-xs text-neutral-muted mt-1 font-mono">
+                        <div className="flex justify-between text-[11px] text-neutral-muted font-mono">
                           <span>{percentPaid}% cleared</span>
-                          <span>
+                          <span className="font-medium text-neutral-text">
                             {percentPaid >= 100 ? 'Contract Settled' : 'Payment in Progress'}
                           </span>
                         </div>
@@ -643,24 +728,24 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
 
                   {/* Private Notes if provided */}
                   {vendor.notes && (
-                    <p className="text-xs text-neutral-muted italic mb-3 bg-neutral-bg p-2 rounded border border-neutral-border/50">
+                    <p className="text-xs text-neutral-muted italic mb-3 bg-neutral-bg p-2.5 rounded-lg border border-neutral-border/50 leading-relaxed">
                       &ldquo;{vendor.notes}&rdquo;
                     </p>
                   )}
                 </div>
 
                 {/* Card Footer: Category Linkage */}
-                <div className="pt-2 border-t border-neutral-border/50 flex items-center justify-between text-xs">
+                <div className="pt-2.5 border-t border-neutral-border/60 flex items-center justify-between text-xs">
                   {linkedCatName ? (
                     <div className="flex items-center gap-1.5 text-neutral-muted">
-                      <Tag className="w-3.5 h-3.5 text-primary" />
+                      <Tag className="w-3.5 h-3.5 text-primary shrink-0" />
                       <span>Linked Category: </span>
-                      <span className="font-medium text-neutral-text">{linkedCatName}</span>
+                      <span className="font-semibold text-neutral-text">{linkedCatName}</span>
                     </div>
                   ) : (
                     <span className="text-neutral-muted italic">Unlinked to budget category</span>
                   )}
-                  <span className="font-mono text-neutral-muted text-xs">
+                  <span className="font-mono text-neutral-muted text-[11px]">
                     Updated {vendor.updatedAt ? vendor.updatedAt.slice(0, 10) : ''}
                   </span>
                 </div>
@@ -670,7 +755,9 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
         </div>
       )}
 
-      {/* Modals */}
+      {/* =========================================================================
+          MODALS & DIALOGS
+      ========================================================================= */}
       <VendorDialog
         isOpen={isVendorDialogOpen}
         onClose={() => {

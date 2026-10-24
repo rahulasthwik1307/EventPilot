@@ -9,6 +9,7 @@ import {
 } from '@/features/vendors/quotations/proposal-adapter';
 import { formatCurrency } from '@/features/events/validation';
 import { Button } from '../../ui/Button';
+import { Dialog } from '../../ui/Dialog';
 import { CouponBadge } from '../../ui/Badge';
 import {
   AlertCircle,
@@ -84,84 +85,82 @@ export function QuoteProposalReviewModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-slate-900 border border-amber-500/30 rounded-xl shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col my-auto text-amber-50">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-800">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-semibold">
-                Quotation Staging &amp; Acceptance
-              </span>
-              <CouponBadge variant="marigold">Contract Safeguards</CouponBadge>
-            </div>
-            <h3 className="font-serif text-2xl font-medium text-amber-100">
-              Review Quote-Derived Proposal
-            </h3>
+    <Dialog
+      isOpen={isOpen}
+      onClose={onClose}
+      title={
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#B45309] font-semibold">
+              Quotation Staging &amp; Acceptance
+            </span>
+            <CouponBadge variant="marigold">Contract Safeguards</CouponBadge>
           </div>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-amber-200 transition-colors p-2 rounded-lg hover:bg-slate-800"
-            aria-label="Close dialog"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <span className="font-serif text-xl font-medium text-[#1C1917]">
+            Review Quote-Derived Proposal
+          </span>
         </div>
+      }
+      maxWidth="lg"
+      accentBar
+      contentPadding={false}
+    >
+      <div className="flex flex-col flex-1 min-h-0 bg-white">
 
         {/* Content body */}
-        <div className="p-6 overflow-y-auto space-y-5 flex-1">
+        <div className="p-6 overflow-y-auto space-y-4 flex-1 bg-white">
           {/* Quote summary card */}
-          <div className="p-4 bg-slate-950 border border-slate-800 rounded-lg space-y-2">
+          <div className="p-4 bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg space-y-1.5">
             <div className="flex items-start justify-between">
               <div>
-                <span className="text-xs font-mono uppercase text-slate-400 block">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[#78716C] font-semibold block">
                   {quote.vendorName}
                 </span>
-                <span className="font-serif text-lg text-amber-100 font-medium">
+                <span className="font-serif text-lg text-[#1C1917] font-medium">
                   {quote.title}
                 </span>
               </div>
-              <span className="font-mono text-xl font-bold text-amber-300">
+              <span className="font-mono text-xl font-bold text-[#D97706]">
                 {formatCurrency(quote.quotedTotal, quote.currency)}
               </span>
             </div>
-            <p className="text-xs text-slate-400">
-              Category: <span className="capitalize text-slate-200">{quote.serviceCategory}</span> • {quote.includedServices.length} deliverables
+            <p className="text-xs text-[#78716C]">
+              Category: <span className="capitalize text-[#1C1917] font-medium">{quote.serviceCategory}</span> • {quote.includedServices.length} deliverables
             </p>
           </div>
 
           {/* Configuration Options */}
-          <div className="space-y-3 p-4 bg-slate-950/60 border border-slate-800 rounded-lg">
-            <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-semibold block">
+          <div className="space-y-3 p-4 bg-[#FDFBF7] border border-[#E7DFD5] rounded-lg">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#B45309] font-semibold block">
               Staging Options
             </span>
 
-            <label className="flex items-start gap-2.5 text-xs text-slate-200 cursor-pointer">
+            <label className="flex items-start gap-2.5 text-xs text-[#1C1917] cursor-pointer">
               <input
                 type="checkbox"
                 checked={promoteToContract}
                 onChange={(e) => setPromoteToContract(e.target.checked)}
-                className="mt-0.5 rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500"
+                className="mt-0.5 rounded border-[#E7DFD5] text-[#D97706] focus:ring-[#D97706]"
               />
               <div>
-                <span className="font-medium text-amber-100 block">
+                <span className="font-medium text-[#1C1917] block">
                   Promote to Confirmed Agreed Contract
                 </span>
-                <span className="text-slate-400">
+                <span className="text-[#78716C]">
                   Marks this vendor as booked with agreedCost = {formatCurrency(quote.quotedTotal, quote.currency)}.
                 </span>
               </div>
             </label>
 
             {eligibleExpenses.length > 0 && (
-              <div className="pt-2 border-t border-slate-800/80 space-y-1.5">
-                <label className="block text-xs font-mono uppercase text-slate-400">
+              <div className="pt-2 border-t border-[#E7DFD5] space-y-1.5">
+                <label className="block text-[10px] font-mono uppercase tracking-widest text-[#78716C] font-semibold">
                   Link &amp; Update Budget Ledger Expense Estimate
                 </label>
                 <select
                   value={targetExpenseId}
                   onChange={(e) => setTargetExpenseId(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs font-mono text-amber-100 focus:outline-none focus:border-amber-400"
+                  className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2 text-xs font-mono text-[#1C1917] focus:outline-none focus:border-[#D97706] focus:ring-1 focus:ring-[#D97706]/20 transition-all shadow-sm"
                 >
                   <option value="">-- Do not adjust ledger expense --</option>
                   {eligibleExpenses.map((exp) => (
@@ -176,8 +175,8 @@ export function QuoteProposalReviewModal({
 
           {/* Invariant Failure Warning */}
           {!proposal.canApply && (
-            <div className="p-4 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs text-rose-200 flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
               <div>
                 <strong className="block text-sm font-semibold mb-1">Contract Invariant Violation</strong>
                 {proposal.validationError}
@@ -187,8 +186,8 @@ export function QuoteProposalReviewModal({
 
           {/* Concurrency / Application Error */}
           {applyError && (
-            <div className="p-4 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs text-rose-200 flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
               <span>{applyError}</span>
             </div>
           )}
@@ -196,30 +195,32 @@ export function QuoteProposalReviewModal({
           {/* Before & After Diff Box */}
           {proposal.canApply && (
             <div className="space-y-3">
-              <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-semibold block">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#B45309] font-semibold block">
                 Proposed State Changes
               </span>
 
               {proposal.vendorProposal && (
-                <div className="p-3 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono space-y-2">
-                  <div className="flex items-center justify-between text-slate-400 text-[11px]">
-                    <span>VENDOR RECORD: {proposal.vendorProposal.vendorName}</span>
-                    <span>{proposal.vendorProposal.isNewVendor ? 'NEW' : 'UPDATE'}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-slate-200">
-                    <span>
-                      Status: <strong className="text-slate-400">{proposal.vendorProposal.before?.status || 'none'}</strong>
+                <div className="p-3 bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg text-xs font-mono space-y-2">
+                  <div className="flex items-center justify-between text-[#78716C] text-[11px]">
+                    <span className="font-semibold">VENDOR RECORD: {proposal.vendorProposal.vendorName}</span>
+                    <span className="px-1.5 py-0.5 rounded bg-[#E7DFD5]/50 text-[10px] font-bold">
+                      {proposal.vendorProposal.isNewVendor ? 'NEW' : 'UPDATE'}
                     </span>
-                    <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                  </div>
+                  <div className="flex items-center justify-between text-[#1C1917]">
                     <span>
-                      Status: <strong className="text-amber-300">{proposal.vendorProposal.after.status}</strong>
+                      Status: <strong className="text-[#78716C]">{proposal.vendorProposal.before?.status || 'none'}</strong>
+                    </span>
+                    <ArrowRight className="w-3.5 h-3.5 text-[#D97706]" />
+                    <span>
+                      Status: <strong className="text-[#D97706]">{proposal.vendorProposal.after.status}</strong>
                     </span>
                   </div>
                   {proposal.vendorProposal.after.agreedCost !== undefined && (
-                    <div className="flex items-center justify-between text-slate-200">
+                    <div className="flex items-center justify-between text-[#1C1917]">
                       <span>Agreed Contract</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
-                      <span className="text-emerald-400 font-bold">
+                      <ArrowRight className="w-3.5 h-3.5 text-[#D97706]" />
+                      <span className="text-emerald-700 font-bold">
                         {formatCurrency(proposal.vendorProposal.after.agreedCost, quote.currency)}
                       </span>
                     </div>
@@ -228,24 +229,24 @@ export function QuoteProposalReviewModal({
               )}
 
               {proposal.expenseProposal && (
-                <div className="p-3 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono space-y-2">
-                  <div className="flex items-center justify-between text-slate-400 text-[11px]">
-                    <span>EXPENSE LEDGER: {proposal.expenseProposal.expenseTitle}</span>
-                    <span>ESTIMATE ADJUSTMENT</span>
+                <div className="p-3 bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg text-xs font-mono space-y-2">
+                  <div className="flex items-center justify-between text-[#78716C] text-[11px]">
+                    <span className="font-semibold">EXPENSE LEDGER: {proposal.expenseProposal.expenseTitle}</span>
+                    <span className="px-1.5 py-0.5 rounded bg-[#E7DFD5]/50 text-[10px] font-bold">ESTIMATE ADJUSTMENT</span>
                   </div>
-                  <div className="flex items-center justify-between text-slate-200">
+                  <div className="flex items-center justify-between text-[#1C1917]">
                     <span>
                       Estimate: {formatCurrency(proposal.expenseProposal.before.estimatedAmount, event.currency)}
                     </span>
-                    <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
-                    <span className="text-amber-300 font-bold">
+                    <ArrowRight className="w-3.5 h-3.5 text-[#D97706]" />
+                    <span className="text-[#D97706] font-bold">
                       Estimate: {formatCurrency(proposal.expenseProposal.after.estimatedAmount, event.currency)}
                     </span>
                   </div>
                 </div>
               )}
 
-              <p className="text-xs text-slate-400 italic">
+              <p className="text-xs text-[#78716C] italic">
                 {proposal.impactSummary}
               </p>
             </div>
@@ -253,11 +254,11 @@ export function QuoteProposalReviewModal({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div className="px-6 py-3.5 border-t border-[#E7DFD5] flex items-center justify-between bg-[#FAF8F5]">
           <button
             type="button"
             onClick={onClose}
-            className="text-xs font-mono text-slate-400 hover:text-slate-200"
+            className="text-xs font-mono text-[#78716C] hover:text-[#1C1917] transition-colors"
           >
             Cancel
           </button>
@@ -266,13 +267,13 @@ export function QuoteProposalReviewModal({
             variant="primary"
             onClick={handleApply}
             disabled={!proposal.canApply}
-            className="text-xs font-mono"
+            className="text-xs font-mono shadow-sm"
           >
             <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
             <span>Apply Changes</span>
           </Button>
         </div>
       </div>
-    </div>
+    </Dialog>
   );
 }

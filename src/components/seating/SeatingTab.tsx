@@ -23,19 +23,20 @@ import { Button } from '../ui/Button';
 import { TableDialog } from './TableDialog';
 import { TableDeleteDialog } from './TableDeleteDialog';
 import {
-  AlertCircle,
   AlertTriangle,
   Armchair,
   CheckCircle2,
   Clock,
-  Layers,
+  Edit2,
+  Filter,
   LayoutGrid,
   Plus,
+  Search,
+  Trash2,
   UserCheck,
   UserMinus,
-  UserPlus,
   Users,
-  XCircle,
+  UtensilsCrossed,
 } from 'lucide-react';
 
 export interface SeatingTabProps {
@@ -43,10 +44,41 @@ export interface SeatingTabProps {
   onUpdateEvent: (updated: Event) => void;
 }
 
+const AVATAR_PALETTES = [
+  { bg: 'bg-[#FEF3C7]', text: 'text-[#92400E]', border: 'border-[#FDE68A]' },
+  { bg: 'bg-[#FFEDD5]', text: 'text-[#9A3412]', border: 'border-[#FED7AA]' },
+  { bg: 'bg-[#F3E8FF]', text: 'text-[#6B21A8]', border: 'border-[#E9D5FF]' },
+  { bg: 'bg-[#E0E7FF]', text: 'text-[#3730A3]', border: 'border-[#C7D2FE]' },
+  { bg: 'bg-[#DCFCE7]', text: 'text-[#166534]', border: 'border-[#BBF7D0]' },
+  { bg: 'bg-[#FCE7F3]', text: 'text-[#9D174D]', border: 'border-[#FBCFE8]' },
+  { bg: 'bg-[#CFFAFE]', text: 'text-[#155E75]', border: 'border-[#A5F3FC]' },
+];
+
+function getAvatarPalette(str: string) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return AVATAR_PALETTES[Math.abs(hash) % AVATAR_PALETTES.length];
+}
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
   const [isTableDialogOpen, setIsTableDialogOpen] = useState(false);
   const [editingTable, setEditingTable] = useState<SeatingTable | null>(null);
   const [deletingTable, setDeletingTable] = useState<SeatingTable | null>(null);
+
+  // Filter state for tables
+  const [searchQuery, setSearchQuery] = useState('');
+  const [tableTypeFilter, setTableTypeFilter] = useState<string>('all');
+  const [occupancyFilter, setOccupancyFilter] = useState<string>('all');
 
   const tables = useMemo(() => event.tables || [], [event.tables]);
   const assignments = useMemo(() => event.assignments || [], [event.assignments]);
@@ -139,22 +171,64 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
     });
   }, [tables, assignments, guests]);
 
+  // Filtered tables based on search and dropdown selections
+  const filteredTables = useMemo(() => {
+    return tables.filter((t) => {
+      const occ = calculateTableOccupancy(t, assignments, guests);
+
+      // Search match: table name, notes, or assigned guest names
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const matchesName = t.name.toLowerCase().includes(q);
+        const matchesNotes = t.notes ? t.notes.toLowerCase().includes(q) : false;
+        const matchesGuest = occ.assignments.some((asg) => {
+          const g = guestMap.get(asg.guestId);
+          if (!g) return false;
+          const fullName = `${g.firstName} ${g.lastName || ''}`.toLowerCase();
+          const plusName = g.plusOneName ? g.plusOneName.toLowerCase() : '';
+          return fullName.includes(q) || plusName.includes(q);
+        });
+
+        if (!matchesName && !matchesNotes && !matchesGuest) return false;
+      }
+
+      // Table type filter
+      if (tableTypeFilter !== 'all' && t.tableType !== tableTypeFilter) {
+        return false;
+      }
+
+      // Occupancy status filter
+      if (occupancyFilter === 'has-vacancy') {
+        if (occ.isFull || occ.isOverCapacity) return false;
+      } else if (occupancyFilter === 'full') {
+        if (!occ.isFull || occ.isOverCapacity) return false;
+      } else if (occupancyFilter === 'over-capacity') {
+        if (!occ.isOverCapacity) return false;
+      }
+
+      return true;
+    });
+  }, [tables, assignments, guests, searchQuery, tableTypeFilter, occupancyFilter, guestMap]);
+
   return (
     <div className="space-y-8">
-      {/* 1. Header & Seating Summary Metrics */}
-      <div className="bg-neutral-surface border border-neutral-border rounded-lg p-6 sm:p-8 shadow-card">
+      {/* 1. Header & Seating Summary Master Deck */}
+      <div className="relative overflow-hidden bg-white border border-[#E7DFD5] rounded-xl p-6 sm:p-8 shadow-sm">
+        {/* Top hairline decorative accent */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#C2410C] via-[#D97706] to-[#C2410C]" />
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono uppercase tracking-wider text-secondary font-semibold">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-[#C2410C] font-bold">
                 Banquet Allocation &amp; Floor Plan
               </span>
-              <CouponBadge variant="marigold">Seating Engine</CouponBadge>
+              <CouponBadge variant="marigold">SEATING ENGINE</CouponBadge>
             </div>
-            <h2 className="font-display text-2xl sm:text-3xl font-semibold text-neutral-text">
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917] tracking-tight">
               Banquet Seating Planner
             </h2>
-            <p className="text-xs text-neutral-muted mt-1">
+            <p className="text-xs text-[#78716C] mt-1 max-w-2xl leading-relaxed">
               Deterministic seat allocations, positive table capacities, dynamic over-capacity alerts, and unassigned attendee queues.
             </p>
           </div>
@@ -165,87 +239,92 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
               setEditingTable(null);
               setIsTableDialogOpen(true);
             }}
-            className="self-start sm:self-center"
+            className="self-start sm:self-center text-xs font-mono font-bold active:scale-[0.98] transition-all bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm px-4 py-2"
           >
             <Plus className="w-4 h-4 mr-1.5" />
             <span>Add Table</span>
           </Button>
         </div>
 
-        {/* 5 Summary Cards */}
+        {/* 5 Summary Metric Stations */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
+          {/* Station 1: Total Tables */}
+          <div className="bg-[#FAF8F5] border border-[#E7DFD5] p-3.5 rounded-lg transition-all hover:border-[#D6C7B2]">
+            <span className="text-[11px] uppercase font-bold text-[#78716C] block mb-1 tracking-wider">
               Total Tables
             </span>
-            <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text">
+            <p className="font-mono text-2xl font-bold text-[#1C1917]">
               {summary.totalTables}
             </p>
-            <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
+            <span className="text-[11px] text-[#A8A29E] font-mono mt-0.5 block">
               Banquet layout
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
+          {/* Station 2: Total Seat Capacity */}
+          <div className="bg-[#FAF8F5] border border-[#E7DFD5] p-3.5 rounded-lg transition-all hover:border-[#D6C7B2]">
+            <span className="text-[11px] uppercase font-bold text-[#78716C] block mb-1 tracking-wider">
               Total Seat Capacity
             </span>
-            <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text">
+            <p className="font-mono text-2xl font-bold text-[#1C1917]">
               {summary.totalSeats}
             </p>
-            <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
+            <span className="text-[11px] text-[#A8A29E] font-mono mt-0.5 block">
               Configured seats
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
+          {/* Station 3: Expected Seated */}
+          <div className="bg-[#FAF8F5] border border-[#E7DFD5] p-3.5 rounded-lg transition-all hover:border-[#D6C7B2]">
+            <span className="text-[11px] uppercase font-bold text-[#047857] block mb-1 tracking-wider">
               Expected Seated
             </span>
-            <p className="font-mono text-xl sm:text-2xl font-bold text-status-success">
+            <p className="font-mono text-2xl font-bold text-[#047857]">
               {summary.expectedAssigned}
             </p>
-            <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
+            <span className="text-[11px] text-[#A8A29E] font-mono mt-0.5 block">
               Confirmed attendees
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
+          {/* Station 4: Unassigned Attendees */}
+          <div className="bg-[#FAF8F5] border border-[#E7DFD5] p-3.5 rounded-lg transition-all hover:border-[#D6C7B2]">
+            <span className="text-[11px] uppercase font-bold text-[#C2410C] block mb-1 tracking-wider">
               Unassigned Attendees
             </span>
-            <p className="font-mono text-xl sm:text-2xl font-bold text-secondary">
+            <p className="font-mono text-2xl font-bold text-[#C2410C]">
               {summary.unassignedExpected}
             </p>
-            <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
+            <span className="text-[11px] text-[#A8A29E] font-mono mt-0.5 block">
               Awaiting seat allocation
             </span>
           </div>
 
-          <div className="bg-primary-subtle/50 border border-primary/30 p-3.5 rounded-md col-span-2 lg:col-span-1">
-            <span className="text-xs uppercase font-semibold text-primary block mb-1">
+          {/* Station 5: Seating Completion */}
+          <div className="bg-[#FEF3C7]/40 border border-[#FDE68A] p-3.5 rounded-lg col-span-2 lg:col-span-1">
+            <span className="text-[11px] uppercase font-bold text-[#92400E] block mb-1 tracking-wider">
               Seating Completion
             </span>
-            <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text">
+            <p className="font-mono text-2xl font-bold text-[#92400E]">
               {summary.seatingProgressPct}%
             </p>
-            <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
+            <span className="text-[11px] text-[#A8A29E] font-mono mt-0.5 block">
               Of expected attendance
             </span>
           </div>
         </div>
 
         {/* Global Progress Bar */}
-        <div className="mt-4 pt-4 border-t border-neutral-border/60">
-          <div className="flex items-center justify-between text-xs text-neutral-muted mb-1 font-mono">
-            <span>Overall Seating Progress</span>
+        <div className="mt-5 pt-4 border-t border-[#E7DFD5]">
+          <div className="flex items-center justify-between text-xs text-[#78716C] mb-1.5 font-mono">
+            <span className="font-semibold text-[#1C1917]">Overall Seating Progress</span>
             <span>
-              {summary.expectedAssigned} / {summary.expectedAssigned + summary.unassignedExpected} expected attendees allocated
+              <strong className="text-[#1C1917]">{summary.expectedAssigned}</strong> / {summary.expectedAssigned + summary.unassignedExpected} expected attendees allocated ({summary.seatingProgressPct}%)
             </span>
           </div>
-          <div className="w-full bg-neutral-border/60 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-[#E7DFD5]/70 rounded-full h-2.5 overflow-hidden">
             <div
-              className="h-full bg-primary transition-all duration-300"
+              className="h-full bg-gradient-to-r from-[#D97706] to-[#047857] transition-all duration-500 rounded-full"
               style={{ width: `${Math.min(100, summary.seatingProgressPct)}%` }}
             />
           </div>
@@ -255,14 +334,14 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
         {overCapacityTables.length > 0 && (
           <div
             role="alert"
-            className="mt-5 bg-status-danger-subtle text-status-danger border border-status-danger/40 p-4 rounded-md text-xs flex items-start gap-3 shadow-sm"
+            className="mt-5 bg-[#FEF2F2] text-[#B91C1C] border border-[#FCA5A5] p-4 rounded-xl text-xs flex items-start gap-3 shadow-sm"
           >
-            <AlertTriangle className="w-5 h-5 text-status-danger flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="w-5 h-5 text-[#DC2626] flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-sm text-status-danger mb-1">
+              <p className="font-bold text-sm text-[#991B1B] mb-0.5">
                 Over-Capacity Warning: {overCapacityTables.length} Table(s) Exceed Configured Seats
               </p>
-              <p className="text-neutral-text/90 leading-relaxed">
+              <p className="text-[#7F1D1D] leading-relaxed">
                 The following tables have more attendees assigned than their physical seat limit:{' '}
                 <strong>{overCapacityTables.map((t) => t.name).join(', ')}</strong>. Please unseat or move excess attendees to available tables.
               </p>
@@ -271,27 +350,104 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
         )}
       </div>
 
-      {/* 2. Main Seating Canvas (Tables Grid + Unassigned Queue) */}
+      {/* 2. Interactive Search & Filters Toolbar */}
+      <div className="bg-white border border-[#E7DFD5] rounded-xl p-4 shadow-sm space-y-3">
+        {/* Row 1: Search Bar */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-[#A8A29E] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search tables by name, notes, or assigned attendee..."
+              className="w-full pl-9 pr-4 py-2 text-xs font-sans bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#D97706] focus:bg-white text-[#1C1917] placeholder:text-[#A8A29E]"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-[#A8A29E] hover:text-[#1C1917] px-1.5 py-0.5 rounded"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+
+          <div className="text-xs font-mono text-[#78716C] shrink-0 self-center">
+            Showing <strong className="text-[#1C1917]">{filteredTables.length}</strong> of {tables.length} tables
+          </div>
+        </div>
+
+        {/* Row 2: Select Filters */}
+        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-[#E7DFD5]/60 text-xs">
+          <span className="text-[11px] font-mono uppercase font-bold text-[#A8A29E] flex items-center gap-1 mr-1">
+            <Filter className="w-3.5 h-3.5" /> Filters:
+          </span>
+
+          <select
+            value={tableTypeFilter}
+            onChange={(e) => setTableTypeFilter(e.target.value)}
+            aria-label="Filter by table type"
+            className="px-2.5 py-1.5 text-xs bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#D97706] text-[#1C1917]"
+          >
+            <option value="all">All Table Styles</option>
+            {TABLE_TYPES.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={occupancyFilter}
+            onChange={(e) => setOccupancyFilter(e.target.value)}
+            aria-label="Filter by occupancy"
+            className="px-2.5 py-1.5 text-xs bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#D97706] text-[#1C1917]"
+          >
+            <option value="all">All Occupancy States</option>
+            <option value="has-vacancy">Has Open Seats</option>
+            <option value="full">Table Full</option>
+            <option value="over-capacity">Over Capacity</option>
+          </select>
+
+          {(searchQuery || tableTypeFilter !== 'all' || occupancyFilter !== 'all') && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('');
+                setTableTypeFilter('all');
+                setOccupancyFilter('all');
+              }}
+              className="text-xs text-[#C2410C] hover:underline font-mono ml-auto"
+            >
+              Reset Filters
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* 3. Main Seating Canvas (Tables Grid + Unassigned Queue) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Left Column: Tables Grid (2 cols on large) */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-display text-xl font-semibold text-neutral-text flex items-center gap-2">
-              <LayoutGrid className="w-5 h-5 text-secondary" />
+            <h3 className="font-serif text-lg font-bold text-[#1C1917] flex items-center gap-2">
+              <LayoutGrid className="w-5 h-5 text-[#D97706]" />
               <span>Table Roster &amp; Occupancy</span>
             </h3>
-            <span className="text-xs text-neutral-muted font-mono">
+            <span className="text-xs text-[#78716C] font-mono">
               {tables.length} tables registered
             </span>
           </div>
 
           {tables.length === 0 ? (
-            <div className="bg-neutral-surface border border-neutral-border rounded-lg p-10 text-center shadow-card">
-              <Armchair className="w-12 h-12 text-neutral-muted mx-auto mb-3 opacity-60" />
-              <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
+            <div className="bg-white border border-[#E7DFD5] rounded-xl p-10 text-center shadow-sm">
+              <Armchair className="w-12 h-12 text-[#A8A29E] mx-auto mb-3 opacity-60" />
+              <h4 className="font-serif text-base font-bold text-[#1C1917] mb-1">
                 No Tables Created
               </h4>
-              <p className="text-xs text-neutral-muted max-w-sm mx-auto mb-4 leading-relaxed">
+              <p className="text-xs text-[#78716C] max-w-sm mx-auto mb-4 leading-relaxed">
                 Add banquet tables with designated seat capacities to start allocating your confirmed celebration attendees.
               </p>
               <Button
@@ -300,14 +456,35 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
                   setEditingTable(null);
                   setIsTableDialogOpen(true);
                 }}
+                className="bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm"
               >
                 <Plus className="w-4 h-4 mr-1.5" />
                 <span>Add First Table</span>
               </Button>
             </div>
+          ) : filteredTables.length === 0 ? (
+            <div className="bg-white border border-[#E7DFD5] rounded-xl p-8 text-center shadow-sm">
+              <p className="text-sm font-semibold text-[#1C1917] mb-1">
+                No tables match your filter criteria
+              </p>
+              <p className="text-xs text-[#78716C] mb-3">
+                Try loosening your search query or reset filters.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setTableTypeFilter('all');
+                  setOccupancyFilter('all');
+                }}
+                className="text-xs text-[#C2410C] font-mono underline"
+              >
+                Clear all filters
+              </button>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {tables.map((table) => {
+              {filteredTables.map((table) => {
                 const occ = calculateTableOccupancy(table, assignments, guests);
                 const tableTypeLabel =
                   TABLE_TYPES.find((t) => t.id === table.tableType)?.label || 'Banquet';
@@ -315,87 +492,93 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
                 return (
                   <div
                     key={table.id}
-                    className={`bg-neutral-surface border rounded-lg p-5 shadow-card flex flex-col justify-between transition-all ${
+                    className={`bg-white border rounded-xl p-5 shadow-sm flex flex-col justify-between transition-all hover:shadow-md ${
                       occ.isOverCapacity
-                        ? 'border-status-danger ring-1 ring-status-danger/40'
+                        ? 'border-[#EF4444] ring-1 ring-[#EF4444]/40 bg-[#FEF2F2]/20'
                         : occ.isFull
-                        ? 'border-status-success/60'
-                        : 'border-neutral-border hover:border-neutral-border-strong'
+                        ? 'border-[#10B981]/50'
+                        : 'border-[#E7DFD5] hover:border-[#D6C7B2]'
                     }`}
                   >
                     <div>
-                      {/* Table Header: Name, Type, Capacity Status */}
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div>
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <span className="text-xs font-mono px-2 py-0.5 rounded bg-neutral-subtle border border-neutral-border text-neutral-muted">
+                      {/* Table Header: Type + Status on top, Action Buttons right, Table Name full width below */}
+                      <div className="mb-3 space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#FAF8F5] border border-[#E7DFD5] text-[#78716C] font-semibold">
                               {tableTypeLabel}
                             </span>
                             {occ.isOverCapacity ? (
-                              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded bg-status-danger-subtle text-status-danger border border-status-danger/30">
+                              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded bg-[#FEF2F2] text-[#DC2626] border border-[#FCA5A5]">
                                 Over by {occ.currentOccupancy - table.capacity}
                               </span>
                             ) : occ.isFull ? (
-                              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded bg-status-success-subtle text-status-success border border-status-success/30">
+                              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0]">
                                 Table Full
                               </span>
                             ) : (
-                              <span className="text-xs font-mono text-neutral-muted">
+                              <span className="text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-[#FAF8F5] border border-[#E7DFD5] text-[#047857]">
                                 {occ.availableSeats} seat(s) open
                               </span>
                             )}
                           </div>
-                          <h4 className="font-display text-base font-semibold text-neutral-text">
-                            {table.name}
-                          </h4>
+
+                          <div className="flex items-center gap-1 shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditingTable(table);
+                                setIsTableDialogOpen(true);
+                              }}
+                              className="text-xs text-[#78716C] hover:text-[#1C1917] hover:bg-[#FAF8F5] px-2 py-1 h-auto"
+                              title="Edit table"
+                            >
+                              <Edit2 className="w-3.5 h-3.5 mr-1" />
+                              <span>Edit</span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDeletingTable(table)}
+                              className="text-xs text-[#DC2626] hover:bg-[#FEF2F2] px-2 py-1 h-auto"
+                              title="Delete table"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 mr-1" />
+                              <span>Delete</span>
+                            </Button>
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setEditingTable(table);
-                              setIsTableDialogOpen(true);
-                            }}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setDeletingTable(table)}
-                            className="text-status-danger hover:bg-status-danger-subtle"
-                          >
-                            Delete
-                          </Button>
-                        </div>
+                        <h4 className="font-serif text-lg font-bold text-[#1C1917] tracking-tight leading-snug">
+                          {table.name}
+                        </h4>
                       </div>
 
                       {/* Capacity Meter Bar */}
-                      <div className="my-3 space-y-1">
+                      <div className="my-3 space-y-1.5 bg-[#FAF8F5] border border-[#E7DFD5]/80 p-3 rounded-lg">
                         <div className="flex justify-between text-xs font-mono">
-                          <span className="text-neutral-muted">Seat Occupancy:</span>
+                          <span className="text-[#78716C] font-semibold">Seat Occupancy:</span>
                           <span
-                            className={`font-semibold ${
+                            className={`font-bold ${
                               occ.isOverCapacity
-                                ? 'text-status-danger'
+                                ? 'text-[#DC2626]'
                                 : occ.isFull
-                                ? 'text-status-success'
-                                : 'text-neutral-text'
+                                ? 'text-[#059669]'
+                                : 'text-[#1C1917]'
                             }`}
                           >
                             {occ.currentOccupancy} / {table.capacity} seats
                           </span>
                         </div>
-                        <div className="w-full bg-neutral-border/60 rounded-full h-2 overflow-hidden">
+                        <div className="w-full bg-[#E7DFD5] rounded-full h-2 overflow-hidden">
                           <div
-                            className={`h-full transition-all duration-300 ${
+                            className={`h-full transition-all duration-300 rounded-full ${
                               occ.isOverCapacity
-                                ? 'bg-status-danger'
+                                ? 'bg-[#DC2626]'
                                 : occ.isFull
-                                ? 'bg-status-success'
-                                : 'bg-primary'
+                                ? 'bg-[#059669]'
+                                : 'bg-[#D97706]'
                             }`}
                             style={{
                               width: `${Math.min(
@@ -407,49 +590,57 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
                         </div>
 
                         {/* Seat occupancy dots (up to capacity, max 20) */}
-                        <div className="flex flex-wrap items-center gap-1 pt-1" title={`${occ.currentOccupancy} of ${table.capacity} seats occupied`}>
+                        <div
+                          className="flex flex-wrap items-center gap-1 pt-1"
+                          title={`${occ.currentOccupancy} of ${table.capacity} seats occupied`}
+                        >
                           {Array.from({ length: Math.min(table.capacity, 20) }).map((_, seatIdx) => {
                             const isOccupied = seatIdx < occ.currentOccupancy;
                             const isOver = occ.isOverCapacity && seatIdx >= table.capacity - (occ.currentOccupancy - table.capacity);
                             return (
                               <span
                                 key={seatIdx}
-                                className={`w-2.5 h-2.5 rounded-full border transition-colors ${
+                                className={`w-2.5 h-2.5 rounded-full border transition-all ${
                                   isOver
-                                    ? 'bg-status-danger border-status-danger'
+                                    ? 'bg-[#DC2626] border-[#DC2626] ring-2 ring-[#DC2626]/20'
                                     : isOccupied
                                     ? occ.isOverCapacity
-                                      ? 'bg-status-danger/70 border-status-danger'
+                                      ? 'bg-[#DC2626]/70 border-[#DC2626]'
                                       : occ.isFull
-                                      ? 'bg-status-success border-status-success'
-                                      : 'bg-primary border-primary'
-                                    : 'bg-neutral-subtle border-neutral-border'
+                                      ? 'bg-[#059669] border-[#059669]'
+                                      : 'bg-[#D97706] border-[#D97706]'
+                                    : 'bg-white border-[#D6C7B2]'
                                 }`}
                                 aria-hidden="true"
                               />
                             );
                           })}
                           {table.capacity > 20 && (
-                            <span className="text-xs font-mono text-neutral-muted">+{table.capacity - 20}</span>
+                            <span className="text-[11px] font-mono text-[#A8A29E] ml-1">+{table.capacity - 20}</span>
                           )}
                         </div>
                       </div>
 
                       {/* Location notes if any */}
                       {table.notes && (
-                        <p className="text-xs text-neutral-muted italic mb-3 bg-neutral-bg p-2 rounded border border-neutral-border/50">
+                        <p className="text-xs text-[#78716C] italic mb-3 bg-[#FAF8F5] p-2.5 rounded-lg border border-[#E7DFD5]/70">
                           &ldquo;{table.notes}&rdquo;
                         </p>
                       )}
 
                       {/* Seated Occupants List */}
-                      <div className="mt-4 pt-3 border-t border-neutral-border/50 space-y-2">
-                        <span className="text-xs uppercase font-bold text-neutral-muted tracking-wider block mb-1">
-                          Seated Occupants ({occ.assignments.length})
-                        </span>
+                      <div className="mt-4 pt-3 border-t border-[#E7DFD5] space-y-2">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[11px] uppercase font-bold text-[#78716C] tracking-wider">
+                            Seated Occupants ({occ.assignments.length})
+                          </span>
+                          <span className="text-[11px] font-mono text-[#A8A29E]">
+                            {occ.availableSeats > 0 ? `${occ.availableSeats} open` : 'Full'}
+                          </span>
+                        </div>
 
                         {occ.assignments.length === 0 ? (
-                          <p className="text-xs text-neutral-muted italic py-2">
+                          <p className="text-xs text-[#A8A29E] italic py-3 text-center bg-[#FAF8F5]/60 rounded-lg border border-dashed border-[#E7DFD5]">
                             No attendees currently seated here.
                           </p>
                         ) : (
@@ -467,57 +658,68 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
 
                               const isConfirmed = guest?.rsvpStatus === 'confirmed';
                               const isDeclined = guest?.rsvpStatus === 'declined';
+                              const avatarPalette = getAvatarPalette(displayName);
+                              const initials = getInitials(displayName);
 
                               return (
                                 <div
                                   key={asg.id}
-                                  className="flex items-center justify-between p-2 rounded bg-neutral-subtle/70 border border-neutral-border/60 text-xs"
+                                  className="flex items-center justify-between p-2 rounded-lg bg-[#FAF8F5] border border-[#E7DFD5] text-xs hover:bg-[#F5F2EB] transition-colors"
                                 >
-                                  <div className="space-y-0.5">
-                                    <div className="flex items-center gap-1.5">
-                                      <span
-                                        className={`w-2 h-2 rounded-full ${
-                                          isDeclined
-                                            ? 'bg-status-danger'
-                                            : isConfirmed
-                                            ? 'bg-status-success'
-                                            : 'bg-status-warning'
-                                        }`}
-                                        title={
-                                          isDeclined
-                                            ? 'Declined RSVP (occupying seat)'
-                                            : isConfirmed
-                                            ? 'Confirmed RSVP'
-                                            : 'Pending RSVP'
-                                        }
-                                      />
-                                      <span
-                                        className={`font-medium ${
-                                          isDeclined ? 'line-through text-neutral-muted' : 'text-neutral-text'
-                                        }`}
-                                      >
-                                        {displayName}
-                                      </span>
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    {/* Monogram Avatar */}
+                                    <div
+                                      className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0 border ${avatarPalette.bg} ${avatarPalette.text} ${avatarPalette.border}`}
+                                    >
+                                      {initials}
                                     </div>
-                                    <div className="flex items-center gap-2 text-neutral-muted font-sans text-xs pl-3.5">
-                                      {householdName && <span>{householdName}</span>}
-                                      {!isConfirmed && !isDeclined && (
-                                        <span className="text-status-warning font-semibold">
-                                          (Pending RSVP)
+
+                                    <div className="space-y-0.5 min-w-0 flex-1">
+                                      <div className="flex items-center gap-1.5">
+                                        <span
+                                          className={`w-2 h-2 rounded-full shrink-0 ${
+                                            isDeclined
+                                              ? 'bg-[#DC2626]'
+                                              : isConfirmed
+                                              ? 'bg-[#059669]'
+                                              : 'bg-[#D97706]'
+                                          }`}
+                                          title={
+                                            isDeclined
+                                              ? 'Declined RSVP (occupying seat)'
+                                              : isConfirmed
+                                              ? 'Confirmed RSVP'
+                                              : 'Pending RSVP'
+                                          }
+                                        />
+                                        <span
+                                          className={`font-semibold leading-tight text-xs ${
+                                            isDeclined ? 'line-through text-[#A8A29E]' : 'text-[#1C1917]'
+                                          }`}
+                                        >
+                                          {displayName}
                                         </span>
-                                      )}
-                                      {isDeclined && (
-                                        <span className="text-status-danger font-semibold">
-                                          (Declined)
-                                        </span>
-                                      )}
+                                      </div>
+                                      <div className="flex items-center gap-2 text-[#78716C] font-sans text-[11px]">
+                                        {householdName && <span>{householdName}</span>}
+                                        {!isConfirmed && !isDeclined && (
+                                          <span className="text-[#D97706] font-semibold shrink-0">
+                                            (Pending RSVP)
+                                          </span>
+                                        )}
+                                        {isDeclined && (
+                                          <span className="text-[#DC2626] font-semibold shrink-0">
+                                            (Declined)
+                                          </span>
+                                        )}
+                                      </div>
                                     </div>
                                   </div>
 
                                   <button
                                     type="button"
                                     onClick={() => handleUnseatAttendee(asg.id)}
-                                    className="text-neutral-muted hover:text-status-danger p-1 rounded hover:bg-neutral-surface"
+                                    className="text-[#A8A29E] hover:text-[#DC2626] p-1 rounded-md hover:bg-white transition-colors shrink-0 ml-2"
                                     title="Unseat attendee"
                                     aria-label={`Unseat ${displayName}`}
                                   >
@@ -533,10 +735,10 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
 
                     {/* Quick Inline Seat from Unassigned Pool */}
                     {unassignedAttendees.length > 0 && !occ.isFull && !occ.isOverCapacity && (
-                      <div className="mt-4 pt-3 border-t border-neutral-border/50">
+                      <div className="mt-4 pt-3 border-t border-[#E7DFD5]">
                         <label
                           htmlFor={`seat-select-${table.id}`}
-                          className="block text-xs font-semibold uppercase text-neutral-muted mb-1"
+                          className="block text-[11px] font-bold uppercase text-[#78716C] mb-1"
                         >
                           Seat Attendee Here:
                         </label>
@@ -549,7 +751,7 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
                             handleAssignAttendee(table.id, guestId, plusOneStr === 'true');
                             e.target.value = '';
                           }}
-                          className="w-full px-2.5 py-1.5 text-xs bg-neutral-surface border border-neutral-border rounded focus:outline-none focus:ring-1 focus:ring-primary"
+                          className="w-full px-2.5 py-1.5 text-xs bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#D97706] text-[#1C1917]"
                         >
                           <option value="">Choose attendee to seat...</option>
                           {unassignedAttendees.map((u) => (
@@ -573,119 +775,132 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
         </div>
 
         {/* Right Column: Unassigned Expected Attendees Queue */}
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card space-y-4 lg:sticky lg:top-6 self-start">
-          <div className="flex items-center justify-between border-b border-neutral-border pb-3">
+        <div className="bg-white border border-[#E7DFD5] rounded-xl p-5 shadow-sm space-y-4 lg:sticky lg:top-6 self-start">
+          <div className="flex items-center justify-between border-b border-[#E7DFD5] pb-3">
             <div>
-              <h3 className="font-display text-base font-semibold text-neutral-text flex items-center gap-1.5">
-                <Armchair className="w-4 h-4 text-primary" />
+              <h3 className="font-serif text-base font-bold text-[#1C1917] flex items-center gap-1.5">
+                <Armchair className="w-4 h-4 text-[#C2410C]" />
                 <span>Unassigned Queue</span>
               </h3>
-              <p className="text-xs text-neutral-muted">
+              <p className="text-xs text-[#78716C]">
                 Attendees needing table assignments
               </p>
             </div>
-            <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-full bg-secondary-subtle text-secondary border border-secondary/30">
+            <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-full bg-[#FFEDD5] text-[#9A3412] border border-[#FED7AA]">
               {unassignedAttendees.length}
             </span>
           </div>
 
           {unassignedAttendees.length === 0 ? (
             guests.length === 0 ? (
-              <div className="text-center py-8 text-neutral-muted">
-                <Users className="w-8 h-8 text-neutral-muted/60 mx-auto mb-2" />
-                <p className="text-xs font-semibold text-neutral-text mb-0.5">
+              <div className="text-center py-8 text-[#78716C]">
+                <Users className="w-8 h-8 text-[#A8A29E] mx-auto mb-2 opacity-60" />
+                <p className="text-xs font-bold text-[#1C1917] mb-0.5">
                   No Guests Registered
                 </p>
-                <p className="text-xs text-neutral-muted max-w-xs mx-auto">
+                <p className="text-xs text-[#78716C] max-w-xs mx-auto">
                   Add guests and record their RSVPs in the Guests tab to begin seating arrangements.
                 </p>
               </div>
             ) : attendanceSummary.expectedAttendance === 0 ? (
-              <div className="text-center py-8 text-neutral-muted">
-                <Clock className="w-8 h-8 text-status-warning mx-auto mb-2 opacity-80" />
-                <p className="text-xs font-semibold text-neutral-text mb-0.5">
+              <div className="text-center py-8 text-[#78716C]">
+                <Clock className="w-8 h-8 text-[#D97706] mx-auto mb-2 opacity-80" />
+                <p className="text-xs font-bold text-[#1C1917] mb-0.5">
                   Awaiting Confirmed RSVPs
                 </p>
-                <p className="text-xs text-neutral-muted max-w-xs mx-auto">
+                <p className="text-xs text-[#78716C] max-w-xs mx-auto">
                   There are no confirmed attendees to assign. Update guest RSVPs to confirmed to seat them.
                 </p>
               </div>
             ) : tables.length === 0 ? (
-              <div className="text-center py-8 text-neutral-muted">
-                <Armchair className="w-8 h-8 text-secondary mx-auto mb-2 opacity-80" />
-                <p className="text-xs font-semibold text-neutral-text mb-0.5">
+              <div className="text-center py-8 text-[#78716C]">
+                <Armchair className="w-8 h-8 text-[#C2410C] mx-auto mb-2 opacity-80" />
+                <p className="text-xs font-bold text-[#1C1917] mb-0.5">
                   Tables Needed
                 </p>
-                <p className="text-xs text-neutral-muted max-w-xs mx-auto">
+                <p className="text-xs text-[#78716C] max-w-xs mx-auto">
                   Create banquet tables to begin assigning seats to your confirmed guests.
                 </p>
               </div>
             ) : (
-              <div className="text-center py-8 text-neutral-muted">
-                <CheckCircle2 className="w-8 h-8 text-status-success mx-auto mb-2 opacity-80" />
-                <p className="text-xs font-semibold text-neutral-text mb-0.5">
+              <div className="text-center py-8 text-[#78716C]">
+                <CheckCircle2 className="w-8 h-8 text-[#059669] mx-auto mb-2 opacity-80" />
+                <p className="text-xs font-bold text-[#1C1917] mb-0.5">
                   All Confirmed Attendees Seated!
                 </p>
-                <p className="text-xs text-neutral-muted max-w-xs mx-auto">
+                <p className="text-xs text-[#78716C] max-w-xs mx-auto">
                   Every confirmed attendee and attending partner currently holds a reserved table seat.
                 </p>
               </div>
             )
           ) : (
             <div className="space-y-2.5 max-h-[600px] overflow-y-auto pr-1">
-              {unassignedAttendees.map((u) => (
-                <div
-                  key={`${u.guestId}:${u.isPlusOne}`}
-                  className="p-3 rounded-md bg-neutral-subtle/60 border border-neutral-border/70 text-xs space-y-2"
-                >
-                  <div className="flex items-start justify-between gap-1">
-                    <div>
-                      <p className="font-semibold text-neutral-text text-sm">{u.displayName}</p>
-                      {u.householdName && (
-                        <p className="text-neutral-muted">{u.householdName}</p>
+              {unassignedAttendees.map((u) => {
+                const avatarPalette = getAvatarPalette(u.displayName);
+                const initials = getInitials(u.displayName);
+
+                return (
+                  <div
+                    key={`${u.guestId}:${u.isPlusOne}`}
+                    className="p-3 rounded-lg bg-[#FAF8F5] border border-[#E7DFD5] text-xs space-y-2 transition-all hover:border-[#D6C7B2]"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div
+                          className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0 border ${avatarPalette.bg} ${avatarPalette.text} ${avatarPalette.border}`}
+                        >
+                          {initials}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-[#1C1917] text-xs truncate">{u.displayName}</p>
+                          {u.householdName && (
+                            <p className="text-[11px] text-[#78716C] truncate">{u.householdName}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {u.rsvpStatus === 'pending' ? (
+                        <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] shrink-0">
+                          Pending
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0] shrink-0">
+                          Confirmed
+                        </span>
                       )}
                     </div>
-                    {u.rsvpStatus === 'pending' ? (
-                      <span className="text-xs font-mono px-1.5 py-0.5 rounded bg-status-warning-subtle text-status-warning border border-status-warning/30">
-                        Pending
-                      </span>
+
+                    {tables.length > 0 ? (
+                      <div className="flex items-center gap-2 pt-2 border-t border-[#E7DFD5]">
+                        <select
+                          aria-label={`Seat ${u.displayName} at table`}
+                          defaultValue=""
+                          onChange={(e) => {
+                            if (!e.target.value) return;
+                            handleAssignAttendee(e.target.value, u.guestId, u.isPlusOne);
+                            e.target.value = '';
+                          }}
+                          className="w-full px-2.5 py-1.5 text-xs bg-white border border-[#E7DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#D97706] text-[#1C1917]"
+                        >
+                          <option value="">Seat at table...</option>
+                          {tables.map((tbl) => {
+                            const occ = calculateTableOccupancy(tbl, assignments, guests);
+                            return (
+                              <option key={tbl.id} value={tbl.id}>
+                                {tbl.name} ({occ.currentOccupancy}/{tbl.capacity} seated)
+                              </option>
+                            );
+                          })}
+                        </select>
+                      </div>
                     ) : (
-                      <span className="text-xs font-mono px-1.5 py-0.5 rounded bg-status-success-subtle text-status-success border border-status-success/30">
-                        Confirmed
-                      </span>
+                      <p className="text-[#A8A29E] italic text-xs pt-1">
+                        Create a table to seat this guest.
+                      </p>
                     )}
                   </div>
-
-                  {tables.length > 0 ? (
-                    <div className="flex items-center gap-2 pt-1 border-t border-neutral-border/40">
-                      <select
-                        aria-label={`Seat ${u.displayName} at table`}
-                        defaultValue=""
-                        onChange={(e) => {
-                          if (!e.target.value) return;
-                          handleAssignAttendee(e.target.value, u.guestId, u.isPlusOne);
-                          e.target.value = '';
-                        }}
-                        className="w-full px-2 py-1 text-xs bg-neutral-surface border border-neutral-border rounded focus:outline-none focus:ring-1 focus:ring-primary"
-                      >
-                        <option value="">Seat at table...</option>
-                        {tables.map((tbl) => {
-                          const occ = calculateTableOccupancy(tbl, assignments, guests);
-                          return (
-                            <option key={tbl.id} value={tbl.id}>
-                              {tbl.name} ({occ.currentOccupancy}/{tbl.capacity} seated)
-                            </option>
-                          );
-                        })}
-                      </select>
-                    </div>
-                  ) : (
-                    <p className="text-neutral-muted italic text-xs pt-1">
-                      Create a table to seat this guest.
-                    </p>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

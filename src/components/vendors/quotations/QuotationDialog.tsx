@@ -14,6 +14,7 @@ import {
 import { VENDOR_CATEGORIES } from '@/features/vendors/vendor-engine';
 import { formatCurrency } from '@/features/events/validation';
 import { Button } from '../../ui/Button';
+import { Dialog } from '../../ui/Dialog';
 import { CouponBadge } from '../../ui/Badge';
 import {
   AlertCircle,
@@ -210,66 +211,63 @@ export function QuotationDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-slate-900 border border-amber-500/30 rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col my-auto text-amber-50">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-800">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-semibold">
-                Quotation Modeling
-              </span>
-              <CouponBadge variant="stone">
-                {editingQuote ? 'Edit Quotation' : 'New Vendor Quotation'}
-              </CouponBadge>
-            </div>
-            <h3 className="font-serif text-2xl font-medium text-amber-100">
-              {editingQuote ? `Edit: ${editingQuote.title}` : 'Record Vendor Quotation'}
-            </h3>
+    <Dialog
+      isOpen={isOpen}
+      onClose={onClose}
+      title={
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-[#C2410C] font-bold">
+              Quotation Modeling
+            </span>
+            <CouponBadge variant="stone">
+              {editingQuote ? 'Edit Quotation' : 'New Vendor Quotation'}
+            </CouponBadge>
           </div>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-amber-200 transition-colors p-2 rounded-lg hover:bg-slate-800"
-            aria-label="Close dialog"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <span className="font-serif text-2xl font-bold text-[#1C1917] tracking-tight">
+            {editingQuote ? `Edit: ${editingQuote.title}` : 'Record Vendor Quotation'}
+          </span>
         </div>
-
+      }
+      maxWidth="xl"
+      accentBar
+      contentPadding={false}
+    >
+      <div className="flex flex-col flex-1 min-h-0 bg-white">
         {/* Tab switch */}
-        <div className="flex border-b border-slate-800 px-6 pt-3 gap-4">
+        <div className="flex border-b border-[#E7DFD5] px-6 pt-3 gap-4 bg-[#FAF8F5]/60 flex-shrink-0">
           <button
             type="button"
             onClick={() => setActiveTab('form')}
-            className={`pb-3 text-sm font-medium border-b-2 transition-all flex items-center gap-2 ${
+            className={`pb-3 text-xs font-mono font-bold border-b-2 transition-all flex items-center gap-2 ${
               activeTab === 'form'
-                ? 'border-amber-400 text-amber-300'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border-[#D97706] text-[#9A3412]'
+                : 'border-transparent text-[#78716C] hover:text-[#1C1917]'
             }`}
           >
-            <FileText className="w-4 h-4" />
+            <FileText className="w-4 h-4 text-[#D97706]" />
             <span>Structured Form</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('extract')}
-            className={`pb-3 text-sm font-medium border-b-2 transition-all flex items-center gap-2 ${
+            className={`pb-3 text-xs font-mono font-bold border-b-2 transition-all flex items-center gap-2 ${
               activeTab === 'extract'
-                ? 'border-amber-400 text-amber-300'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border-[#D97706] text-[#9A3412]'
+                : 'border-transparent text-[#78716C] hover:text-[#1C1917]'
             }`}
           >
-            <Sparkles className="w-4 h-4 text-amber-400" />
+            <Sparkles className="w-4 h-4 text-[#D97706]" />
             <span>Paste &amp; Extract (AI)</span>
           </button>
         </div>
 
         {/* Content body */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1">
+        <div className="p-6 overflow-y-auto space-y-6 flex-1 bg-white">
           {errors.length > 0 && (
-            <div className="p-4 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-200 text-sm">
-              <div className="flex items-center gap-2 font-medium mb-1">
-                <AlertCircle className="w-4 h-4 text-rose-400" />
+            <div className="p-4 rounded-xl bg-[#FEF2F2] border border-[#FCA5A5] text-[#991B1B] text-xs">
+              <div className="flex items-center gap-2 font-bold mb-1">
+                <AlertCircle className="w-4 h-4 text-[#DC2626]" />
                 <span>Please correct the following:</span>
               </div>
               <ul className="list-disc list-inside space-y-0.5 text-xs">
@@ -283,7 +281,7 @@ export function QuotationDialog({
           {activeTab === 'extract' ? (
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-2">
+                <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-[#78716C] mb-2">
                   Paste Quotation Text, Email, or WhatsApp Quote
                 </label>
                 <textarea
@@ -291,14 +289,14 @@ export function QuotationDialog({
                   value={pasteText}
                   onChange={(e) => setPasteText(e.target.value)}
                   placeholder="Paste raw vendor proposal text here... e.g.:&#10;Studio Memoir&#10;Signature Wedding Photography&#10;Total: ₹1,80,000&#10;Inclusions:&#10;- 2 Lead Photographers&#10;- 1 Cinematographer&#10;Exclusions: Outstation travel&#10;Deposit: ₹50,000"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm font-mono text-amber-100 placeholder:text-slate-600 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                  className="w-full bg-[#FAF8F5] border border-[#E7DFD5] rounded-xl p-3.5 text-xs font-mono text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:ring-1 focus:ring-[#D97706] focus:bg-white leading-relaxed"
                 />
               </div>
 
               {extractError && (
-                <p className="text-xs text-rose-300 flex items-center gap-1.5">
-                  <AlertCircle className="w-4 h-4 text-rose-400" />
-                  {extractError}
+                <p className="text-xs text-[#DC2626] flex items-center gap-1.5 font-mono">
+                  <AlertCircle className="w-4 h-4 text-[#DC2626]" />
+                  <span>{extractError}</span>
                 </p>
               )}
 
@@ -306,18 +304,18 @@ export function QuotationDialog({
                 variant="primary"
                 onClick={handleAiExtract}
                 disabled={isExtracting}
-                className="w-full justify-center"
+                className="w-full justify-center text-xs font-mono font-bold bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm py-2.5"
               >
                 <Sparkles className="w-4 h-4 mr-2" />
-                {isExtracting ? 'Extracting Fields...' : 'Extract Quotation Fields'}
+                <span>{isExtracting ? 'Extracting Fields...' : 'Extract Quotation Fields'}</span>
               </Button>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Primary metadata row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-[#78716C] mb-1.5">
                     Vendor Name *
                   </label>
                   <input
@@ -325,18 +323,18 @@ export function QuotationDialog({
                     value={vendorName}
                     onChange={(e) => setVendorName(e.target.value)}
                     placeholder="e.g. Studio Memoir"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-amber-100 focus:outline-none focus:border-amber-400"
+                    className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2.5 text-xs sm:text-sm text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#D97706]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-[#78716C] mb-1.5">
                     Service Category *
                   </label>
                   <select
                     value={serviceCategory}
                     onChange={(e) => setServiceCategory(e.target.value as VendorCategory)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-amber-100 focus:outline-none focus:border-amber-400"
+                    className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2.5 text-xs sm:text-sm text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#D97706]"
                   >
                     {VENDOR_CATEGORIES.map((cat) => (
                       <option key={cat.id} value={cat.id}>
@@ -347,7 +345,7 @@ export function QuotationDialog({
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-[#78716C] mb-1.5">
                     Package / Quotation Title *
                   </label>
                   <input
@@ -355,19 +353,19 @@ export function QuotationDialog({
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g. Signature Vivaha Photography & Cinematic Film"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-amber-100 focus:outline-none focus:border-amber-400"
+                    className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2.5 text-xs sm:text-sm text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#D97706]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-[#78716C] mb-1.5">
                     Headline Quoted Total *
                   </label>
                   <div className="flex gap-2">
                     <select
                       value={currency}
                       onChange={(e) => setCurrency(e.target.value as any)}
-                      className="bg-slate-950 border border-slate-700 rounded-lg px-2.5 text-sm text-amber-100 focus:outline-none focus:border-amber-400"
+                      className="bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg px-2.5 text-xs sm:text-sm text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#D97706]"
                     >
                       <option value="INR">INR (₹)</option>
                       <option value="USD">USD ($)</option>
@@ -379,37 +377,37 @@ export function QuotationDialog({
                       value={quotedTotal}
                       onChange={(e) => setQuotedTotal(e.target.value)}
                       placeholder="180000"
-                      className="flex-1 bg-slate-950 border border-slate-700 rounded-lg p-2.5 font-mono text-sm text-amber-100 focus:outline-none focus:border-amber-400"
+                      className="flex-1 bg-white border border-[#E7DFD5] rounded-lg p-2.5 font-mono text-xs sm:text-sm text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#D97706]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-[#78716C] mb-1.5">
                     Quote Date *
                   </label>
                   <input
                     type="date"
                     value={quoteDate}
                     onChange={(e) => setQuoteDate(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-amber-100 focus:outline-none focus:border-amber-400"
+                    className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2.5 text-xs sm:text-sm text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#D97706]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-[#78716C] mb-1.5">
                     Quotation Expiry Date
                   </label>
                   <input
                     type="date"
                     value={validUntilDate}
                     onChange={(e) => setValidUntilDate(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-amber-100 focus:outline-none focus:border-amber-400"
+                    className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2.5 text-xs sm:text-sm text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#D97706]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-[#78716C] mb-1.5">
                     Advance Deposit Required
                   </label>
                   <input
@@ -417,21 +415,21 @@ export function QuotationDialog({
                     value={depositRequired}
                     onChange={(e) => setDepositRequired(e.target.value)}
                     placeholder="e.g. 50000"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 font-mono text-sm text-amber-100 focus:outline-none focus:border-amber-400"
+                    className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2.5 font-mono text-xs sm:text-sm text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#D97706]"
                   />
                 </div>
               </div>
 
               {/* Inclusions list */}
-              <div className="border-t border-slate-800 pt-5 space-y-3">
+              <div className="border-t border-[#E7DFD5] pt-5 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-semibold">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-[#D97706] font-bold">
                     Included Services &amp; Deliverables
                   </span>
                   <button
                     type="button"
                     onClick={() => setIncludedServices([...includedServices, { description: '', itemizedCost: undefined }])}
-                    className="text-xs text-amber-300 hover:text-amber-200 flex items-center gap-1 font-mono"
+                    className="text-xs text-[#C2410C] hover:underline flex items-center gap-1 font-mono font-bold"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add Item</span>
@@ -449,7 +447,7 @@ export function QuotationDialog({
                         next[idx].description = e.target.value;
                         setIncludedServices(next);
                       }}
-                      className="flex-1 bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-amber-100 focus:outline-none focus:border-amber-400"
+                      className="flex-1 bg-white border border-[#E7DFD5] rounded-lg p-2 text-xs text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#D97706]"
                     />
                     <input
                       type="number"
@@ -461,13 +459,13 @@ export function QuotationDialog({
                         next[idx].itemizedCost = isNaN(val) ? undefined : val;
                         setIncludedServices(next);
                       }}
-                      className="w-36 bg-slate-950 border border-slate-700 rounded-lg p-2 font-mono text-xs text-amber-100 focus:outline-none focus:border-amber-400"
+                      className="w-36 bg-white border border-[#E7DFD5] rounded-lg p-2 font-mono text-xs text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#D97706]"
                     />
                     {includedServices.length > 1 && (
                       <button
                         type="button"
                         onClick={() => setIncludedServices(includedServices.filter((_, i) => i !== idx))}
-                        className="text-slate-500 hover:text-rose-400 p-1"
+                        className="text-[#78716C] hover:text-[#DC2626] p-1"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -477,8 +475,8 @@ export function QuotationDialog({
               </div>
 
               {/* Exclusions list */}
-              <div className="border-t border-slate-800 pt-5 space-y-3">
-                <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-semibold block">
+              <div className="border-t border-[#E7DFD5] pt-5 space-y-3">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-[#C2410C] font-bold block">
                   Explicit Exclusions
                 </span>
                 <div className="flex gap-2">
@@ -496,7 +494,7 @@ export function QuotationDialog({
                         }
                       }
                     }}
-                    className="flex-1 bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-amber-100 focus:outline-none focus:border-amber-400"
+                    className="flex-1 bg-white border border-[#E7DFD5] rounded-lg p-2 text-xs text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#D97706]"
                   />
                   <button
                     type="button"
@@ -506,7 +504,7 @@ export function QuotationDialog({
                         setNewExclusion('');
                       }
                     }}
-                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-mono text-amber-200"
+                    className="px-3 py-1.5 bg-[#FAF8F5] hover:bg-[#F5F2EB] border border-[#E7DFD5] rounded-lg text-xs font-mono font-bold text-[#1C1917]"
                   >
                     Add
                   </button>
@@ -517,13 +515,13 @@ export function QuotationDialog({
                     {exclusions.map((item, idx) => (
                       <span
                         key={idx}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs bg-rose-500/10 border border-rose-500/20 text-rose-300"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs bg-[#FEF2F2] border border-[#FCA5A5] text-[#991B1B] font-mono"
                       >
                         <span>{item}</span>
                         <button
                           type="button"
                           onClick={() => setExclusions(exclusions.filter((_, i) => i !== idx))}
-                          className="hover:text-rose-100"
+                          className="hover:text-[#DC2626]"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -534,9 +532,9 @@ export function QuotationDialog({
               </div>
 
               {/* Cancellation policy & notes */}
-              <div className="border-t border-slate-800 pt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="border-t border-[#E7DFD5] pt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-[#78716C] mb-1.5">
                     Cancellation Policy
                   </label>
                   <input
@@ -544,11 +542,11 @@ export function QuotationDialog({
                     value={cancellationPolicy}
                     onChange={(e) => setCancellationPolicy(e.target.value)}
                     placeholder="e.g. 50% deposit refundable up to 45 days prior"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-amber-100 focus:outline-none focus:border-amber-400"
+                    className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2.5 text-xs text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#D97706]"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-[#78716C] mb-1.5">
                     Guest Headcount Assumption
                   </label>
                   <input
@@ -556,17 +554,17 @@ export function QuotationDialog({
                     value={guestCountAssumption}
                     onChange={(e) => setGuestCountAssumption(e.target.value)}
                     placeholder="e.g. 250"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 font-mono text-xs text-amber-100 focus:outline-none focus:border-amber-400"
+                    className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2.5 font-mono text-xs text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#D97706]"
                   />
                 </div>
               </div>
 
               {/* Itemized math discrepancy banner */}
               {itemizedCalc.hasDiscrepancy && (
-                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-200 text-xs flex items-start gap-2 font-mono">
-                  <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div className="p-3.5 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] text-[#92400E] text-xs flex items-start gap-2.5 font-mono">
+                  <AlertCircle className="w-4 h-4 text-[#D97706] shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-semibold block">Itemized Sum Discrepancy</span>
+                    <span className="font-bold block mb-0.5">Itemized Sum Discrepancy</span>
                     Sum of itemized deliverables ({formatCurrency(itemizedCalc.calculatedTotal, currency)}) differs from declared headline total ({formatCurrency(parsedTotal, currency)}) by {formatCurrency(Math.abs(itemizedCalc.discrepancy), currency)}.
                   </div>
                 </div>
@@ -576,29 +574,33 @@ export function QuotationDialog({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-slate-800 flex items-center justify-between bg-slate-950/60">
-          <div className="text-xs font-mono text-slate-400">
+        <div className="p-4 sm:p-5 border-t border-[#E7DFD5] flex items-center justify-between bg-[#FAF8F5]">
+          <div className="text-xs font-mono text-[#78716C]">
             {parsedTotal > 0 && (
               <span>
-                Total: <strong className="text-amber-300">{formatCurrency(parsedTotal, currency)}</strong>
+                Total: <strong className="text-[#1C1917] font-bold">{formatCurrency(parsedTotal, currency)}</strong>
               </span>
             )}
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2.5">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-mono text-slate-400 hover:text-slate-200"
+              className="px-3.5 py-2 text-xs font-mono font-semibold text-[#78716C] hover:text-[#1C1917]"
             >
               Cancel
             </button>
-            <Button variant="primary" onClick={handleSave}>
+            <Button
+              variant="primary"
+              onClick={handleSave}
+              className="text-xs font-mono font-bold bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm"
+            >
               <CheckCircle2 className="w-4 h-4 mr-1.5" />
               <span>Save Quotation</span>
             </Button>
           </div>
         </div>
       </div>
-    </div>
+    </Dialog>
   );
 }

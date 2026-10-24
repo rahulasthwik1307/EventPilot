@@ -23,6 +23,7 @@ import { HouseholdDeleteDialog } from './HouseholdDeleteDialog';
 import {
   CheckCircle2,
   Clock,
+  Edit2,
   Filter,
   FolderPlus,
   HelpCircle,
@@ -31,6 +32,8 @@ import {
   Plus,
   Search,
   ShieldCheck,
+  Sparkles,
+  Trash2,
   UserCheck,
   UserMinus,
   UserPlus,
@@ -233,6 +236,27 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
     setDeletingHousehold(null);
   };
 
+  const getInitials = (firstName: string, lastName?: string) => {
+    if (lastName) {
+      return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    }
+    return firstName.slice(0, 2).toUpperCase();
+  };
+
+  const getAvatarColor = (name: string) => {
+    const palettes = [
+      'bg-primary-subtle text-primary border-primary/30',
+      'bg-secondary-subtle text-secondary border-secondary/30',
+      'bg-status-success-subtle text-status-success border-status-success/30',
+      'bg-status-info-subtle text-status-info border-status-info/30',
+    ];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return palettes[Math.abs(hash) % palettes.length];
+  };
+
   const getRsvpBadge = (status: RsvpStatus) => {
     switch (status) {
       case 'confirmed':
@@ -260,140 +284,173 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
   };
 
   return (
-    <div className="space-y-8">
-      {/* 1. Header & Attendance Metrics */}
-      <div className="bg-neutral-surface border border-neutral-border rounded-lg p-6 sm:p-8 shadow-card">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono uppercase tracking-wider text-secondary font-semibold">
-                Guest Register &amp; Attendance
-              </span>
-              <CouponBadge variant="marigold">RSVP Tracker</CouponBadge>
-            </div>
+    <div className="space-y-7">
+      {/* =========================================================================
+          1. HEADER & ACTION CONTROLS
+      ========================================================================= */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-border pb-5">
+        <div>
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <h2 className="font-display text-2xl sm:text-3xl font-semibold text-neutral-text">
               Guest &amp; RSVP Management
             </h2>
-            <p className="text-xs text-neutral-muted mt-1">
-              Household groupings, individual guest attendance, partner plus-ones, and dietary restrictions.
-            </p>
+            <CouponBadge variant="marigold">RSVP Tracker</CouponBadge>
           </div>
+          <p className="text-xs text-neutral-muted">
+            Household groupings, individual guest attendance, partner plus-ones, and dietary restrictions.
+          </p>
+        </div>
 
-          <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setEditingHousehold(null);
-                setIsHouseholdDialogOpen(true);
-              }}
-            >
-              <FolderPlus className="w-4 h-4 mr-1.5 text-secondary" />
-              <span>New Group</span>
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => {
-                setEditingGuest(null);
-                setIsGuestDialogOpen(true);
-              }}
-            >
-              <UserPlus className="w-4 h-4 mr-1.5" />
-              <span>Add Guest</span>
-            </Button>
+        {/* Action Button Cluster - unclipped, perfectly responsive */}
+        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap sm:flex-nowrap shrink-0">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setEditingHousehold(null);
+              setIsHouseholdDialogOpen(true);
+            }}
+            className="text-xs font-mono font-bold hover:border-secondary/50 hover:bg-neutral-subtle active:scale-[0.98] transition-all"
+          >
+            <FolderPlus className="w-4 h-4 mr-1.5 text-secondary" />
+            <span>New Group</span>
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setEditingGuest(null);
+              setIsGuestDialogOpen(true);
+            }}
+            className="text-xs font-mono font-bold active:scale-[0.98] transition-all"
+          >
+            <UserPlus className="w-4 h-4 mr-1.5" />
+            <span>Add Guest</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          2. HOSPITALITY & CAPACITY RADAR (Panchang Ceremonial Deck)
+      ========================================================================= */}
+      <section className="bg-neutral-surface border border-neutral-border rounded-xl p-5 sm:p-6 shadow-card relative overflow-hidden space-y-4">
+        {/* Panchang Ceremonial Accent Header Hairline */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-primary" />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-border/60 pb-3">
+          <div>
+            <span className="text-[11px] font-mono uppercase tracking-wider text-secondary font-bold block">
+              Hospitality Radar
+            </span>
+            <h3 className="font-display text-lg sm:text-xl font-bold text-neutral-text">
+              Attendance Spectrum &amp; Capacity Economics
+            </h3>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-mono text-neutral-muted">
+            <span className="bg-neutral-subtle px-2.5 py-1 rounded-md border border-neutral-border">
+              Target Capacity: <strong className="text-neutral-text font-bold">{event.guestTarget}</strong>
+            </span>
+            <span className="bg-neutral-subtle px-2.5 py-1 rounded-md border border-neutral-border">
+              Committed: <strong className="text-primary font-bold">{summary.expectedAttendance}</strong>
+            </span>
           </div>
         </div>
 
-        {/* 6 Attendance Metrics Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 items-stretch">
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+        {/* 6 Attendance Metric Stations */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {/* Station 1: Named Guests */}
+          <div className="bg-neutral-subtle/60 border border-neutral-border p-3.5 rounded-lg flex flex-col justify-between">
             <div>
-              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+              <span className="text-[11px] uppercase tracking-wider font-semibold text-neutral-muted block mb-1">
                 Named Guests
               </span>
-              <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text">
+              <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text tracking-tight">
                 {summary.totalNamedGuests}
               </p>
             </div>
-            <span className="text-xs text-neutral-muted font-mono mt-1.5 block">
+            <span className="text-[11px] text-neutral-muted font-mono mt-2 block">
               Registered records
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          {/* Station 2: Confirmed Guests */}
+          <div className="bg-neutral-subtle/60 border border-neutral-border p-3.5 rounded-lg flex flex-col justify-between">
             <div>
-              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+              <span className="text-[11px] uppercase tracking-wider font-semibold text-neutral-muted block mb-1">
                 Confirmed Guests
               </span>
-              <p className="font-mono text-xl sm:text-2xl font-bold text-status-success">
+              <p className="font-mono text-xl sm:text-2xl font-bold text-status-success tracking-tight">
                 {summary.confirmedCount}
               </p>
             </div>
-            <span className="text-xs text-neutral-muted font-mono mt-1.5 block">
+            <span className="text-[11px] text-neutral-muted font-mono mt-2 block">
               Named attendees
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          {/* Station 3: Expected +1s */}
+          <div className="bg-neutral-subtle/60 border border-neutral-border p-3.5 rounded-lg flex flex-col justify-between">
             <div>
-              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+              <span className="text-[11px] uppercase tracking-wider font-semibold text-neutral-muted block mb-1">
                 Expected +1s
               </span>
-              <p className="font-mono text-xl sm:text-2xl font-bold text-primary">
+              <p className="font-mono text-xl sm:text-2xl font-bold text-primary tracking-tight">
                 {summary.expectedPlusOnes}
               </p>
             </div>
-            <span className="text-xs text-neutral-muted font-mono mt-1.5 block">
+            <span className="text-[11px] text-neutral-muted font-mono mt-2 block">
               Attending partners
             </span>
           </div>
 
-          <div className="bg-primary-subtle/50 border border-primary/30 p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          {/* Station 4: Expected Attendance (Highlighted) */}
+          <div className="bg-primary-subtle/40 border border-primary/40 ring-1 ring-primary/20 p-3.5 rounded-lg flex flex-col justify-between shadow-xs">
             <div>
-              <span className="text-xs uppercase font-semibold text-primary mb-1.5 h-8 flex items-start leading-4">
+              <span className="text-[11px] uppercase tracking-wider font-semibold text-primary block mb-1">
                 Expected Attendance
               </span>
-              <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text">
+              <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-text tracking-tight">
                 {summary.expectedAttendance}
               </p>
             </div>
-            <span className="text-xs text-neutral-muted font-mono mt-1.5 block">
+            <span className="text-[11px] text-neutral-muted font-mono mt-2 block font-medium">
               Total seats needed
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          {/* Station 5: Pending RSVPs */}
+          <div className="bg-neutral-subtle/60 border border-neutral-border p-3.5 rounded-lg flex flex-col justify-between">
             <div>
-              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+              <span className="text-[11px] uppercase tracking-wider font-semibold text-neutral-muted block mb-1">
                 Pending RSVPs
               </span>
-              <p className="font-mono text-xl sm:text-2xl font-bold text-status-warning">
+              <p className="font-mono text-xl sm:text-2xl font-bold text-status-warning tracking-tight">
                 {summary.pendingCount}
               </p>
             </div>
-            <span className="text-xs text-neutral-muted font-mono mt-1.5 block">
+            <span className="text-[11px] text-neutral-muted font-mono mt-2 block">
               Awaiting reply
             </span>
           </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between">
+          {/* Station 6: Declined */}
+          <div className="bg-neutral-subtle/60 border border-neutral-border p-3.5 rounded-lg flex flex-col justify-between">
             <div>
-              <span className="text-xs uppercase font-semibold text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
+              <span className="text-[11px] uppercase tracking-wider font-semibold text-neutral-muted block mb-1">
                 Declined
               </span>
-              <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-muted">
+              <p className="font-mono text-xl sm:text-2xl font-bold text-neutral-muted tracking-tight">
                 {summary.declinedCount}
               </p>
             </div>
-            <span className="text-xs text-neutral-muted font-mono mt-1.5 block">
+            <span className="text-[11px] text-neutral-muted font-mono mt-2 block">
               Not attending
             </span>
           </div>
         </div>
 
-        {/* RSVP Distribution Visualization Bar */}
+        {/* Multi-segment RSVP Progress Spectrum */}
         {summary.totalNamedGuests > 0 ? (
-          <div className="mt-4 pt-4 border-t border-neutral-border/60 space-y-2">
-            <div className="flex items-center justify-between text-xs">
+          <div className="pt-3 border-t border-neutral-border/60 space-y-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-1">
               <span className="font-semibold text-neutral-text">
                 RSVP Response Distribution
               </span>
@@ -454,14 +511,14 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
             })()}
           </div>
         ) : (
-          <div className="mt-4 pt-4 border-t border-neutral-border/60 text-xs text-neutral-muted italic">
+          <div className="pt-3 border-t border-neutral-border/60 text-xs text-neutral-muted italic">
             No guests registered yet. Click &ldquo;Add Guest&rdquo; or &ldquo;New Group&rdquo; above to begin tracking RSVPs.
           </div>
         )}
 
         {/* Dietary Catering Requirements Bar */}
         {Object.keys(summary.dietaryBreakdown).length > 0 && (
-          <div className="mt-4 pt-4 border-t border-neutral-border/60 flex flex-wrap items-center gap-2">
+          <div className="pt-3 border-t border-neutral-border/60 flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold uppercase text-neutral-muted flex items-center gap-1.5 mr-2">
               <Utensils className="w-3.5 h-3.5 text-secondary" />
               <span>Confirmed Catering Needs:</span>
@@ -471,35 +528,63 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
               return (
                 <span
                   key={diet}
-                  className="text-xs font-mono font-medium px-2 py-0.5 rounded bg-neutral-surface border border-neutral-border text-neutral-text"
+                  className="text-xs font-mono font-medium px-2.5 py-0.5 rounded-md bg-neutral-subtle border border-neutral-border text-neutral-text shadow-xs"
                 >
-                  {label}: <strong className="text-secondary">{count}</strong>
+                  {label}: <strong className="text-secondary font-bold">{count}</strong>
                 </span>
               );
             })}
           </div>
         )}
-      </div>
+      </section>
 
-      {/* 2. Search & Filters */}
-      <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 sm:p-5 shadow-card space-y-3">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      {/* =========================================================================
+          3. REFINED SEARCH & FILTER TOOLBAR (Zero Placeholder Clipping)
+      ========================================================================= */}
+      <div className="bg-neutral-surface border border-neutral-border rounded-xl p-4 sm:p-5 shadow-xs space-y-3.5">
+        {/* Top Row: Full Width Search Input + Quick Count / Select All */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3 top-3 text-neutral-muted" />
+            <Search className="w-4 h-4 absolute left-3.5 top-3 text-neutral-muted" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search guests by name, phone, email, notes, or plus-one..."
-              className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-neutral-subtle/50 border border-neutral-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-neutral-subtle border border-neutral-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary text-neutral-text placeholder:text-neutral-muted/70"
             />
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-3 text-xs text-neutral-muted shrink-0">
+            <span className="font-mono">
+              Showing <strong className="text-neutral-text">{filteredGuests.length}</strong> of {guests.length} guests
+            </span>
+            {filteredGuests.length > 0 && (
+              <button
+                type="button"
+                onClick={handleSelectAllFiltered}
+                className="text-secondary hover:text-primary font-semibold font-mono text-xs transition-colors"
+              >
+                {selectedGuestIds.length === filteredGuests.length
+                  ? 'Deselect All'
+                  : `Select All (${filteredGuests.length})`}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Bottom Row: 3 Responsive Filters with Clear Labels */}
+        <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2.5 border-t border-neutral-border/50 text-xs">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span className="font-semibold text-neutral-text uppercase tracking-wider flex items-center gap-1 text-[11px]">
+              <Filter className="w-3.5 h-3.5 text-secondary" />
+              <span>Filters:</span>
+            </span>
+
             <select
               value={rsvpFilter}
               onChange={(e) => setRsvpFilter(e.target.value)}
-              className="px-3 py-2 text-xs sm:text-sm bg-neutral-surface border border-neutral-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+              className="bg-neutral-subtle border border-neutral-border rounded-md px-2.5 py-1 text-xs text-neutral-text focus:outline-none focus:ring-1 focus:ring-primary shadow-xs font-medium"
               aria-label="Filter by RSVP status"
             >
               <option value="all">All RSVP Responses</option>
@@ -511,7 +596,7 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
             <select
               value={householdFilter}
               onChange={(e) => setHouseholdFilter(e.target.value)}
-              className="px-3 py-2 text-xs sm:text-sm bg-neutral-surface border border-neutral-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+              className="bg-neutral-subtle border border-neutral-border rounded-md px-2.5 py-1 text-xs text-neutral-text focus:outline-none focus:ring-1 focus:ring-primary shadow-xs font-medium"
               aria-label="Filter by household group"
             >
               <option value="all">All Households</option>
@@ -526,7 +611,7 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
             <select
               value={dietaryFilter}
               onChange={(e) => setDietaryFilter(e.target.value)}
-              className="px-3 py-2 text-xs sm:text-sm bg-neutral-surface border border-neutral-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+              className="bg-neutral-subtle border border-neutral-border rounded-md px-2.5 py-1 text-xs text-neutral-text focus:outline-none focus:ring-1 focus:ring-primary shadow-xs font-medium"
               aria-label="Filter by dietary requirement"
             >
               <option value="all">All Diets</option>
@@ -538,25 +623,7 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
               ))}
             </select>
           </div>
-        </div>
 
-        <div className="flex items-center justify-between text-xs text-neutral-muted pt-2 border-t border-neutral-border/40">
-          <div className="flex items-center gap-3">
-            <span>
-              Showing {filteredGuests.length} of {guests.length} guests
-            </span>
-            {filteredGuests.length > 0 && (
-              <button
-                type="button"
-                onClick={handleSelectAllFiltered}
-                className="text-secondary hover:underline font-semibold font-mono text-xs"
-              >
-                {selectedGuestIds.length === filteredGuests.length
-                  ? 'Deselect All'
-                  : `Select All (${filteredGuests.length})`}
-              </button>
-            )}
-          </div>
           {(searchQuery || rsvpFilter !== 'all' || householdFilter !== 'all' || dietaryFilter !== 'all') && (
             <button
               type="button"
@@ -566,19 +633,21 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
                 setHouseholdFilter('all');
                 setDietaryFilter('all');
               }}
-              className="text-secondary hover:underline font-semibold"
+              className="text-secondary hover:text-primary font-semibold text-xs transition-colors"
             >
-              Clear filters
+              Clear all filters
             </button>
           )}
         </div>
       </div>
 
-      {/* 2.5 Bulk Action Bar when guests are selected */}
+      {/* =========================================================================
+          4. BULK ACTION BAR (When Guests Are Selected)
+      ========================================================================= */}
       {selectedGuestIds.length > 0 && (
-        <div className="bg-primary-subtle/80 border border-primary/50 rounded-lg p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm animate-in fade-in-0 duration-150">
+        <div className="bg-primary-subtle/80 border border-primary/50 rounded-xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm animate-in fade-in-0 duration-150">
           <div className="flex items-center gap-2 text-xs font-mono font-semibold text-neutral-text">
-            <span className="w-2 h-2 rounded-full bg-primary" />
+            <span className="w-2.5 h-2.5 rounded-full bg-primary" />
             <span>
               {selectedGuestIds.length} {selectedGuestIds.length === 1 ? 'guest' : 'guests'} selected
             </span>
@@ -622,9 +691,11 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
         </div>
       )}
 
-      {/* 3. Grouped Guest List */}
+      {/* =========================================================================
+          5. HOUSEHOLD DIRECTORIES & GUEST DOSSIER CARDS
+      ========================================================================= */}
       {filteredGuests.length === 0 ? (
-        <div className="bg-neutral-surface border border-neutral-border rounded-lg p-12 text-center shadow-card">
+        <div className="bg-neutral-surface border border-neutral-border rounded-xl p-12 text-center shadow-card">
           <Users className="w-12 h-12 text-neutral-muted mx-auto mb-3 opacity-60" />
           <h3 className="font-display text-lg font-semibold text-neutral-text mb-1">
             {guests.length === 0 ? 'No Guests Registered Yet' : 'No Guests Match Your Filter'}
@@ -653,7 +724,6 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
           {households.map((household) => {
             const memberGuests = groupedGuests.get(household.id) || [];
             if (memberGuests.length === 0 && householdFilter !== household.id && !searchQuery) {
-              // If filtering and no guests match, skip
               return null;
             }
             if (memberGuests.length === 0) return null;
@@ -661,51 +731,56 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
             return (
               <div
                 key={household.id}
-                className="bg-neutral-surface border border-neutral-border rounded-lg shadow-card overflow-hidden"
+                className="bg-neutral-surface border border-neutral-border rounded-xl shadow-card overflow-hidden"
               >
                 {/* Household Header */}
-                <div className="bg-neutral-subtle/80 border-b border-neutral-border px-5 py-3.5 flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <Users className="w-4 h-4 text-secondary" />
+                <div className="bg-neutral-subtle/70 border-b border-neutral-border px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-secondary-subtle border border-secondary/30 flex items-center justify-center shrink-0">
+                      <Users className="w-4 h-4 text-secondary" />
+                    </div>
                     <div>
-                      <h3 className="font-display text-base font-semibold text-neutral-text">
-                        {household.name}
-                      </h3>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-display text-base sm:text-lg font-bold text-neutral-text">
+                          {household.name}
+                        </h3>
+                        <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-neutral-surface border border-neutral-border text-neutral-muted">
+                          {memberGuests.length} members
+                        </span>
+                      </div>
                       {household.relationshipType && (
-                        <span className="text-xs text-neutral-muted">
+                        <span className="text-xs text-neutral-muted block">
                           {household.relationshipType}
                         </span>
                       )}
                     </div>
-                    <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-neutral-surface border border-neutral-border text-neutral-muted">
-                      {memberGuests.length} members
-                    </span>
                   </div>
 
-                  <div className="flex items-center gap-1.5">
-                    <Button
-                      variant="ghost"
-                      size="sm"
+                  <div className="flex items-center gap-1.5 self-end sm:self-auto">
+                    <button
+                      type="button"
                       onClick={() => {
                         setEditingHousehold(household);
                         setIsHouseholdDialogOpen(true);
                       }}
+                      className="px-2.5 py-1 text-xs font-medium text-neutral-muted hover:text-neutral-text rounded-md hover:bg-neutral-surface border border-transparent hover:border-neutral-border transition-colors inline-flex items-center gap-1"
                     >
-                      Edit Group
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
+                      <Edit2 className="w-3.5 h-3.5" />
+                      <span>Edit Group</span>
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => setDeletingHousehold(household)}
-                      className="text-status-danger hover:bg-status-danger-subtle"
+                      className="px-2.5 py-1 text-xs font-medium text-neutral-muted hover:text-status-danger rounded-md hover:bg-neutral-surface border border-transparent hover:border-neutral-border transition-colors inline-flex items-center gap-1"
                     >
-                      Delete
-                    </Button>
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete</span>
+                    </button>
                   </div>
                 </div>
 
                 {/* Household Members */}
-                <div className="p-4 divide-y divide-neutral-border/50">
+                <div className="p-3 sm:p-4 divide-y divide-neutral-border/60">
                   {memberGuests.map((guest) => renderGuestCard(guest))}
                 </div>
               </div>
@@ -714,11 +789,13 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
 
           {/* Render Ungrouped Guests if any */}
           {groupedGuests.has('ungrouped') && groupedGuests.get('ungrouped')!.length > 0 && (
-            <div className="bg-neutral-surface border border-neutral-border rounded-lg shadow-card overflow-hidden">
-              <div className="bg-neutral-subtle/60 border-b border-neutral-border px-5 py-3.5 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-neutral-muted" />
-                  <h3 className="font-display text-base font-semibold text-neutral-text">
+            <div className="bg-neutral-surface border border-neutral-border rounded-xl shadow-card overflow-hidden">
+              <div className="bg-neutral-subtle/70 border-b border-neutral-border px-5 py-3.5 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-neutral-surface border border-neutral-border flex items-center justify-center shrink-0">
+                    <Users className="w-4 h-4 text-neutral-muted" />
+                  </div>
+                  <h3 className="font-display text-base sm:text-lg font-bold text-neutral-text">
                     Ungrouped Attendees
                   </h3>
                   <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-neutral-surface border border-neutral-border text-neutral-muted">
@@ -727,7 +804,7 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
                 </div>
               </div>
 
-              <div className="p-4 divide-y divide-neutral-border/50">
+              <div className="p-3 sm:p-4 divide-y divide-neutral-border/60">
                 {groupedGuests.get('ungrouped')!.map((guest) => renderGuestCard(guest))}
               </div>
             </div>
@@ -779,82 +856,100 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
         ? DIETARY_PREFERENCES.find((d) => d.id === guest.dietaryPreference)?.label
         : null;
 
+    const initials = getInitials(guest.firstName, guest.lastName);
+    const avatarTone = getAvatarColor(fullName);
+
     return (
       <div
         key={guest.id}
-        className={`py-3 px-2 rounded-md flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs transition-colors ${
-          isSelected ? 'bg-primary-subtle/40 border border-primary/30' : 'hover:bg-neutral-subtle/40'
+        className={`py-3.5 px-3 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs transition-all ${
+          isSelected ? 'bg-primary-subtle/30 ring-1 ring-primary/40' : 'hover:bg-neutral-subtle/30'
         }`}
       >
-        <div className="flex items-start gap-3 min-w-0">
+        <div className="flex items-start gap-3 min-w-0 flex-1">
           <input
             type="checkbox"
             checked={isSelected}
             onChange={() => handleToggleSelectGuest(guest.id)}
             aria-label={`Select ${fullName}`}
-            className="w-4 h-4 rounded border-neutral-border text-primary focus:ring-primary cursor-pointer mt-0.5 flex-shrink-0"
+            className="w-4 h-4 rounded border-neutral-border text-primary focus:ring-primary cursor-pointer mt-1 flex-shrink-0"
           />
-          <div className="space-y-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-semibold text-sm text-neutral-text">{fullName}</span>
-            {guest.relationship && (
-              <span className="text-neutral-muted italic font-sans">
-                ({guest.relationship})
-              </span>
-            )}
-            {getRsvpBadge(guest.rsvpStatus)}
-            {guest.plusOneExpected && (
-              <span className="inline-flex items-center gap-1 font-mono text-xs px-2 py-0.5 rounded bg-primary-subtle text-primary border border-primary/30">
-                <UserPlus className="w-3 h-3" />
-                <span>+1 Expected: {guest.plusOneName || 'Partner'}</span>
-              </span>
-            )}
-            {!guest.plusOneExpected && guest.plusOneAllowed && (
-              <span className="font-mono text-xs px-2 py-0.5 rounded bg-neutral-subtle text-neutral-muted border border-neutral-border">
-                +1 Allowed
-              </span>
-            )}
-            {dietLabel && (
-              <span className="inline-flex items-center gap-1 font-mono text-xs px-2 py-0.5 rounded bg-secondary-subtle text-secondary border border-secondary/30">
-                <Utensils className="w-3 h-3" />
-                <span>{dietLabel}</span>
-              </span>
-            )}
+
+          {/* Monogram Avatar */}
+          <div
+            className={`w-9 h-9 rounded-full border flex items-center justify-center font-mono font-bold text-xs shrink-0 ${avatarTone}`}
+            aria-hidden="true"
+          >
+            {initials}
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-neutral-muted">
-            {guest.phone && (
-              <div className="flex items-center gap-1 font-mono">
-                <Phone className="w-3 h-3 text-secondary" />
-                <span>{guest.phone}</span>
-              </div>
-            )}
-            {guest.email && (
-              <div className="flex items-center gap-1">
-                <Mail className="w-3 h-3 text-secondary" />
-                <span>{guest.email}</span>
-              </div>
-            )}
+          <div className="space-y-1.5 min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-semibold text-sm text-neutral-text leading-tight">{fullName}</span>
+              {guest.relationship && (
+                <span className="text-neutral-muted italic font-sans text-xs">
+                  ({guest.relationship})
+                </span>
+              )}
+              {getRsvpBadge(guest.rsvpStatus)}
+              {guest.plusOneExpected && (
+                <span className="inline-flex items-center gap-1 font-mono text-xs px-2 py-0.5 rounded bg-primary-subtle text-primary border border-primary/30">
+                  <UserPlus className="w-3 h-3" />
+                  <span>+1 Expected: {guest.plusOneName || 'Partner'}</span>
+                </span>
+              )}
+              {!guest.plusOneExpected && guest.plusOneAllowed && (
+                <span className="font-mono text-xs px-2 py-0.5 rounded bg-neutral-subtle text-neutral-muted border border-neutral-border">
+                  +1 Allowed
+                </span>
+              )}
+              {dietLabel && (
+                <span className="inline-flex items-center gap-1 font-mono text-xs px-2 py-0.5 rounded bg-secondary-subtle text-secondary border border-secondary/30">
+                  <Utensils className="w-3 h-3" />
+                  <span>{dietLabel}</span>
+                </span>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 text-neutral-muted text-xs">
+              {guest.phone && (
+                <div className="flex items-center gap-1 font-mono">
+                  <Phone className="w-3 h-3 text-secondary shrink-0" />
+                  <span>{guest.phone}</span>
+                </div>
+              )}
+              {guest.email && (
+                <div className="flex items-center gap-1">
+                  <Mail className="w-3 h-3 text-secondary shrink-0" />
+                  <span>{guest.email}</span>
+                </div>
+              )}
+            </div>
+
             {guest.dietaryNotes && (
-              <span className="text-status-warning italic">
+              <p className="text-status-warning italic text-xs leading-relaxed">
                 Dietary Note: {guest.dietaryNotes}
-              </span>
+              </p>
             )}
-            {guest.notes && <span className="italic">&ldquo;{guest.notes}&rdquo;</span>}
+
+            {guest.notes && (
+              <p className="text-neutral-muted italic text-xs leading-relaxed">
+                &ldquo;{guest.notes}&rdquo;
+              </p>
+            )}
           </div>
         </div>
-      </div>
 
-      {/* Quick RSVP toggle buttons & Actions */}
-        <div className="flex items-center gap-2 self-start md:self-center">
-          <div className="flex items-center border border-neutral-border rounded overflow-hidden">
+        {/* Quick RSVP toggle buttons & Actions */}
+        <div className="flex items-center gap-2 self-start md:self-center shrink-0 pt-1 md:pt-0">
+          <div className="flex items-center border border-neutral-border rounded-lg overflow-hidden shadow-xs bg-neutral-surface">
             <button
               type="button"
               onClick={() => handleQuickToggleRsvp(guest, 'confirmed')}
-              className={`px-2 py-1 text-xs font-semibold transition-colors ${
+              className={`px-2.5 py-1 text-xs font-semibold transition-all ${
                 guest.rsvpStatus === 'confirmed'
-                  ? 'bg-status-success text-white'
-                  : 'bg-neutral-surface text-neutral-muted hover:bg-neutral-subtle'
+                  ? 'bg-status-success text-white shadow-xs'
+                  : 'text-neutral-muted hover:text-neutral-text hover:bg-neutral-subtle'
               }`}
               title="Mark Attending"
             >
@@ -863,10 +958,10 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
             <button
               type="button"
               onClick={() => handleQuickToggleRsvp(guest, 'pending')}
-              className={`px-2 py-1 text-xs font-semibold transition-colors border-l border-neutral-border ${
+              className={`px-2.5 py-1 text-xs font-semibold transition-all border-l border-neutral-border ${
                 guest.rsvpStatus === 'pending'
-                  ? 'bg-status-warning text-white'
-                  : 'bg-neutral-surface text-neutral-muted hover:bg-neutral-subtle'
+                  ? 'bg-status-warning text-white shadow-xs'
+                  : 'text-neutral-muted hover:text-neutral-text hover:bg-neutral-subtle'
               }`}
               title="Mark Pending"
             >
@@ -875,10 +970,10 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
             <button
               type="button"
               onClick={() => handleQuickToggleRsvp(guest, 'declined')}
-              className={`px-2 py-1 text-xs font-semibold transition-colors border-l border-neutral-border ${
+              className={`px-2.5 py-1 text-xs font-semibold transition-all border-l border-neutral-border ${
                 guest.rsvpStatus === 'declined'
-                  ? 'bg-neutral-muted text-white'
-                  : 'bg-neutral-surface text-neutral-muted hover:bg-neutral-subtle'
+                  ? 'bg-neutral-muted text-white shadow-xs'
+                  : 'text-neutral-muted hover:text-neutral-text hover:bg-neutral-subtle'
               }`}
               title="Mark Declined"
             >
@@ -886,25 +981,28 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
             </button>
           </div>
 
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
+            type="button"
             onClick={() => {
               setEditingGuest(guest);
               setIsGuestDialogOpen(true);
             }}
+            aria-label={`Edit ${fullName}`}
+            className="p-1.5 text-neutral-muted hover:text-neutral-text rounded-md hover:bg-neutral-subtle border border-transparent hover:border-neutral-border transition-colors text-xs font-medium inline-flex items-center gap-1"
           >
-            Edit
-          </Button>
+            <Edit2 className="w-3.5 h-3.5" />
+            <span>Edit</span>
+          </button>
 
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
+            type="button"
             onClick={() => handleDeleteGuest(guest.id)}
-            className="text-status-danger hover:bg-status-danger-subtle"
+            aria-label={`Delete ${fullName}`}
+            className="p-1.5 text-neutral-muted hover:text-status-danger rounded-md hover:bg-neutral-subtle border border-transparent hover:border-neutral-border transition-colors text-xs font-medium inline-flex items-center gap-1"
           >
-            Delete
-          </Button>
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Delete</span>
+          </button>
         </div>
       </div>
     );

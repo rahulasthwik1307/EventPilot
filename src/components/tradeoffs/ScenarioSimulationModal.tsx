@@ -277,7 +277,7 @@ export function ScenarioSimulationModal({
               onClick={handleApplyScenario}
               disabled={isStale}
               title={isStale ? 'Celebration updated elsewhere. Please recalculate before applying.' : undefined}
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-md text-sm font-semibold text-neutral-text bg-primary hover:bg-primary-hover hover:text-white transition-colors shadow-xs disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-md text-sm font-bold text-neutral-text bg-primary hover:bg-primary-hover hover:text-white transition-all shadow-xs active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none"
             >
               <Check className="w-4 h-4" />
               <span>Apply Scenario to Plan</span>

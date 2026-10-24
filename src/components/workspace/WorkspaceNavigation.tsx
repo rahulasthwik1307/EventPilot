@@ -46,8 +46,13 @@ export function WorkspaceNavigation({
   return (
     <nav
       aria-label="Workspace navigation"
-      className="bg-neutral-surface border border-neutral-border rounded-lg shadow-card p-1.5 sm:p-2 overflow-x-auto scrollbar-none"
+      className="bg-neutral-surface border border-neutral-border rounded-xl shadow-card p-2 sm:p-2.5 overflow-x-auto scrollbar-none"
     >
+      <div className="hidden lg:flex items-center justify-between px-3 py-2 text-xs font-semibold text-neutral-muted border-b border-neutral-border mb-1.5">
+        <span className="tracking-wide uppercase text-[11px]">Almanac Rail</span>
+        <span className="font-mono text-[10px] bg-neutral-subtle border border-neutral-border px-1.5 py-0.5 rounded text-neutral-text">Keys 1–7</span>
+      </div>
+
       <div className="flex lg:flex-col gap-1 sm:gap-1.5 min-w-max lg:min-w-0">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -59,28 +64,28 @@ export function WorkspaceNavigation({
               type="button"
               aria-label={tab.label}
               onClick={() => onTabChange(tab.id)}
-              className={`group relative text-left inline-flex items-center justify-between gap-2.5 py-2.5 px-3 sm:px-3.5 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap lg:w-full ${
+              className={`group relative text-left inline-flex items-center justify-between gap-3 py-2.5 px-3 sm:px-3.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap lg:w-full ${
                 isActive
-                  ? 'bg-primary-subtle text-neutral-text font-semibold shadow-xs border border-primary/40 translate-x-0 lg:translate-x-1'
-                  : 'bg-transparent text-neutral-muted hover:text-neutral-text hover:bg-neutral-subtle/80 border border-transparent'
+                  ? 'bg-primary-subtle text-neutral-text font-bold shadow-xs border border-primary/40 translate-x-0 lg:translate-x-1'
+                  : 'bg-transparent text-neutral-muted hover:text-neutral-text hover:bg-neutral-subtle border border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <span
-                  className={`flex-shrink-0 w-7 h-7 rounded flex items-center justify-center transition-colors ${
+                  className={`flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center transition-colors ${
                     isActive
-                      ? 'bg-primary text-neutral-text'
-                      : 'bg-neutral-subtle text-neutral-muted group-hover:text-neutral-text group-hover:bg-neutral-border-strong/30'
+                      ? 'bg-primary text-neutral-text shadow-xs'
+                      : 'bg-neutral-subtle text-neutral-muted group-hover:text-neutral-text group-hover:bg-neutral-border'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
                 </span>
 
                 <div className="truncate">
-                  <span className="block truncate font-medium text-xs sm:text-sm">
+                  <span className="block truncate font-semibold text-xs sm:text-sm">
                     {tab.label}
                   </span>
-                  <span className="hidden lg:block text-xs font-sans text-neutral-muted/80 font-normal leading-tight">
+                  <span className="hidden lg:block text-xs font-sans text-neutral-muted font-normal leading-tight">
                     {tab.hint}
                   </span>
                 </div>
@@ -98,7 +103,7 @@ export function WorkspaceNavigation({
                   {tab.index}
                 </span>
                 {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-secondary" aria-hidden="true" />
+                  <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" aria-hidden="true" />
                 )}
               </div>
             </button>

@@ -20,8 +20,8 @@ export function SampleBanner({ onResetSample }: SampleBannerProps) {
   };
 
   return (
-    <div className="bg-primary-subtle/70 border-b border-primary/30 px-4 py-2.5 text-xs text-neutral-text">
-      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+    <div className="bg-primary-subtle border-b border-primary/30 px-4 sm:px-6 lg:px-8 py-2.5 text-xs text-neutral-text">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
         <div className="flex items-center gap-2">
           <Compass className="w-4 h-4 text-primary-hover flex-shrink-0" />
           <span>

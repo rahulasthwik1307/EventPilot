@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { BudgetCategory, CurrencyCode } from '../../features/events/types';
+import { formatCurrency } from '../../features/events/validation';
 import { Dialog } from '../ui/Dialog';
 
 export interface CategoryDialogProps {
@@ -117,6 +118,11 @@ export function CategoryDialog({
             onChange={(e) => setAllocatedAmount(e.target.value)}
             className="w-full bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text font-mono focus:outline-none focus:ring-2 focus:ring-primary"
           />
+          {Number(allocatedAmount) > 0 && !errors.allocatedAmount && (
+            <p className="text-xs text-neutral-muted mt-1.5 font-mono">
+              Formatted Allocation: <strong className="text-neutral-text font-bold">{formatCurrency(Number(allocatedAmount), currency)}</strong>
+            </p>
+          )}
           {errors.allocatedAmount && (
             <p className="text-xs text-status-danger mt-1 flex items-center gap-1">
               <AlertCircle className="w-3.5 h-3.5" />

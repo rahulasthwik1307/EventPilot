@@ -520,6 +520,31 @@ export function EventCreateDialog({
               </div>
             </div>
 
+            {/* Live Calculation Dial: Cost Per Guest Ratio */}
+            {Number(budgetCap) > 0 && Number(guestTarget) > 0 && (
+              <div className="bg-neutral-subtle border border-neutral-border p-3.5 rounded-lg flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-md bg-primary-subtle text-primary">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <span className="font-semibold text-neutral-text block">
+                      Live Allocation Dial
+                    </span>
+                    <span className="text-neutral-muted">
+                      Deterministic per-guest ratio computed in real time
+                    </span>
+                  </div>
+                </div>
+                <div className="text-right font-mono">
+                  <span className="text-neutral-muted block text-[11px]">Planned per guest:</span>
+                  <strong className="text-secondary text-sm font-bold">
+                    {formatCurrency(Math.round(Number(budgetCap) / Number(guestTarget)), currency)} / guest
+                  </strong>
+                </div>
+              </div>
+            )}
+
             {/* 5. Cultural & Celebration Context (Optional, strictly opt-in) */}
             <div className="border-t border-neutral-border/60 pt-4 space-y-4">
               <div>

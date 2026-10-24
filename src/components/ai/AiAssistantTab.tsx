@@ -440,19 +440,25 @@ export function AiAssistantTab({
   return (
     <div className="space-y-8" data-testid="ai-assistant-tab">
       {/* Editorial Header & Privacy Banner */}
-      <section className="bg-neutral-surface border border-neutral-border rounded-lg p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-border/60">
+      <section className="relative overflow-hidden bg-white border border-[#E7DFD5] rounded-xl p-6 sm:p-8 shadow-sm">
+        {/* Top decorative hairline accent */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#C2410C] via-[#D97706] to-[#C2410C]" />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#E7DFD5]">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="p-1.5 rounded-md bg-primary-subtle text-primary">
-                <Sparkles className="w-5 h-5 text-primary" />
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="p-1 rounded-md bg-[#FEF3C7] text-[#D97706]">
+                <Sparkles className="w-4 h-4 text-[#D97706]" />
               </span>
-              <h2 className="font-display font-semibold text-2xl text-neutral-text">
-                AI Planning Assistant
-              </h2>
+              <span className="text-[11px] font-mono uppercase tracking-wider text-[#C2410C] font-bold">
+                Cultural Advisory &amp; Co-Pilot
+              </span>
               <CouponBadge variant="marigold">Cloudflare AI + Fallback</CouponBadge>
             </div>
-            <p className="text-sm text-neutral-muted">
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917] tracking-tight">
+              AI Planning Assistant
+            </h2>
+            <p className="text-xs text-[#78716C] mt-1 max-w-2xl leading-relaxed">
               AI proposes structured advisory changes. You review before/after diffs before any change is applied.
             </p>
           </div>
@@ -461,32 +467,32 @@ export function AiAssistantTab({
             variant="outline"
             size="sm"
             onClick={() => setIsPrivacyModalOpen(true)}
-            className="self-start sm:self-center"
+            className="self-start sm:self-center text-xs font-mono font-semibold bg-[#FAF8F5] border-[#E7DFD5] text-[#1C1917] hover:bg-[#F5F2EB]"
           >
-            <ShieldCheck className="w-4 h-4 mr-1.5 text-status-success" />
+            <ShieldCheck className="w-4 h-4 mr-1.5 text-[#059669]" />
             Inspect Safe Context
           </Button>
         </div>
 
         {/* Privacy Guard Notice */}
-        <div className="mt-4 flex items-center justify-between bg-neutral-subtle/80 rounded-md px-3.5 py-2.5 text-xs text-neutral-muted border border-neutral-border">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-status-success shrink-0" />
+        <div className="mt-4 flex items-center justify-between bg-[#FAF8F5] rounded-lg px-4 py-3 text-xs text-[#78716C] border border-[#E7DFD5]">
+          <div className="flex items-center gap-2.5">
+            <ShieldCheck className="w-4 h-4 text-[#059669] shrink-0" />
             <span>
-              <strong className="text-neutral-text font-medium">Privacy Guard Active:</strong> Only high-level event metadata (archetype, city, budget caps, aggregate counts) is shared. Guest names, contact details, dietary notes, and personal contacts are strictly excluded.
+              <strong className="text-[#1C1917] font-semibold">Privacy Guard Active:</strong> Only high-level event metadata (archetype, city, budget caps, aggregate counts) is shared. Guest names, contact details, dietary notes, and personal contacts are strictly excluded.
             </span>
           </div>
-          <span className="hidden md:inline font-mono text-xs text-neutral-text-muted">
+          <span className="hidden md:inline font-mono text-[11px] font-bold text-[#059669] px-2 py-0.5 rounded bg-[#ECFDF5] border border-[#A7F3D0] shrink-0">
             Zero PII Transmitted
           </span>
         </div>
       </section>
 
       {/* Main Interactive Assistant Console */}
-      <section className="bg-neutral-surface border border-neutral-border rounded-lg p-6 shadow-sm space-y-6">
+      <section className="bg-white border border-[#E7DFD5] rounded-xl p-6 sm:p-8 shadow-sm space-y-6">
         {/* Intent Selection Tabs */}
         <div>
-          <label className="block text-xs font-semibold text-neutral-muted uppercase tracking-wider mb-2.5">
+          <label className="block text-[11px] font-mono font-bold text-[#78716C] uppercase tracking-wider mb-2.5">
             1. Select Planning Focus Area
           </label>
           <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Planning Intent">
@@ -500,14 +506,14 @@ export function AiAssistantTab({
                   onClick={() => setIntent(opt.id)}
                   aria-checked={isSelected}
                   role="radio"
-                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-all ${
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all ${
                     isSelected
-                      ? 'bg-primary text-neutral-text font-semibold shadow-sm ring-1 ring-primary'
-                      : 'bg-neutral-subtle text-neutral-text hover:bg-neutral-subtle/80 border border-neutral-border'
+                      ? 'bg-[#FFEDD5] text-[#9A3412] font-bold shadow-xs border border-[#FED7AA] ring-1 ring-[#FED7AA]'
+                      : 'bg-[#FAF8F5] text-[#78716C] hover:bg-[#F5F2EB] hover:text-[#1C1917] border border-[#E7DFD5]'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isSelected ? 'text-neutral-text' : 'text-neutral-muted'}`} />
-                  {opt.label}
+                  <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-[#C2410C]' : 'text-[#A8A29E]'}`} />
+                  <span>{opt.label}</span>
                 </button>
               );
             })}
@@ -516,10 +522,10 @@ export function AiAssistantTab({
 
         {/* Suggested Starter Prompts */}
         <div>
-          <label className="block text-xs font-semibold text-neutral-muted uppercase tracking-wider mb-2">
+          <label className="block text-[11px] font-mono font-bold text-[#78716C] uppercase tracking-wider mb-2">
             2. Choose a Suggested Question or Type Your Own
           </label>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {starterPrompts.map((starter, idx) => (
               <button
                 key={idx}
@@ -529,10 +535,12 @@ export function AiAssistantTab({
                   handleSubmit(starter);
                 }}
                 disabled={isLoading}
-                className="text-left p-3 rounded-md border border-neutral-border bg-neutral-subtle/50 hover:bg-primary-subtle/40 hover:border-primary/40 transition-all text-xs text-neutral-text line-clamp-3 disabled:opacity-50"
+                className="text-left p-3.5 rounded-xl border border-[#E7DFD5] bg-[#FAF8F5] hover:bg-white hover:border-[#D97706] hover:shadow-sm transition-all text-xs text-[#1C1917] line-clamp-3 disabled:opacity-50 group"
               >
-                <span className="font-semibold text-primary block mb-0.5">Idea {idx + 1}</span>
-                {starter}
+                <span className="font-mono text-[10px] uppercase font-bold text-[#D97706] block mb-1 group-hover:text-[#C2410C]">
+                  Idea {idx + 1}
+                </span>
+                <span className="leading-relaxed">{starter}</span>
               </button>
             ))}
           </div>
@@ -554,12 +562,12 @@ export function AiAssistantTab({
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Ask the planning assistant for advice on budgeting, timeline milestones, vendor vetting questions, or cultural traditions..."
               disabled={isLoading}
-              className="w-full rounded-md border border-neutral-border bg-neutral-bg px-3.5 py-3 text-sm text-neutral-text placeholder:text-neutral-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary resize-y transition-all disabled:opacity-60"
+              className="w-full rounded-xl border border-[#E7DFD5] bg-[#FAF8F5] px-4 py-3 text-xs sm:text-sm text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:ring-1 focus:ring-[#D97706] focus:bg-white resize-y transition-all disabled:opacity-60 leading-relaxed"
             />
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-xs text-neutral-muted">
+            <p className="text-xs text-[#78716C]">
               Press Ask Assistant to generate cultural recommendations and staged proposals.
             </p>
 
@@ -567,17 +575,17 @@ export function AiAssistantTab({
               type="submit"
               variant="primary"
               disabled={isLoading || !prompt.trim()}
-              className="min-w-[140px]"
+              className="min-w-[140px] font-bold text-xs font-mono active:scale-[0.98] transition-all bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm px-4 py-2"
             >
               {isLoading ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin mr-1.5" />
-                  Consulting...
+                  <span>Consulting...</span>
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4 mr-1.5" />
-                  Ask Assistant
+                  <span>Ask Assistant</span>
                 </>
               )}
             </Button>
@@ -586,18 +594,18 @@ export function AiAssistantTab({
 
         {/* Loading Indicator */}
         {isLoading && (
-          <div className="p-6 rounded-md bg-neutral-subtle/70 border border-neutral-border flex flex-col items-center justify-center text-center space-y-3">
-            <div className="p-2.5 rounded-full bg-primary-subtle text-primary">
-              <Sparkles className="w-7 h-7 text-primary animate-spin" />
+          <div className="p-8 rounded-xl bg-[#FAF8F5] border border-[#E7DFD5] flex flex-col items-center justify-center text-center space-y-3">
+            <div className="p-3 rounded-full bg-[#FEF3C7] text-[#D97706]">
+              <Sparkles className="w-6 h-6 text-[#D97706] animate-spin" />
             </div>
             <div className="space-y-1">
-              <h4 className="font-semibold text-neutral-text text-sm flex items-center justify-center gap-2">
+              <h4 className="font-semibold text-[#1C1917] text-sm flex items-center justify-center gap-2">
                 <span>Consulting AI Planning Assistant...</span>
-                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-primary text-neutral-text">
+                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-[#D97706] text-white">
                   {(elapsedMs / 1000).toFixed(1)}s
                 </span>
               </h4>
-              <p className="text-xs text-neutral-muted max-w-md">
+              <p className="text-xs text-[#78716C] max-w-md leading-relaxed">
                 Synthesizing celebration context, cultural traditions, and structured proposal diffs...
               </p>
             </div>
@@ -608,21 +616,21 @@ export function AiAssistantTab({
         {errorMessage && !isLoading && (
           <div
             role="alert"
-            className={`p-4 rounded-md border text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+            className={`p-4 rounded-xl border text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
               is503DemandError
-                ? 'bg-status-warning-subtle text-status-warning border-status-warning/40'
-                : 'bg-status-danger-subtle text-status-danger border-status-danger/40'
+                ? 'bg-[#FFFBEB] text-[#92400E] border-[#FDE68A]'
+                : 'bg-[#FEF2F2] text-[#B91C1C] border-[#FCA5A5]'
             }`}
           >
             <div className="flex items-start gap-2.5">
-              <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-current" />
               <div>
-                <p className="font-semibold">
+                <p className="font-bold">
                   {is503DemandError
                     ? 'AI Assistant High Demand (Spike)'
                     : 'Assistant Communication Notice'}
                 </p>
-                <p className="text-xs mt-0.5 opacity-90">
+                <p className="text-xs mt-0.5 opacity-90 leading-relaxed">
                   {errorMessage}
                 </p>
                 {is503DemandError && (
@@ -638,7 +646,7 @@ export function AiAssistantTab({
                 variant="outline"
                 size="sm"
                 onClick={() => handleSubmit(lastSubmittedPrompt)}
-                className="shrink-0 bg-neutral-surface"
+                className="shrink-0 bg-white border-[#E7DFD5] text-[#1C1917] text-xs font-mono hover:bg-[#FAF8F5]"
               >
                 <RefreshCw className="w-3.5 h-3.5 mr-1" />
                 Retry Request
@@ -649,13 +657,13 @@ export function AiAssistantTab({
 
         {/* Session Conversation History Stream (Prior turns in this session) */}
         {sessionMessages.length > 1 && (
-          <div className="pt-4 border-t border-neutral-border/60 space-y-3">
+          <div className="pt-4 border-t border-[#E7DFD5] space-y-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-neutral-text uppercase tracking-wider flex items-center gap-1.5">
-                <Compass className="w-3.5 h-3.5 text-primary" />
+              <span className="font-bold text-[#1C1917] uppercase tracking-wider flex items-center gap-1.5 font-mono text-[11px]">
+                <Compass className="w-3.5 h-3.5 text-[#D97706]" />
                 Previous Turns in this Session ({sessionMessages.length - 1})
               </span>
-              <span className="text-[11px] text-neutral-muted font-mono">Session-only · Never Persisted</span>
+              <span className="text-[11px] text-[#A8A29E] font-mono">Session-only · Never Persisted</span>
             </div>
             <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
               {sessionMessages.slice(0, -1).map((msg) => (
@@ -664,14 +672,14 @@ export function AiAssistantTab({
                   className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
                 >
                   <div
-                    className={`max-w-[88%] rounded-lg p-3 text-xs leading-relaxed ${
+                    className={`max-w-[88%] rounded-xl p-3 text-xs leading-relaxed ${
                       msg.sender === 'user'
-                        ? 'bg-primary-subtle/60 text-neutral-text border border-primary/20'
-                        : 'bg-neutral-subtle/70 text-neutral-text border border-neutral-border'
+                        ? 'bg-[#FFEDD5]/60 text-[#1C1917] border border-[#FED7AA]'
+                        : 'bg-[#FAF8F5] text-[#1C1917] border border-[#E7DFD5]'
                     }`}
                   >
-                    <div className="flex items-center justify-between gap-3 text-[10px] text-neutral-muted mb-1 font-mono">
-                      <span className="font-semibold text-neutral-text">
+                    <div className="flex items-center justify-between gap-3 text-[10px] text-[#78716C] mb-1 font-mono">
+                      <span className="font-bold text-[#1C1917]">
                         {msg.sender === 'user' ? 'You' : 'Planning Assistant'}
                       </span>
                       <span>{msg.timestamp}</span>
@@ -687,18 +695,18 @@ export function AiAssistantTab({
 
       {/* Assistant Conversational Answer Section */}
       {conversationalAnswer && !isLoading && (
-        <section className="bg-neutral-surface border border-neutral-border rounded-lg p-6 shadow-sm space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-neutral-border/60">
+        <section className="bg-white border border-[#E7DFD5] rounded-xl p-6 sm:p-8 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3.5 border-b border-[#E7DFD5]">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary" />
-              <h3 className="font-display font-semibold text-lg text-neutral-text">
+              <Sparkles className="w-5 h-5 text-[#D97706]" />
+              <h3 className="font-serif font-bold text-lg text-[#1C1917]">
                 Planning Guidance &amp; Insights
               </h3>
             </div>
             {activeModel && (
-              <span className="text-xs font-mono text-neutral-muted bg-neutral-subtle px-2.5 py-1 rounded border border-neutral-border self-start sm:self-auto flex items-center gap-1.5 shadow-xs">
-                <span className="inline-block w-2 h-2 rounded-full bg-status-success animate-pulse" />
-                <span className="font-semibold text-neutral-text">
+              <span className="text-[11px] font-mono text-[#78716C] bg-[#FAF8F5] px-2.5 py-1 rounded-lg border border-[#E7DFD5] self-start sm:self-auto flex items-center gap-1.5 shadow-xs">
+                <span className="inline-block w-2 h-2 rounded-full bg-[#059669] animate-pulse" />
+                <span className="font-bold text-[#1C1917]">
                   {responseLatencyMs === 0
                     ? '⚡ 0ms (Instant Cache)'
                     : `⚡ ${((responseLatencyMs ?? 1200) / 1000).toFixed(1)}s`}
@@ -711,7 +719,7 @@ export function AiAssistantTab({
             )}
           </div>
 
-          <div className="prose prose-sm max-w-none text-neutral-text leading-relaxed whitespace-pre-line text-sm bg-neutral-subtle/50 p-4 rounded-md border border-neutral-border/70">
+          <div className="prose prose-sm max-w-none text-[#1C1917] leading-relaxed whitespace-pre-line text-xs sm:text-sm bg-[#FAF8F5] p-5 rounded-xl border border-[#E7DFD5]">
             {conversationalAnswer}
           </div>
         </section>
@@ -721,13 +729,13 @@ export function AiAssistantTab({
       {proposals.length > 0 && !isLoading && (
         <section className="space-y-4" data-testid="staged-proposals-section">
           {/* Section Header with Bulk Actions & Filter */}
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-white border border-[#E7DFD5] rounded-xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-display font-semibold text-lg text-neutral-text">
+                <h3 className="font-serif font-bold text-lg text-[#1C1917]">
                   Proposed Actions
                 </h3>
-                <span className="font-mono text-xs px-2 py-0.5 rounded-full bg-primary-subtle text-primary font-bold">
+                <span className="font-mono text-xs px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold border border-[#FDE68A]">
                   {proposals.length} total
                 </span>
                 {stagedCount > 0 && (
@@ -736,7 +744,7 @@ export function AiAssistantTab({
                   </StatusPill>
                 )}
               </div>
-              <p className="text-xs text-neutral-muted mt-0.5">
+              <p className="text-xs text-[#78716C] mt-0.5">
                 Review before/after diffs. Accepted proposals update allocations or insert tasks deterministically.
               </p>
             </div>
@@ -748,20 +756,20 @@ export function AiAssistantTab({
                   variant="outline"
                   size="sm"
                   onClick={handleDismissAllStaged}
-                  className="text-xs"
+                  className="text-xs font-mono text-[#78716C] hover:text-[#1C1917] border-[#E7DFD5] bg-[#FAF8F5]"
                 >
-                  <XCircle className="w-3.5 h-3.5 mr-1 text-neutral-muted" />
-                  Dismiss All
+                  <XCircle className="w-3.5 h-3.5 mr-1 text-[#A8A29E]" />
+                  <span>Dismiss All</span>
                 </Button>
 
                 <Button
                   variant="primary"
                   size="sm"
                   onClick={handleAcceptAllStaged}
-                  className="text-xs"
+                  className="text-xs font-mono font-bold bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm"
                 >
                   <CheckCheck className="w-3.5 h-3.5 mr-1" />
-                  Accept All ({stagedCount})
+                  <span>Accept All ({stagedCount})</span>
                 </Button>
               </div>
             )}
@@ -769,16 +777,16 @@ export function AiAssistantTab({
 
           {/* Proposal Filter Tabs */}
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-neutral-muted font-medium">Filter proposals:</span>
+            <span className="text-[#78716C] font-semibold font-mono text-[11px] uppercase">Filter proposals:</span>
             {(['all', 'staged', 'applied', 'dismissed'] as const).map((filterKey) => (
               <button
                 key={filterKey}
                 type="button"
                 onClick={() => setProposalFilter(filterKey)}
-                className={`px-2.5 py-1 rounded capitalize font-medium transition-all ${
+                className={`px-3 py-1 rounded-lg capitalize font-mono text-xs transition-all ${
                   proposalFilter === filterKey
-                    ? 'bg-neutral-text text-neutral-surface'
-                    : 'bg-neutral-subtle text-neutral-muted hover:text-neutral-text'
+                    ? 'bg-[#1C1917] text-white font-bold'
+                    : 'bg-[#FAF8F5] text-[#78716C] border border-[#E7DFD5] hover:text-[#1C1917]'
                 }`}
               >
                 {filterKey === 'applied' ? 'Applied' : filterKey}
@@ -802,7 +810,7 @@ export function AiAssistantTab({
             ))}
 
             {displayedProposals.length === 0 && (
-              <div className="p-8 text-center text-neutral-muted text-xs bg-neutral-surface border border-neutral-border rounded-lg">
+              <div className="p-8 text-center text-[#78716C] text-xs bg-white border border-[#E7DFD5] rounded-xl">
                 No proposals matching filter &ldquo;{proposalFilter}&rdquo;.
               </div>
             )}
@@ -819,14 +827,15 @@ export function AiAssistantTab({
         maxWidth="lg"
       >
         <div className="space-y-4">
-          <div className="max-h-96 overflow-y-auto bg-neutral-subtle p-3.5 rounded-md border border-neutral-border font-mono text-xs text-neutral-text">
-            <pre>{JSON.stringify(safeContext, null, 2)}</pre>
+          <div className="max-h-96 overflow-y-auto bg-[#FAF8F5] p-4 rounded-xl border border-[#E7DFD5] font-mono text-xs text-[#1C1917] leading-relaxed">
+            <pre className="whitespace-pre-wrap">{JSON.stringify(safeContext, null, 2)}</pre>
           </div>
           <div className="flex justify-end pt-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setIsPrivacyModalOpen(false)}
+              className="border-[#E7DFD5] text-[#1C1917] hover:bg-[#FAF8F5]"
             >
               Close Inspector
             </Button>

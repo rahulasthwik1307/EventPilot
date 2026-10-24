@@ -7,10 +7,13 @@ import { X } from 'lucide-react';
 export interface DialogProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title: React.ReactNode;
   description?: string;
   children: React.ReactNode;
-  maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl';
+  headerActions?: React.ReactNode;
+  accentBar?: boolean;
+  contentPadding?: boolean;
 }
 
 function subscribe() {
@@ -24,6 +27,9 @@ export function Dialog({
   description,
   children,
   maxWidth = 'md',
+  headerActions,
+  accentBar,
+  contentPadding = true,
 }: DialogProps) {
   const isClient = useSyncExternalStore(
     subscribe,
@@ -98,7 +104,11 @@ export function Dialog({
     md: 'max-w-xl',
     lg: 'max-w-2xl',
     xl: 'max-w-4xl',
-  }[maxWidth];
+    '2xl': 'max-w-5xl',
+    '3xl': 'max-w-6xl',
+    '4xl': 'max-w-7xl',
+    '5xl': 'max-w-7xl',
+  }[maxWidth] || 'max-w-xl';
 
   const dialogElement = (
     <div
@@ -121,33 +131,45 @@ export function Dialog({
         aria-describedby={description ? 'dialog-description' : undefined}
         className={`relative w-full ${maxWidthStyles} max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3.5rem)] flex flex-col bg-neutral-surface rounded-xl border border-neutral-border shadow-drawer z-10 my-auto overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150`}
       >
+        {/* Optional Panchang Top Accent */}
+        {accentBar && (
+          <div className="h-1.5 w-full bg-gradient-to-r from-[#D97706] via-[#C2410C] to-[#B45309] flex-shrink-0" />
+        )}
+
         {/* Pinned Dialog Header */}
         <div className="flex items-start justify-between border-b border-neutral-border px-6 py-5 sm:px-8 sm:py-6 flex-shrink-0 bg-neutral-surface">
-          <div className="pr-2">
-            <h2
-              id="dialog-title"
-              className="font-display text-2xl font-semibold text-neutral-text leading-tight"
-            >
-              {title}
-            </h2>
+          <div className="pr-2 flex-1 min-w-0">
+            {typeof title === 'string' ? (
+              <h2
+                id="dialog-title"
+                className="font-display text-2xl font-semibold text-neutral-text leading-tight"
+              >
+                {title}
+              </h2>
+            ) : (
+              <div id="dialog-title">{title}</div>
+            )}
             {description && (
               <p id="dialog-description" className="text-sm text-neutral-muted mt-1 leading-normal">
                 {description}
               </p>
             )}
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close dialog"
-            className="text-neutral-muted hover:text-neutral-text hover:bg-neutral-subtle p-1.5 rounded-md transition-colors flex-shrink-0 ml-4"
-          >
-            <X className="w-5 h-5" aria-hidden="true" />
-          </button>
+          <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+            {headerActions}
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close dialog"
+              className="text-neutral-muted hover:text-neutral-text hover:bg-neutral-subtle p-1.5 rounded-md transition-colors"
+            >
+              <X className="w-5 h-5" aria-hidden="true" />
+            </button>
+          </div>
         </div>
 
         {/* Scrollable Content Body */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 sm:px-8 sm:py-6">
+        <div className={`flex-1 overflow-y-auto ${contentPadding ? 'px-6 py-5 sm:px-8 sm:py-6' : ''}`}>
           {children}
         </div>
       </div>

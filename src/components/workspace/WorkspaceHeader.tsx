@@ -65,39 +65,39 @@ export function WorkspaceHeader({
             </div>
 
             {/* Compact inline metadata ribbon */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-muted">
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
               {event.location && (
-                <span className="flex items-center gap-1 text-neutral-text/90">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-subtle border border-neutral-border text-neutral-text">
                   <MapPin className="w-3.5 h-3.5 text-secondary flex-shrink-0" />
-                  <span className="truncate">{event.location}</span>
-                </span>
+                  <span className="font-medium">{event.location}</span>
+                </div>
               )}
 
-              <span className="flex items-center gap-1">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-subtle border border-neutral-border text-neutral-text">
                 <Calendar className="w-3.5 h-3.5 text-neutral-muted flex-shrink-0" />
                 <span>{formatDateDisplay(event.date)}</span>
-                <span className="font-mono text-secondary font-medium">({countdownLabel})</span>
-              </span>
+                <span className="font-mono text-secondary font-semibold">({countdownLabel})</span>
+              </div>
 
-              <span className="flex items-center gap-1 font-mono tabular-nums">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-subtle border border-neutral-border text-neutral-text font-mono tabular-nums">
                 <Users className="w-3.5 h-3.5 text-neutral-muted flex-shrink-0" />
                 <span>{event.guestTarget} guests</span>
-              </span>
+              </div>
 
-              <span className="flex items-center gap-1 font-mono tabular-nums font-semibold text-neutral-text">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary-subtle border border-primary/30 text-neutral-text font-mono tabular-nums font-bold">
                 <Wallet className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                 <span>{formatCurrency(event.budgetCap, event.currency)}</span>
-              </span>
+              </div>
             </div>
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-2 pt-2 md:pt-0 self-start md:self-auto flex-shrink-0">
+          <div className="flex items-center gap-2.5 pt-2 md:pt-0 self-start md:self-auto flex-shrink-0">
             {onReplan && (
               <button
                 type="button"
                 onClick={onReplan}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold bg-primary-subtle text-primary border border-primary/30 hover:bg-primary hover:text-white px-3.5 py-2 rounded-md transition-all shadow-xs active:translate-y-0.5"
+                className="inline-flex items-center gap-1.5 text-xs font-bold bg-primary hover:bg-primary-hover text-neutral-text px-4 py-2.5 rounded-md transition-all shadow-xs active:translate-y-0.5"
               >
                 <Sliders className="w-3.5 h-3.5" />
                 <span>Dynamic Replan</span>
@@ -107,7 +107,7 @@ export function WorkspaceHeader({
             <button
               type="button"
               onClick={onEdit}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold bg-neutral-surface hover:bg-neutral-subtle text-neutral-text border border-neutral-border px-3.5 py-2 rounded-md transition-all shadow-xs active:translate-y-0.5"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold bg-neutral-surface hover:bg-neutral-subtle text-neutral-text border border-neutral-border px-3.5 py-2.5 rounded-md transition-all shadow-xs active:translate-y-0.5"
             >
               <Edit3 className="w-3.5 h-3.5 text-neutral-muted" />
               <span>Edit Details</span>
@@ -118,7 +118,7 @@ export function WorkspaceHeader({
                 type="button"
                 onClick={() => setShowDeleteConfirm(true)}
                 aria-label="Delete Event"
-                className="p-2 text-neutral-muted hover:text-status-danger hover:bg-status-danger-subtle/50 rounded-md transition-colors"
+                className="p-2.5 text-neutral-muted hover:text-status-danger hover:bg-status-danger-subtle rounded-md transition-colors"
                 title="Delete Celebration"
               >
                 <Trash2 className="w-4 h-4" />

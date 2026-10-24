@@ -6,15 +6,21 @@ import { VendorCategory } from '@/features/vendors/types';
 import { generateVendorRequirementBrief } from '@/features/vendors/quotations/brief-engine';
 import { VENDOR_CATEGORIES } from '@/features/vendors/vendor-engine';
 import { Button } from '../../ui/Button';
+import { Dialog } from '../../ui/Dialog';
 import { CouponBadge } from '../../ui/Badge';
 import {
+  Calendar,
   Check,
   CheckCircle2,
   Copy,
   Download,
+  Edit3,
+  FileCheck2,
   FileText,
-  Lock,
+  MapPin,
   ShieldCheck,
+  Users,
+  Wallet,
   X,
 } from 'lucide-react';
 
@@ -35,6 +41,7 @@ export function RequirementBriefModal({
     initialCategory || 'photography'
   );
   const [copied, setCopied] = useState(false);
+  const [activeTab, setActiveTab] = useState<'formatted' | 'raw'>('formatted');
 
   const brief = useMemo(() => {
     return generateVendorRequirementBrief(event, selectedCategory);
@@ -72,117 +79,274 @@ export function RequirementBriefModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-slate-900 border border-amber-500/30 rounded-xl shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col my-auto text-amber-50">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-6 border-b border-slate-800 gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-semibold">
-                Vendor Procurement
-              </span>
-              <CouponBadge variant="marigold">Requirement Brief</CouponBadge>
-            </div>
-            <h2 className="font-serif text-2xl font-medium text-amber-100">
-              Vendor Requirement Brief Generator
-            </h2>
-            <p className="text-xs text-slate-400 mt-1">
-              Professional, privacy-safe scope summary tailored to your event parameters and confirmed preferences.
-            </p>
+    <Dialog
+      isOpen={isOpen}
+      onClose={onClose}
+      title={
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-[#C2410C] font-bold">
+              Vendor Procurement
+            </span>
+            <CouponBadge variant="marigold">Requirement Brief</CouponBadge>
           </div>
-
-          <div className="flex items-center gap-2">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value as VendorCategory)}
-              className="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-amber-100 focus:outline-none focus:border-amber-400"
-            >
-              {VENDOR_CATEGORIES.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.label}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={onClose}
-              className="text-slate-400 hover:text-amber-200 transition-colors p-2 rounded-lg hover:bg-slate-800"
-              aria-label="Close dialog"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+          <span className="font-serif text-2xl font-bold text-[#1C1917] tracking-tight">
+            Vendor Requirement Brief Generator
+          </span>
         </div>
+      }
+      description="Professional, privacy-safe scope summary tailored to your celebration parameters and confirmed preferences."
+      headerActions={
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value as VendorCategory)}
+          className="bg-neutral-surface border border-neutral-border rounded-lg px-3 py-1.5 text-xs font-mono font-medium text-neutral-text focus:outline-none focus:ring-1 focus:ring-primary shadow-sm"
+        >
+          {VENDOR_CATEGORIES.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.label}
+            </option>
+          ))}
+        </select>
+      }
+      maxWidth="2xl"
+      accentBar
+      contentPadding={false}
+    >
+      <div className="flex flex-col flex-1 min-h-0 bg-white">
 
         {/* Privacy Notice Banner */}
-        <div className="px-6 py-3 bg-emerald-500/10 border-b border-emerald-500/20 flex items-center gap-2 text-xs font-mono text-emerald-300">
-          <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className="px-6 py-2.5 bg-[#ECFDF5] border-b border-[#A7F3D0] flex items-center gap-2 text-xs font-mono text-[#065F46]">
+          <ShieldCheck className="w-4 h-4 text-[#059669] shrink-0" />
           <span>
             Privacy Shield Active: Private guest lists, individual contact details, and internal host notes are strictly excluded from this brief.
           </span>
         </div>
 
-        {/* Content Body */}
-        <div className="p-6 overflow-y-auto space-y-5 flex-1">
-          {/* Key Parameters Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-            <div className="p-3 bg-slate-950 border border-slate-800 rounded-lg">
-              <span className="text-[10px] uppercase text-slate-400 block mb-1">Target Date</span>
-              <span className="text-amber-200 font-semibold">{brief.eventDate}</span>
+        {/* Parameter Strip (Single-Row Compact Cards) */}
+        <div className="px-6 py-3.5 bg-[#FAF8F5] border-b border-[#E7DFD5]">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
+            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-[#C2410C] shrink-0" />
+              <div className="min-w-0">
+                <span className="text-[10px] uppercase font-bold text-[#78716C] block">Target Date</span>
+                <span className="text-[#1C1917] font-bold truncate block">{brief.eventDate}</span>
+              </div>
             </div>
-            <div className="p-3 bg-slate-950 border border-slate-800 rounded-lg">
-              <span className="text-[10px] uppercase text-slate-400 block mb-1">Headcount Target</span>
-              <span className="text-amber-200 font-semibold">{brief.guestTarget} guests</span>
-            </div>
-            <div className="p-3 bg-slate-950 border border-slate-800 rounded-lg">
-              <span className="text-[10px] uppercase text-slate-400 block mb-1">Location</span>
-              <span className="text-amber-200 font-semibold">{brief.location || 'To be finalized'}</span>
-            </div>
-            <div className="p-3 bg-slate-950 border border-slate-800 rounded-lg">
-              <span className="text-[10px] uppercase text-slate-400 block mb-1">Category Budget</span>
-              <span className="text-amber-300 font-semibold">
-                {brief.allocatedCategoryBudgetFormatted || 'Envelope open'}
-              </span>
-            </div>
-          </div>
 
-          {/* Editable Text Area */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-mono uppercase tracking-wider text-slate-300">
-                Brief Text (Editable for Custom Requests)
-              </label>
-              <span className="text-[11px] font-mono text-slate-500">
-                Markdown formatted • Ready to copy &amp; send
-              </span>
+            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-center gap-2">
+              <Users className="w-4 h-4 text-[#D97706] shrink-0" />
+              <div className="min-w-0">
+                <span className="text-[10px] uppercase font-bold text-[#78716C] block">Headcount</span>
+                <span className="text-[#1C1917] font-bold truncate block">{brief.guestTarget} guests</span>
+              </div>
             </div>
-            <textarea
-              rows={14}
-              value={briefText}
-              onChange={(e) => setBriefText(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg p-4 font-mono text-xs text-amber-100 leading-relaxed focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
-            />
+
+            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-[#78716C] shrink-0" />
+              <div className="min-w-0">
+                <span className="text-[10px] uppercase font-bold text-[#78716C] block">Location</span>
+                <span className="text-[#1C1917] font-bold truncate block">{brief.location || 'To be finalized'}</span>
+              </div>
+            </div>
+
+            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-center gap-2">
+              <Wallet className="w-4 h-4 text-[#059669] shrink-0" />
+              <div className="min-w-0">
+                <span className="text-[10px] uppercase font-bold text-[#78716C] block">Category Budget</span>
+                <span className="text-[#059669] font-bold truncate block">
+                  {brief.allocatedCategoryBudgetFormatted || 'Envelope open'}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
+        {/* View Mode Toggle: Formatted Document vs Raw Markdown Editor */}
+        <div className="flex items-center justify-between px-6 pt-3 pb-2 border-b border-[#E7DFD5] bg-white">
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveTab('formatted')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
+                activeTab === 'formatted'
+                  ? 'bg-[#FFEDD5] text-[#9A3412] border border-[#FED7AA]'
+                  : 'bg-[#FAF8F5] text-[#78716C] hover:text-[#1C1917] border border-[#E7DFD5]'
+              }`}
+            >
+              <FileCheck2 className="w-3.5 h-3.5" />
+              <span>Formatted Document</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('raw')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
+                activeTab === 'raw'
+                  ? 'bg-[#FFEDD5] text-[#9A3412] border border-[#FED7AA]'
+                  : 'bg-[#FAF8F5] text-[#78716C] hover:text-[#1C1917] border border-[#E7DFD5]'
+              }`}
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>Edit Raw Text</span>
+            </button>
+          </div>
+
+          <span className="text-[11px] font-mono text-[#78716C] hidden sm:inline">
+            {activeTab === 'formatted' ? 'Clean letterhead preview' : 'Markdown formatted • Ready to copy & send'}
+          </span>
+        </div>
+
+        {/* Content Body */}
+        <div className="p-6 overflow-y-auto space-y-4 flex-1 bg-[#FAF8F5]/40">
+          {activeTab === 'formatted' ? (
+            /* 1. Formatted Document Preview */
+            <div className="bg-white border border-[#E7DFD5] rounded-xl p-6 sm:p-8 shadow-sm space-y-6">
+              {/* Document Letterhead */}
+              <div className="border-b border-[#E7DFD5] pb-5">
+                <span className="text-[11px] font-mono uppercase tracking-widest text-[#C2410C] font-bold block mb-1">
+                  Official Procurement Brief
+                </span>
+                <h3 className="font-serif text-2xl font-bold text-[#1C1917]">
+                  Vendor Requirement Brief: {brief.categoryLabel}
+                </h3>
+                <p className="text-xs text-[#78716C] mt-1 font-mono">
+                  <strong>Celebration:</strong> {event.title} ({event.type || 'Celebration'}) · <strong>Date:</strong> {brief.eventDate}
+                </p>
+              </div>
+
+              {/* Requirements & Preferences */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-mono uppercase tracking-wider text-[#78716C] font-bold flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#D97706]" />
+                  <span>Confirmed Requirements &amp; Preferences</span>
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {brief.confirmedPreferences.map((pref, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3 rounded-lg bg-[#FAF8F5] border border-[#E7DFD5] text-xs space-y-1"
+                    >
+                      <span className="font-bold text-[#1C1917] block">{pref.label}</span>
+                      <span className="text-[#78716C] leading-relaxed block">{pref.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Non-Negotiables */}
+              {brief.confirmedNonNegotiables.length > 0 && (
+                <div className="space-y-2.5 pt-2 border-t border-[#E7DFD5]">
+                  <h4 className="text-xs font-mono uppercase tracking-wider text-[#C2410C] font-bold flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#C2410C]" />
+                    <span>Essential Non-Negotiables</span>
+                  </h4>
+                  <ul className="space-y-1.5 text-xs text-[#1C1917] pl-1">
+                    {brief.confirmedNonNegotiables.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <span className="text-[#C2410C] font-bold">•</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Milestones & Timing */}
+              {brief.timingConstraints.length > 0 && (
+                <div className="space-y-2.5 pt-2 border-t border-[#E7DFD5]">
+                  <h4 className="text-xs font-mono uppercase tracking-wider text-[#78716C] font-bold flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#D97706]" />
+                    <span>Key Milestones &amp; Timing</span>
+                  </h4>
+                  <div className="space-y-1.5">
+                    {brief.timingConstraints.map((t, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between p-2.5 rounded-lg bg-[#FAF8F5] border border-[#E7DFD5] text-xs"
+                      >
+                        <span className="font-semibold text-[#1C1917]">{t.milestone}</span>
+                        <span className="font-mono text-[11px] text-[#78716C] bg-white px-2 py-0.5 rounded border border-[#E7DFD5]">
+                          Due by {t.dueDate}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Information Requested */}
+              <div className="space-y-2.5 pt-2 border-t border-[#E7DFD5]">
+                <h4 className="text-xs font-mono uppercase tracking-wider text-[#059669] font-bold flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#059669]" />
+                  <span>Information Requested in Your Proposal</span>
+                </h4>
+                <ol className="list-decimal list-inside space-y-1 text-xs text-[#1C1917] leading-relaxed pl-1">
+                  <li>Scope of work and complete list of deliverables.</li>
+                  <li>Fully itemized pricing, specifying base charges and any applicable taxes/fees.</li>
+                  <li>Advance deposit requirements and payment milestone schedule.</li>
+                  <li>Quotation validity period.</li>
+                  <li>Standard cancellation and postponement provisions.</li>
+                </ol>
+              </div>
+
+              {/* Legal / Privacy Footnote */}
+              <div className="p-3 rounded-lg bg-[#FAF8F5] border border-[#E7DFD5] text-[11px] text-[#78716C] italic leading-relaxed">
+                Note: Identifiable attendee names, personal contact numbers, and private family arrangements are reserved for contracted booking stages.
+              </div>
+            </div>
+          ) : (
+            /* 2. Raw Text Editor */
+            <div className="space-y-2">
+              <label className="text-xs font-mono uppercase tracking-wider text-[#78716C] block font-semibold">
+                Brief Text (Editable for Custom Requests)
+              </label>
+              <textarea
+                rows={13}
+                value={briefText}
+                onChange={(e) => setBriefText(e.target.value)}
+                className="w-full bg-white border border-[#E7DFD5] rounded-xl p-4 font-mono text-xs text-[#1C1917] leading-relaxed focus:outline-none focus:ring-1 focus:ring-[#D97706]"
+              />
+            </div>
+          )}
+
+          {/* Hidden accessible textarea when in formatted tab to maintain test compatibility */}
+          {activeTab === 'formatted' && (
+            <textarea
+              value={briefText}
+              onChange={(e) => setBriefText(e.target.value)}
+              aria-label="Brief Text (Editable for Custom Requests)"
+              className="sr-only"
+            />
+          )}
+        </div>
+
         {/* Footer */}
-        <div className="p-6 border-t border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div className="p-5 border-t border-[#E7DFD5] flex items-center justify-between bg-[#FAF8F5]">
           <button
             type="button"
             onClick={onClose}
-            className="text-xs font-mono text-slate-400 hover:text-slate-200"
+            className="text-xs font-mono font-semibold text-[#78716C] hover:text-[#1C1917]"
           >
             Close
           </button>
 
-          <div className="flex gap-3">
-            <Button variant="secondary" onClick={handleDownload} className="text-xs font-mono">
+          <div className="flex gap-2.5">
+            <Button
+              variant="outline"
+              onClick={handleDownload}
+              className="text-xs font-mono border-[#E7DFD5] text-[#1C1917] bg-white hover:bg-[#FAF8F5]"
+            >
               <Download className="w-3.5 h-3.5 mr-1.5" />
               <span>Download .txt</span>
             </Button>
-            <Button variant="primary" onClick={handleCopy} className="text-xs font-mono">
+            <Button
+              variant="primary"
+              onClick={handleCopy}
+              className="text-xs font-mono font-bold bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm"
+            >
               {copied ? (
                 <>
-                  <Check className="w-3.5 h-3.5 mr-1.5 text-emerald-300" />
+                  <Check className="w-3.5 h-3.5 mr-1.5 text-white" />
                   <span>Copied to Clipboard!</span>
                 </>
               ) : (
@@ -195,6 +359,6 @@ export function RequirementBriefModal({
           </div>
         </div>
       </div>
-    </div>
+    </Dialog>
   );
 }

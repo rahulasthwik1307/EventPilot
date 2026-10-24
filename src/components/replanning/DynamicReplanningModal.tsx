@@ -403,7 +403,7 @@ export function DynamicReplanningModal({
                   ? 'Select at least one proposal to apply.'
                   : undefined
               }
-              className="inline-flex items-center justify-center gap-1.5 px-5 py-2 rounded-md text-xs font-semibold text-neutral-text bg-primary hover:bg-primary-hover hover:text-white transition-colors shadow-xs disabled:opacity-60 w-full sm:w-auto"
+              className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-md text-xs font-bold text-neutral-text bg-primary hover:bg-primary-hover transition-all shadow-xs active:scale-[0.98] disabled:opacity-60 w-full sm:w-auto"
             >
               <Check className="w-4 h-4" />
               <span>

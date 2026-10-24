@@ -13,6 +13,7 @@ import {
 } from '@/features/vendors/quotations/comparison-engine';
 import { formatCurrency } from '@/features/events/validation';
 import { Button } from '../../ui/Button';
+import { Dialog } from '../../ui/Dialog';
 import { CouponBadge } from '../../ui/Badge';
 import {
   AlertCircle,
@@ -27,6 +28,7 @@ import {
   Mail,
   MinusCircle,
   Plus,
+  Scale,
   ShieldAlert,
   Sparkles,
   Star,
@@ -125,47 +127,42 @@ export function QuotationComparisonView({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-slate-900 border border-amber-500/30 rounded-xl shadow-2xl w-full max-w-6xl max-h-[92vh] flex flex-col my-auto text-amber-50">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-6 border-b border-slate-800 gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-semibold">
-                Vendor Procurement
-              </span>
-              <CouponBadge variant="marigold">Side-by-Side Comparison</CouponBadge>
-            </div>
-            <h2 className="font-serif text-2xl sm:text-3xl font-medium text-amber-100">
-              Quotation Comparison &amp; Scope Alignment
-            </h2>
-            <p className="text-xs text-slate-400 mt-1">
-              Objective side-by-side comparison across pricing, scope deliverables, hidden charges, and contract terms.
-            </p>
+    <Dialog
+      isOpen={isOpen}
+      onClose={onClose}
+      title={
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-[#C2410C] font-bold">
+              Vendor Procurement
+            </span>
+            <CouponBadge variant="marigold">Side-by-Side Comparison</CouponBadge>
           </div>
-
-          <div className="flex items-center gap-3">
-            <Button
-              variant="secondary"
-              onClick={() => onAddNewQuote(selectedCategory)}
-              className="text-xs font-mono"
-            >
-              <Plus className="w-3.5 h-3.5 mr-1.5" />
-              <span>Add Quotation</span>
-            </Button>
-            <button
-              onClick={onClose}
-              className="text-slate-400 hover:text-amber-200 transition-colors p-2 rounded-lg hover:bg-slate-800"
-              aria-label="Close modal"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+          <span className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917] tracking-tight">
+            Quotation Comparison &amp; Scope Alignment
+          </span>
         </div>
+      }
+      description="Objective side-by-side comparison across pricing, scope deliverables, hidden charges, and contract terms."
+      headerActions={
+        <Button
+          variant="outline"
+          onClick={() => onAddNewQuote(selectedCategory)}
+          className="text-xs font-mono font-bold border-neutral-border bg-neutral-surface text-neutral-text hover:bg-neutral-subtle shadow-sm"
+        >
+          <Plus className="w-3.5 h-3.5 mr-1.5 text-primary" />
+          <span>Add Quotation</span>
+        </Button>
+      }
+      maxWidth="3xl"
+      accentBar
+      contentPadding={false}
+    >
+      <div className="flex flex-col flex-1 min-h-0 bg-white">
 
         {/* Category Tabs */}
         {availableCategories.length > 1 && (
-          <div className="flex border-b border-slate-800 px-6 overflow-x-auto gap-2 py-2.5 bg-slate-950/40">
+          <div className="flex border-b border-[#E7DFD5] px-6 overflow-x-auto gap-2 py-2.5 bg-[#FAF8F5]">
             {availableCategories.map((cat) => (
               <button
                 key={cat}
@@ -173,8 +170,8 @@ export function QuotationComparisonView({
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-mono capitalize transition-all ${
                   selectedCategory === cat
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                    ? 'bg-[#FFEDD5] text-[#9A3412] font-bold border border-[#FED7AA]'
+                    : 'text-[#78716C] hover:text-[#1C1917] hover:bg-white border border-transparent'
                 }`}
               >
                 {cat} ({allQuotations.filter((q) => q.serviceCategory === cat && q.status !== 'archived').length})
@@ -184,20 +181,20 @@ export function QuotationComparisonView({
         )}
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1">
+        <div className="p-6 overflow-y-auto space-y-6 flex-1 bg-[#FAF8F5]/30">
           {categoryQuotes.length === 0 ? (
-            <div className="p-12 text-center border border-dashed border-slate-800 rounded-xl space-y-3">
-              <FileText className="w-10 h-10 text-slate-600 mx-auto" />
-              <p className="text-sm font-medium text-amber-200">
+            <div className="p-12 text-center border border-dashed border-[#E7DFD5] rounded-xl space-y-3 bg-white">
+              <FileText className="w-10 h-10 text-[#A8A29E] mx-auto opacity-60" />
+              <p className="text-sm font-semibold text-[#1C1917]">
                 No quotations recorded for {selectedCategory}.
               </p>
-              <p className="text-xs text-slate-400 max-w-md mx-auto">
+              <p className="text-xs text-[#78716C] max-w-md mx-auto leading-relaxed">
                 Record quotations to compare deliverables, unincluded taxes, payment milestones, and negotiate effectively.
               </p>
               <Button
                 variant="primary"
                 onClick={() => onAddNewQuote(selectedCategory)}
-                className="mt-2"
+                className="mt-2 bg-[#D97706] hover:bg-[#B45309] text-white border-0"
               >
                 <Plus className="w-4 h-4 mr-1.5" />
                 <span>Record First Quotation</span>
@@ -207,28 +204,28 @@ export function QuotationComparisonView({
             <>
               {/* Variance & Metrics Header Card */}
               {categoryQuotes.length > 1 && !comparisonResult.hasCurrencyMismatch && (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-950 border border-slate-800 rounded-xl p-4">
-                  <div>
-                    <span className="text-xs font-mono uppercase tracking-wider text-slate-400 block mb-1">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 bg-white border border-[#E7DFD5] rounded-xl p-4 shadow-sm">
+                  <div className="p-3 bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg">
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-[#78716C] font-semibold block mb-1">
                       Lowest Quoted Total
                     </span>
-                    <span className="font-mono text-xl font-bold text-amber-300">
+                    <span className="font-mono text-xl font-bold text-[#059669]">
                       {formatCurrency(comparisonResult.basePriceComparison.lowestQuotedTotal, comparisonResult.currency)}
                     </span>
                   </div>
-                  <div>
-                    <span className="text-xs font-mono uppercase tracking-wider text-slate-400 block mb-1">
+                  <div className="p-3 bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg">
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-[#78716C] font-semibold block mb-1">
                       Highest Quoted Total
                     </span>
-                    <span className="font-mono text-xl font-bold text-amber-300">
+                    <span className="font-mono text-xl font-bold text-[#1C1917]">
                       {formatCurrency(comparisonResult.basePriceComparison.highestQuotedTotal, comparisonResult.currency)}
                     </span>
                   </div>
-                  <div>
-                    <span className="text-xs font-mono uppercase tracking-wider text-slate-400 block mb-1">
+                  <div className="p-3 bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg">
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-[#C2410C] font-semibold block mb-1">
                       Price Variance
                     </span>
-                    <span className="font-mono text-xl font-bold text-secondary">
+                    <span className="font-mono text-xl font-bold text-[#C2410C]">
                       {formatCurrency(comparisonResult.basePriceComparison.variance, comparisonResult.currency)}
                     </span>
                   </div>
@@ -237,8 +234,8 @@ export function QuotationComparisonView({
 
               {/* Currency Mismatch Warning Banner */}
               {comparisonResult.hasCurrencyMismatch && (
-                <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-3 font-mono">
-                  <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                <div className="p-4 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] text-[#92400E] text-xs flex items-start gap-3 font-mono">
+                  <AlertTriangle className="w-5 h-5 text-[#D97706] shrink-0 mt-0.5" />
                   <div>
                     <strong className="block text-sm font-semibold mb-1">Currency Mismatch Detected</strong>
                     These quotations are denominated in different currencies. Direct mathematical netting is disabled to prevent misleading exchange approximations. Evaluate each package against local rate standards.
@@ -272,48 +269,50 @@ export function QuotationComparisonView({
                   return (
                     <div
                       key={quote.id}
-                      className={`bg-slate-950/70 border rounded-xl p-5 flex flex-col justify-between transition-all duration-200 hover:border-amber-500/40 ${
-                        isCheapest ? 'border-amber-500/50 shadow-md ring-1 ring-amber-500/20' : 'border-slate-800'
+                      className={`bg-white border rounded-xl p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-md ${
+                        isCheapest
+                          ? 'border-[#D97706] shadow-sm ring-1 ring-[#D97706]/30 bg-[#FEF3C7]/10'
+                          : 'border-[#E7DFD5] hover:border-[#D6C7B2]'
                       }`}
                     >
                       {/* Top Meta */}
-                      <div className="space-y-4">
+                      <div className="space-y-3.5">
                         <div className="flex items-start justify-between gap-2">
                           <div>
-                            <span className="text-xs font-mono uppercase tracking-wider text-slate-400 block">
+                            <span className="text-[11px] font-mono uppercase tracking-wider text-[#78716C] block">
                               {quote.vendorName}
                             </span>
-                            <h4 className="font-serif text-lg font-medium text-amber-100">
+                            <h4 className="font-serif text-lg font-bold text-[#1C1917] tracking-tight">
                               {quote.title}
                             </h4>
                           </div>
                           {isCheapest && (
-                            <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] shrink-0">
                               Lowest Base
                             </span>
                           )}
                         </div>
 
                         {/* Price Block */}
-                        <div className="p-3 bg-slate-900/80 border border-slate-800 rounded-lg">
+                        <div className="p-3 bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg">
                           <div className="flex items-baseline justify-between">
-                            <span className="font-mono text-2xl font-bold text-amber-300">
+                            <span className="font-mono text-2xl font-bold text-[#1C1917]">
                               {formatCurrency(quote.quotedTotal, quote.currency)}
                             </span>
-                            <span className="text-[11px] font-mono text-slate-400">
+                            <span className="text-[11px] font-mono text-[#78716C]">
                               {quote.currency}
                             </span>
                           </div>
 
                           {unincludedTaxes.length > 0 ? (
-                            <p className="text-[11px] font-mono text-amber-400 mt-1 flex items-center gap-1">
+                            <p className="text-[11px] font-mono text-[#C2410C] mt-1 flex items-center gap-1">
                               <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                               <span>
                                 Excl. {formatCurrency(unincludedSum, quote.currency)} taxes (Effective: {formatCurrency(effectiveTotal, quote.currency)})
                               </span>
                             </p>
                           ) : (
-                            <p className="text-[11px] font-mono text-emerald-400 mt-1">
+                            <p className="text-[11px] font-mono text-[#059669] mt-1 font-medium">
                               ✓ All taxes included in total
                             </p>
                           )}
@@ -321,41 +320,41 @@ export function QuotationComparisonView({
 
                         {/* Deposit & Valid dates */}
                         <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                          <div className="p-2 bg-slate-900/50 rounded border border-slate-800/80">
-                            <span className="text-[10px] text-slate-400 block uppercase">Deposit Required</span>
-                            <span className="text-slate-200">
+                          <div className="p-2 bg-[#FAF8F5] rounded border border-[#E7DFD5]">
+                            <span className="text-[10px] text-[#78716C] block uppercase font-semibold">Deposit Required</span>
+                            <span className="text-[#1C1917] font-medium">
                               {quote.depositRequired
                                 ? `${formatCurrency(quote.depositRequired, quote.currency)} (${Math.round((quote.depositRequired / quote.quotedTotal) * 100)}%)`
                                 : 'Not specified'}
                             </span>
                           </div>
-                          <div className="p-2 bg-slate-900/50 rounded border border-slate-800/80">
-                            <span className="text-[10px] text-slate-400 block uppercase">Quote Validity</span>
-                            <span className="text-slate-200">
+                          <div className="p-2 bg-[#FAF8F5] rounded border border-[#E7DFD5]">
+                            <span className="text-[10px] text-[#78716C] block uppercase font-semibold">Quote Validity</span>
+                            <span className="text-[#1C1917] font-medium">
                               {quote.validUntilDate || 'No date set'}
                             </span>
                           </div>
                         </div>
 
                         {/* Deliverables Section */}
-                        <div className="space-y-2">
-                          <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-semibold block">
+                        <div className="space-y-1.5">
+                          <span className="text-[11px] font-mono uppercase tracking-wider text-[#D97706] font-bold block">
                             Deliverables ({quote.includedServices.length})
                           </span>
-                          <ul className="space-y-1.5 text-xs text-slate-300">
+                          <ul className="space-y-1 text-xs text-[#1C1917]">
                             {(quote.includedServices || []).map((svc: { description: string; itemizedCost?: number }, sIdx: number) => {
                               const isUnique = uniqueItems.includes(svc.description);
                               return (
                                 <li key={sIdx} className="flex items-start gap-1.5">
                                   {isUnique ? (
-                                    <Star className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                                    <Star className="w-3.5 h-3.5 text-[#D97706] shrink-0 mt-0.5" />
                                   ) : (
-                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-[#059669] shrink-0 mt-0.5" />
                                   )}
-                                  <span className={isUnique ? 'text-amber-200 font-medium' : ''}>
+                                  <span className={isUnique ? 'text-[#92400E] font-bold' : ''}>
                                     {svc.description}
                                     {svc.itemizedCost !== undefined && (
-                                      <span className="font-mono text-slate-400 ml-1">
+                                      <span className="font-mono text-[#78716C] ml-1">
                                         ({formatCurrency(svc.itemizedCost, quote.currency)})
                                       </span>
                                     )}
@@ -368,14 +367,14 @@ export function QuotationComparisonView({
 
                         {/* Exclusions Section */}
                         {quote.exclusions && quote.exclusions.length > 0 && (
-                          <div className="space-y-1.5 border-t border-slate-800/80 pt-3">
-                            <span className="text-[11px] font-mono uppercase tracking-wider text-rose-400 font-semibold block">
+                          <div className="space-y-1 border-t border-[#E7DFD5] pt-2.5">
+                            <span className="text-[10px] font-mono uppercase tracking-wider text-[#C2410C] font-bold block">
                               Explicit Exclusions
                             </span>
-                            <ul className="space-y-1 text-xs text-rose-300">
+                            <ul className="space-y-0.5 text-xs text-[#C2410C]">
                               {(quote.exclusions || []).map((ex: string, eIdx: number) => (
                                 <li key={eIdx} className="flex items-start gap-1.5">
-                                  <MinusCircle className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
+                                  <MinusCircle className="w-3.5 h-3.5 text-[#C2410C] shrink-0 mt-0.5" />
                                   <span>{ex}</span>
                                 </li>
                               ))}
@@ -385,14 +384,14 @@ export function QuotationComparisonView({
 
                         {/* Missing Information Alerts */}
                         {missingTerms.length > 0 && (
-                          <div className="space-y-1 border-t border-slate-800/80 pt-3">
-                            <span className="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-semibold block">
+                          <div className="space-y-1 border-t border-[#E7DFD5] pt-2.5">
+                            <span className="text-[10px] font-mono uppercase tracking-wider text-[#D97706] font-bold block">
                               Missing Terms to Clarify
                             </span>
-                            <ul className="space-y-0.5 text-xs text-amber-300/80">
+                            <ul className="space-y-0.5 text-xs text-[#92400E]">
                               {missingTerms.map((m, mIdx) => (
                                 <li key={mIdx} className="flex items-start gap-1.5">
-                                  <AlertCircle className="w-3 h-3 text-amber-400 shrink-0 mt-0.5" />
+                                  <AlertCircle className="w-3 h-3 text-[#D97706] shrink-0 mt-0.5" />
                                   <span>{m}</span>
                                 </li>
                               ))}
@@ -402,11 +401,11 @@ export function QuotationComparisonView({
                       </div>
 
                       {/* Bottom Actions */}
-                      <div className="pt-5 border-t border-slate-800/80 space-y-2 mt-4">
+                      <div className="pt-4 border-t border-[#E7DFD5] space-y-2 mt-4">
                         <Button
                           variant="primary"
                           onClick={() => onPromoteQuote(quote)}
-                          className="w-full justify-center text-xs"
+                          className="w-full justify-center text-xs font-mono font-bold bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
                           <span>Accept &amp; Stage Proposal</span>
@@ -416,17 +415,17 @@ export function QuotationComparisonView({
                           <button
                             type="button"
                             onClick={() => onDraftMessage(quote)}
-                            className="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg text-xs font-mono text-amber-200 flex items-center justify-center gap-1 transition-colors"
+                            className="px-2.5 py-1.5 bg-[#FAF8F5] hover:bg-[#F5F2EB] border border-[#E7DFD5] rounded-lg text-xs font-mono text-[#1C1917] flex items-center justify-center gap-1 transition-colors font-medium"
                           >
-                            <Mail className="w-3 h-3" />
+                            <Mail className="w-3 h-3 text-[#78716C]" />
                             <span>Message</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => onEditQuote(quote)}
-                            className="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg text-xs font-mono text-slate-300 flex items-center justify-center gap-1 transition-colors"
+                            className="px-2.5 py-1.5 bg-[#FAF8F5] hover:bg-[#F5F2EB] border border-[#E7DFD5] rounded-lg text-xs font-mono text-[#1C1917] flex items-center justify-center gap-1 transition-colors font-medium"
                           >
-                            <FileText className="w-3 h-3" />
+                            <FileText className="w-3 h-3 text-[#78716C]" />
                             <span>Edit Quote</span>
                           </button>
                         </div>
@@ -437,71 +436,71 @@ export function QuotationComparisonView({
               </div>
 
               {/* Findings & Qualitative Insights Section */}
-              <div className="border-t border-slate-800 pt-6 space-y-4">
+              <div className="border-t border-[#E7DFD5] pt-5 space-y-3.5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <h3 className="font-serif text-lg font-medium text-amber-100 flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-amber-400" />
+                    <h3 className="font-serif text-lg font-bold text-[#1C1917] flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#D97706]" />
                       <span>Comparative Findings &amp; Trade-Offs</span>
                     </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-[#78716C] mt-0.5">
                       Direct mathematical facts and qualitative trade-offs to help you decide.
                     </p>
                   </div>
 
                   {!aiFindingsAdded && categoryQuotes.length >= 2 && (
                     <Button
-                      variant="secondary"
+                      variant="outline"
                       onClick={handleFetchAiInsights}
                       disabled={isFetchingAiInsights}
-                      className="text-xs font-mono self-start sm:self-auto"
+                      className="text-xs font-mono self-start sm:self-auto border-[#E7DFD5] bg-white text-[#1C1917] hover:bg-[#FAF8F5]"
                     >
-                      <Sparkles className="w-3.5 h-3.5 mr-1.5 text-amber-400" />
+                      <Sparkles className="w-3.5 h-3.5 mr-1.5 text-[#D97706]" />
                       <span>{isFetchingAiInsights ? 'Analyzing Insights...' : 'Analyze Qualitative Insights'}</span>
                     </Button>
                   )}
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {comparisonResult.findings.map((f, idx) => {
                     const isAi = f.isAiInterpretation;
                     return (
                       <div
                         key={idx}
-                        className={`p-3.5 rounded-lg border flex items-start gap-3 text-xs ${
+                        className={`p-3.5 rounded-xl border flex items-start gap-3 text-xs ${
                           f.severity === 'alert'
-                            ? 'bg-rose-500/10 border-rose-500/30 text-rose-200'
+                            ? 'bg-[#FEF2F2] border-[#FCA5A5] text-[#991B1B]'
                             : f.severity === 'warning'
-                            ? 'bg-amber-500/10 border-amber-500/30 text-amber-200'
-                            : 'bg-slate-950/60 border-slate-800 text-slate-300'
+                            ? 'bg-[#FFFBEB] border-[#FDE68A] text-[#92400E]'
+                            : 'bg-white border-[#E7DFD5] text-[#1C1917]'
                         }`}
                       >
                         <div className="mt-0.5">
                           {f.severity === 'alert' ? (
-                            <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
+                            <ShieldAlert className="w-4 h-4 text-[#DC2626] shrink-0" />
                           ) : f.severity === 'warning' ? (
-                            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                            <AlertTriangle className="w-4 h-4 text-[#D97706] shrink-0" />
                           ) : (
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                            <CheckCircle2 className="w-4 h-4 text-[#059669] shrink-0" />
                           )}
                         </div>
 
                         <div className="space-y-1 flex-1">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-amber-100">{f.summary}</span>
+                            <span className="font-bold text-[#1C1917]">{f.summary}</span>
                             <span
-                              className={`px-1.5 py-0.2 rounded text-[10px] font-mono uppercase ${
+                              className={`px-1.5 py-0.2 rounded text-[10px] font-mono uppercase font-semibold ${
                                 isAi
-                                  ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                                  : 'bg-slate-800 text-slate-300 border border-slate-700'
+                                  ? 'bg-[#F3E8FF] text-[#6B21A8] border border-[#E9D5FF]'
+                                  : 'bg-[#FAF8F5] text-[#78716C] border border-[#E7DFD5]'
                               }`}
                             >
                               {isAi ? 'AI Qualitative Insight' : 'Direct Quote Fact'}
                             </span>
                           </div>
-                          <p className="leading-relaxed">{f.detail}</p>
+                          <p className="leading-relaxed text-[#78716C]">{f.detail}</p>
                           {f.sourceEvidence && (
-                            <p className="font-mono text-[10px] text-slate-500">
+                            <p className="font-mono text-[10px] text-[#A8A29E]">
                               Basis: {f.sourceEvidence}
                             </p>
                           )}
@@ -516,12 +515,16 @@ export function QuotationComparisonView({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-slate-800 flex items-center justify-end bg-slate-950/60">
-          <Button variant="secondary" onClick={onClose}>
+        <div className="p-4 border-t border-[#E7DFD5] flex items-center justify-end bg-[#FAF8F5]">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="text-xs font-mono font-bold border-[#E7DFD5] bg-white text-[#1C1917] hover:bg-[#FAF8F5]"
+          >
             <span>Done</span>
           </Button>
         </div>
       </div>
-    </div>
+    </Dialog>
   );
 }

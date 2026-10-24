@@ -14,6 +14,14 @@ import {
   AlertTriangle,
   Armchair,
   Sliders,
+  Check,
+  AlertCircle,
+  TrendingUp,
+  Layers,
+  ChevronRight,
+  ShieldCheck,
+  Utensils,
+  ExternalLink,
 } from 'lucide-react';
 import { Event } from '../../features/events/types';
 import {
@@ -48,12 +56,6 @@ export function OverviewTab({
   lastSavedAt,
 }: OverviewTabProps) {
   const daysLeft = calculateDaysRemaining(event.date);
-  const countdownLabel =
-    daysLeft === 0
-      ? 'Today'
-      : daysLeft > 0
-      ? `${daysLeft} days away`
-      : `${Math.abs(daysLeft)} days ago`;
 
   const categories = useMemo(() => event.categories || [], [event.categories]);
   const expenses = useMemo(() => event.expenses || [], [event.expenses]);
@@ -64,7 +66,7 @@ export function OverviewTab({
   const tables = useMemo(() => event.tables || [], [event.tables]);
   const assignments = useMemo(() => event.assignments || [], [event.assignments]);
 
-  // Deterministic financial math
+  // Pure deterministic calculations
   const summary = useMemo(() => {
     return calculateBudgetSummary(
       event.budgetCap,
@@ -105,19 +107,24 @@ export function OverviewTab({
     [tables, assignments, guests]
   );
 
-  // Calculate next upcoming milestone
-  const nextMilestone = useMemo(() => {
-    if (!milestones || milestones.length === 0) return null;
-    const sorted = [...milestones].sort((a, b) => a.offsetDays - b.offsetDays);
-    const withDates = sorted.map((m) => ({
-      ...m,
-      effectiveDate: calculateMilestoneDate(event.date, m.offsetDays),
-    }));
-    const future = withDates.find((m) => m.effectiveDate >= todayStr);
-    return future || withDates[0];
-  }, [milestones, event.date, todayStr]);
+  // Sorted Milestones with Effective Dates
+  const milestonesWithDates = useMemo(() => {
+    if (!milestones || milestones.length === 0) return [];
+    return [...milestones]
+      .sort((a, b) => a.offsetDays - b.offsetDays)
+      .map((m) => ({
+        ...m,
+        effectiveDate: calculateMilestoneDate(event.date, m.offsetDays),
+      }));
+  }, [milestones, event.date]);
 
-  // Deterministic Celebration Readiness Score (0-100%)
+  // Upcoming Milestones sequence (first 3 upcoming)
+  const upcomingMilestones = useMemo(() => {
+    const future = milestonesWithDates.filter((m) => m.effectiveDate >= todayStr);
+    return (future.length > 0 ? future : milestonesWithDates).slice(0, 3);
+  }, [milestonesWithDates, todayStr]);
+
+  // Deterministic Celebration Readiness Composite Score (0-100%)
   const readiness = useMemo(() => {
     const budgetScore =
       event.budgetCap > 0
@@ -128,104 +135,240 @@ export function OverviewTab({
       event.guestTarget > 0
         ? Math.min(Math.round((attendanceSummary.expectedAttendance / event.guestTarget) * 100), 100)
         : 0;
-    const composite = Math.round((budgetScore * 0.4) + (taskScore * 0.3) + (rsvpScore * 0.3));
+    const composite = Math.round(budgetScore * 0.4 + taskScore * 0.3 + rsvpScore * 0.3);
     return {
       score: Math.max(10, Math.min(composite, 100)),
       budgetScore,
       taskScore,
       rsvpScore,
     };
-  }, [summary.totalAllocated, event.budgetCap, taskMetrics.pct, attendanceSummary.expectedAttendance, event.guestTarget]);
+  }, [
+    summary.totalAllocated,
+    event.budgetCap,
+    taskMetrics.pct,
+    attendanceSummary.expectedAttendance,
+    event.guestTarget,
+  ]);
+
+  // Action Radar Items (Urgent bottlenecks needing immediate human attention)
+  const actionRadarItems = useMemo(() => {
+    const items: {
+      id: string;
+      title: string;
+      detail: string;
+      severity: 'urgent' | 'warning' | 'info';
+      tab: WorkspaceTab;
+      actionLabel: string;
+    }[] = [];
+
+    if (taskMetrics.overdue > 0) {
+      items.push({
+        id: 'overdue-tasks',
+        title: `${taskMetrics.overdue} Overdue Ritual Task${taskMetrics.overdue > 1 ? 's' : ''}`,
+        detail: 'Scheduled milestone checklists need review to keep your timeline on track.',
+        severity: 'urgent',
+        tab: 'timeline',
+        actionLabel: 'Resolve Tasks',
+      });
+    }
+
+    if (summary.isOverAllocated) {
+      items.push({
+        id: 'budget-deficit',
+        title: `Budget Cap Over-Allocated by ${formatCurrency(Math.abs(summary.unallocatedBudget), event.currency)}`,
+        detail: 'Category plans exceed total budget ceiling. Re-balance allocations or expand cap.',
+        severity: 'urgent',
+        tab: 'budget',
+        actionLabel: 'Re-balance Budget',
+      });
+    }
+
+    if (seatingSummary.unassignedExpected > 0 && tables.length > 0) {
+      items.push({
+        id: 'unseated-guests',
+        title: `${seatingSummary.unassignedExpected} Confirmed Guest${seatingSummary.unassignedExpected > 1 ? 's' : ''} Awaiting Seats`,
+        detail: 'Tables are configured but seats are not yet assigned to all attending households.',
+        severity: 'warning',
+        tab: 'seating',
+        actionLabel: 'Assign Seats',
+      });
+    }
+
+    if (vendorFinancials.overpaidCount > 0) {
+      items.push({
+        id: 'vendor-overpaid',
+        title: `${vendorFinancials.overpaidCount} Vendor Payment${vendorFinancials.overpaidCount > 1 ? 's' : ''} Exceed Agreement`,
+        detail: 'Advances recorded exceed established contract commitments.',
+        severity: 'warning',
+        tab: 'vendors',
+        actionLabel: 'Audit Contracts',
+      });
+    }
+
+    return items;
+  }, [
+    taskMetrics.overdue,
+    summary.isOverAllocated,
+    summary.unallocatedBudget,
+    event.currency,
+    seatingSummary.unassignedExpected,
+    tables.length,
+    vendorFinancials.overpaidCount,
+  ]);
+
+  // SVG Gauge calculations for the Master Readiness Dial
+  const radius = 38;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (readiness.score / 100) * circumference;
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      {/* 1. Auspicious Celebration Master Readiness & Countdown */}
-      <div className="bg-neutral-surface border border-neutral-border rounded-lg p-6 sm:p-7 shadow-card relative overflow-hidden">
-        {/* Subtle decorative almanac accent line */}
+    <div className="space-y-6">
+      {/* =========================================================================
+          1. EXECUTIVE MASTER PLAN & READINESS DECK
+          (No duplicate title, date, or location which are already in top header)
+      ========================================================================= */}
+      <section className="bg-neutral-surface border border-neutral-border rounded-xl p-5 sm:p-7 shadow-card relative overflow-hidden">
+        {/* Panchang Ceremonial Accent Header Hairline */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-primary" />
 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          {/* Left Column: Health Narrative & Operational Highlights */}
           <div className="space-y-3 max-w-xl">
             <div className="flex flex-wrap items-center gap-2">
-              <CouponBadge variant={event.isSample ? 'terracotta' : 'marigold'}>
-                {event.isSample ? 'SAMPLE CELEBRATION' : 'ACTIVE PERSONAL PLAN'}
-              </CouponBadge>
-              <span className="text-xs font-mono uppercase tracking-wider text-neutral-text/75">
-                {event.type} Archetype
+              <span className="text-xs font-mono uppercase tracking-wider text-secondary font-bold">
+                Almanac Executive Deck
               </span>
+              <CouponBadge variant="marigold">Live Execution Health</CouponBadge>
             </div>
 
             <div>
-              <h2 className="font-display text-2xl sm:text-3xl font-semibold text-neutral-text">
-                Celebration Master Readiness
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-neutral-text tracking-tight">
+                Celebration Master Health &amp; Readiness
               </h2>
-              <p className="text-xs sm:text-sm text-neutral-text/80 mt-1 leading-relaxed">
-                Deterministic readiness across budget allocations, ritual milestones, vendor contracts, and guest attendance.
+              <p className="text-xs sm:text-sm text-neutral-muted mt-1 leading-relaxed">
+                Deterministic mathematical tracking across budget capital, ritual milestones, guest attendance, and banquet seating.
               </p>
             </div>
 
-            {/* Next Milestone Ticker */}
-            {nextMilestone && (
-              <div className="flex items-center gap-2.5 text-xs bg-neutral-subtle/80 border border-neutral-border/80 px-3.5 py-2.5 rounded-md">
-                <Clock className="w-4 h-4 text-secondary flex-shrink-0" />
-                <div className="min-w-0 truncate">
-                  <span className="font-semibold text-neutral-text">Next Scheduled Milestone: </span>
-                  <span className="text-neutral-text/90 font-medium">{nextMilestone.title}</span>
-                  <span className="text-neutral-text/70 font-mono ml-1.5">
-                    ({formatDateDisplay(nextMilestone.effectiveDate)})
-                  </span>
-                </div>
+            {/* Cultural Tradition / Theme Banner (Full text, never truncated!) */}
+            {event.culturalContext?.traditionOrTheme && (
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary-subtle border border-primary/30 text-neutral-text text-xs">
+                <Sparkles className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                <span className="font-semibold text-neutral-text">Tradition &amp; Ritual:</span>
+                <span className="font-medium text-neutral-text/90">
+                  {event.culturalContext.traditionOrTheme}
+                </span>
               </div>
             )}
 
-            {event.culturalContext?.traditionOrTheme && (
-              <div className="text-xs text-neutral-text/85 bg-neutral-surface border border-neutral-border/70 p-2.5 rounded-md">
-                <span className="font-semibold text-neutral-text">Tradition / Theme: </span>
-                {event.culturalContext.traditionOrTheme}
-              </div>
-            )}
+            {/* High-Level Pulse Badges (Data not shown in top bar) */}
+            <div className="flex flex-wrap items-center gap-2 text-xs font-mono pt-0.5">
+              <span className="px-2.5 py-1 rounded bg-neutral-subtle border border-neutral-border text-neutral-text">
+                <strong className="text-primary">{categories.length}</strong> Categories Budgeted
+              </span>
+              <span className="px-2.5 py-1 rounded bg-neutral-subtle border border-neutral-border text-neutral-text">
+                <strong className="text-secondary">{taskMetrics.completed}/{taskMetrics.total}</strong> Tasks Completed
+              </span>
+              <span className="px-2.5 py-1 rounded bg-neutral-subtle border border-neutral-border text-neutral-text">
+                <strong className="text-status-success">{seatingSummary.totalTables}</strong> Tables Arranged
+              </span>
+              <span className="px-2.5 py-1 rounded bg-neutral-subtle border border-neutral-border text-neutral-text">
+                <strong className="text-neutral-text">{vendorFinancials.bookedCount}</strong> Vendors Booked
+              </span>
+            </div>
           </div>
 
-          {/* Master Readiness Gauge & Composite Pillars */}
-          <div className="lg:w-80 flex-shrink-0 bg-neutral-subtle/40 border border-neutral-border/60 rounded-lg p-5">
-            <div className="flex items-baseline justify-between mb-2">
-              <span className="text-xs font-mono uppercase tracking-wider text-neutral-text/75 font-semibold">
-                Almanac Readiness
-              </span>
-              <span className="font-mono text-2xl font-bold text-neutral-text">
-                {readiness.score}%
-              </span>
+          {/* Right Column: Master Execution Score Card with Radial Gauge */}
+          <div className="lg:w-84 flex-shrink-0 bg-neutral-subtle/50 border border-neutral-border rounded-lg p-4 sm:p-5 shadow-xs">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <div>
+                <span className="text-[11px] font-mono uppercase tracking-wider text-secondary font-bold block mb-0.5">
+                  Execution Score
+                </span>
+                <h3 className="font-display text-base font-bold text-neutral-text">
+                  Master Readiness
+                </h3>
+              </div>
+
+              {/* Radial Score Gauge */}
+              <div className="relative w-14 h-14 flex items-center justify-center flex-shrink-0">
+                <svg className="w-14 h-14 transform -rotate-90" viewBox="0 0 90 90">
+                  <circle
+                    cx="45"
+                    cy="45"
+                    r={radius}
+                    className="stroke-neutral-border/60"
+                    strokeWidth="7"
+                    fill="transparent"
+                  />
+                  <circle
+                    cx="45"
+                    cy="45"
+                    r={radius}
+                    className="stroke-primary transition-all duration-700 ease-out"
+                    strokeWidth="7"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={strokeDashoffset}
+                    strokeLinecap="round"
+                    fill="transparent"
+                  />
+                </svg>
+                <span className="absolute font-mono text-sm font-bold text-neutral-text">
+                  {readiness.score}%
+                </span>
+              </div>
             </div>
 
-            <div className="w-full bg-neutral-subtle rounded-full h-2.5 overflow-hidden border border-neutral-border/60 mb-4">
-              <div
-                className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-500 rounded-full"
-                style={{ width: `${readiness.score}%` }}
-              />
-            </div>
-
+            {/* 3 Pillar Progress Bars */}
             <div className="space-y-2 text-xs font-mono">
-              <div className="flex justify-between text-neutral-text/80">
-                <span>Budget Allocated:</span>
-                <span className="font-bold text-neutral-text">{readiness.budgetScore}%</span>
+              <div>
+                <div className="flex justify-between text-neutral-text mb-0.5">
+                  <span>Budget Allocation</span>
+                  <span className="font-bold">{readiness.budgetScore}%</span>
+                </div>
+                <div className="w-full bg-neutral-border/60 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all duration-500"
+                    style={{ width: `${readiness.budgetScore}%` }}
+                  />
+                </div>
               </div>
-              <div className="flex justify-between text-neutral-text/80">
-                <span>Milestone Tasks:</span>
-                <span className="font-bold text-neutral-text">{readiness.taskScore}%</span>
+
+              <div>
+                <div className="flex justify-between text-neutral-text mb-0.5">
+                  <span>Milestone Tasks</span>
+                  <span className="font-bold">{readiness.taskScore}%</span>
+                </div>
+                <div className="w-full bg-neutral-border/60 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className="h-full bg-secondary rounded-full transition-all duration-500"
+                    style={{ width: `${readiness.taskScore}%` }}
+                  />
+                </div>
               </div>
-              <div className="flex justify-between text-neutral-text/80">
-                <span>Guest Target RSVPs:</span>
-                <span className="font-bold text-neutral-text">{readiness.rsvpScore}%</span>
+
+              <div>
+                <div className="flex justify-between text-neutral-text mb-0.5">
+                  <span>Guest Attendance RSVPs</span>
+                  <span className="font-bold">{readiness.rsvpScore}%</span>
+                </div>
+                <div className="w-full bg-neutral-border/60 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className="h-full bg-status-success rounded-full transition-all duration-500"
+                    style={{ width: `${readiness.rsvpScore}%` }}
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-neutral-border/60 flex items-center justify-between text-xs flex-wrap gap-2">
+            {/* Quick Action Links */}
+            <div className="mt-3.5 pt-2.5 border-t border-neutral-border/80 flex items-center justify-between text-xs">
               <button
                 type="button"
                 onClick={onEdit}
-                className="font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 active:translate-x-0.5 transition-transform"
+                className="font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 active:scale-[0.98] transition-all"
               >
-                <span>Edit Celebration Baseline</span>
+                <span>Edit Baseline</span>
                 <ArrowRight className="w-3 h-3" />
               </button>
 
@@ -233,9 +376,9 @@ export function OverviewTab({
                 <button
                   type="button"
                   onClick={onReplan}
-                  className="font-semibold text-primary hover:text-primary-hover flex items-center gap-1"
+                  className="font-bold text-primary hover:text-primary-hover underline flex items-center gap-1 active:scale-[0.98] transition-all"
                 >
-                  <Sliders className="w-3.5 h-3.5" />
+                  <Sliders className="w-3 h-3" />
                   <span>Dynamic Replan</span>
                 </button>
               )}
@@ -243,375 +386,671 @@ export function OverviewTab({
           </div>
         </div>
 
-        {/* Sync & Trust Footer Note */}
-        <div className="border-t border-neutral-border/60 mt-5 pt-3.5 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-text/75 gap-2">
-          <div className="flex items-center gap-2">
+        {/* Sync Note Footer */}
+        <div className="border-t border-neutral-border/60 mt-4 pt-2.5 flex flex-col sm:flex-row items-center justify-between text-[11px] text-neutral-muted gap-2 font-mono">
+          <div className="flex items-center gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-status-success" />
-            <span className="font-mono">
-              Local-First Browser Storage (v1)
+            <span>
+              Local-First Browser Engine (v1)
               {lastSavedAt ? ` · Last synced at ${lastSavedAt}` : ''}
             </span>
           </div>
-
-          <div className="text-neutral-text/70 text-xs font-mono">
-            Deterministic mathematical precision
+          <div className="text-neutral-text-muted">
+            Deterministic mathematics · Zero delegated arithmetic
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* 2. Operations Snapshot (Vendors, Attendance, Seating) */}
-      <div>
-        <div className="flex items-center justify-between mb-3.5">
+      {/* =========================================================================
+          2. "NEEDS ATTENTION TODAY" ACTION RADAR
+      ========================================================================= */}
+      {actionRadarItems.length > 0 ? (
+        <section
+          role="region"
+          aria-label="Action Radar"
+          className="bg-secondary-subtle/30 border border-secondary/30 rounded-xl p-4 shadow-xs space-y-2.5"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse" />
+              <h3 className="font-display text-sm sm:text-base font-bold text-neutral-text">
+                Needs Attention Radar ({actionRadarItems.length} Urgent Items)
+              </h3>
+            </div>
+            <span className="text-[11px] font-mono text-secondary font-bold uppercase tracking-wider">
+              Immediate Action Required
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+            {actionRadarItems.map((item) => (
+              <div
+                key={item.id}
+                className="bg-neutral-surface border border-neutral-border rounded-lg p-3 flex items-start justify-between gap-3 shadow-xs hover:border-secondary/40 transition-all"
+              >
+                <div className="space-y-0.5 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <AlertTriangle className="w-3.5 h-3.5 text-secondary shrink-0" />
+                    <span className="font-semibold text-xs text-neutral-text truncate">
+                      {item.title}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-neutral-muted leading-relaxed pl-5">
+                    {item.detail}
+                  </p>
+                </div>
+
+                {onNavigateTab && (
+                  <button
+                    type="button"
+                    onClick={() => onNavigateTab(item.tab)}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-secondary hover:text-secondary-hover underline shrink-0 pl-1"
+                  >
+                    <span>{item.actionLabel}</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : (
+        <section className="bg-status-success-subtle/40 border border-status-success/30 rounded-lg px-4 py-2.5 flex items-center justify-between text-xs text-status-success font-medium">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-status-success shrink-0" />
+            <span>
+              <strong>Celebration Radar Clear:</strong> All ritual milestones, budget allocations, and guest registrations are in healthy standing.
+            </span>
+          </div>
+          <span className="hidden sm:inline font-mono text-neutral-muted text-[11px]">
+            No active bottlenecks
+          </span>
+        </section>
+      )}
+
+      {/* =========================================================================
+          3. FINANCIAL RUNWAY & RITUAL MILESTONE MATRIX (Balanced 2-Column Grid)
+      ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        {/* FINANCIAL CAPITAL RUNWAY (Span 7 cols on lg) */}
+        <section className="lg:col-span-7 bg-neutral-surface border border-neutral-border rounded-xl p-5 shadow-card flex flex-col justify-between">
           <div>
-            <h3 className="font-display text-xl font-semibold text-neutral-text">
-              Celebration Operations Snapshot
-            </h3>
-            <p className="text-xs text-neutral-muted">
-              Live operational metrics for vendor contracts, guest attendance, and banquet seating.
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Vendor Commitments Card */}
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-neutral-muted">
-                  Vendor Contracts
+            <div className="flex items-center justify-between mb-3 border-b border-neutral-border/60 pb-2.5">
+              <div>
+                <span className="text-[11px] font-mono uppercase tracking-wider text-secondary font-bold block">
+                  Capital Allocation
                 </span>
-                <span className="w-7 h-7 rounded bg-secondary-subtle/80 flex items-center justify-center text-secondary">
-                  <Briefcase className="w-3.5 h-3.5" />
+                <h3 className="font-display text-lg font-bold text-neutral-text">
+                  Financial Capital Runway
+                </h3>
+              </div>
+
+              {onNavigateTab && (
+                <button
+                  type="button"
+                  onClick={() => onNavigateTab('budget')}
+                  className="text-xs font-bold text-secondary hover:text-secondary-hover underline flex items-center gap-1 active:scale-[0.98] transition-all"
+                >
+                  <span>Manage Ledger</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+
+            {/* 4 Financial Figures in a well-spaced 2x2 grid with ample room for large numbers */}
+            <div className="grid grid-cols-2 gap-3 my-3">
+              <div className="bg-neutral-subtle/60 border border-neutral-border p-3 rounded-lg">
+                <span className="text-[11px] uppercase font-semibold text-neutral-muted block mb-0.5">
+                  Total Budget Cap
+                </span>
+                <p className="font-mono text-base sm:text-lg font-bold text-neutral-text tracking-tight">
+                  {formatCurrency(summary.budgetCap, event.currency)}
+                </p>
+                <span className="text-[10px] text-neutral-muted font-mono mt-0.5 block">
+                  Authoritative cap ceiling
                 </span>
               </div>
 
-              <p className="font-mono text-xl font-bold text-neutral-text">
-                {formatCurrency(vendorFinancials.totalAgreed, event.currency)}
-              </p>
-              <p className="text-xs text-neutral-muted mt-0.5 font-mono">
-                Agreed contract commitments
-              </p>
+              <div className="bg-neutral-subtle/60 border border-neutral-border p-3 rounded-lg">
+                <span className="text-[11px] uppercase font-semibold text-neutral-muted block mb-0.5">
+                  Allocated Planned
+                </span>
+                <p className="font-mono text-base sm:text-lg font-bold text-primary tracking-tight">
+                  {formatCurrency(summary.totalAllocated, event.currency)}
+                </p>
+                <span className="text-[10px] text-neutral-muted font-mono mt-0.5 block">
+                  {categories.length} categories defined
+                </span>
+              </div>
 
-              <div className="mt-3 pt-3 border-t border-neutral-border/50 text-xs space-y-1 font-mono">
-                <div className="flex justify-between text-neutral-muted">
-                  <span>Paid to date:</span>
-                  <span className="text-status-success font-semibold">
-                    {formatCurrency(vendorFinancials.totalPaid, event.currency)}
-                  </span>
+              <div className="bg-neutral-subtle/60 border border-neutral-border p-3 rounded-lg">
+                <span className="text-[11px] uppercase font-semibold text-neutral-muted block mb-0.5">
+                  Cleared Actuals
+                </span>
+                <p className="font-mono text-base sm:text-lg font-bold text-status-success tracking-tight">
+                  {formatCurrency(summary.totalActual, event.currency)}
+                </p>
+                <span className="text-[10px] text-neutral-muted font-mono mt-0.5 block">
+                  {expenses.length} expense items recorded
+                </span>
+              </div>
+
+              <div className="bg-neutral-subtle/60 border border-neutral-border p-3 rounded-lg">
+                <span className="text-[11px] uppercase font-semibold text-neutral-muted block mb-0.5">
+                  Safety Reserve Buffer
+                </span>
+                <p
+                  className={`font-mono text-base sm:text-lg font-bold tracking-tight ${
+                    summary.unallocatedBudget < 0 ? 'text-status-danger' : 'text-neutral-text'
+                  }`}
+                >
+                  {formatCurrency(summary.unallocatedBudget, event.currency)}
+                </p>
+                <span className="text-[10px] text-neutral-muted font-mono mt-0.5 block">
+                  {summary.unallocatedBudget >= 0 ? 'Unallocated runway' : 'Over allocated'}
+                </span>
+              </div>
+            </div>
+
+            {/* Segmented Color Spectrum Progress Bar */}
+            <div className="space-y-1.5 my-3">
+              <div className="flex items-center justify-between text-xs font-mono text-neutral-muted">
+                <span>Allocation Runway Spectrum</span>
+                <span>
+                  {summary.budgetCap > 0
+                    ? Math.round((summary.totalAllocated / summary.budgetCap) * 100)
+                    : 0}
+                  % of cap allocated
+                </span>
+              </div>
+
+              {(() => {
+                const cap = Math.max(1, summary.budgetCap);
+                const actualPct = Math.min(100, Math.round((summary.totalActual / cap) * 100));
+                const remainingAllocatedPct = Math.min(
+                  100 - actualPct,
+                  Math.max(
+                    0,
+                    Math.round(((summary.totalAllocated - summary.totalActual) / cap) * 100)
+                  )
+                );
+                const bufferPct = Math.max(0, 100 - actualPct - remainingAllocatedPct);
+
+                return (
+                  <div className="w-full h-2.5 bg-neutral-subtle rounded-full overflow-hidden flex border border-neutral-border/70">
+                    <div
+                      className="bg-status-success transition-all duration-300"
+                      style={{ width: `${actualPct}%` }}
+                      title={`Cleared Actuals: ${formatCurrency(summary.totalActual, event.currency)} (${actualPct}%)`}
+                    />
+                    <div
+                      className="bg-primary transition-all duration-300"
+                      style={{ width: `${remainingAllocatedPct}%` }}
+                      title={`Planned Allocations: ${remainingAllocatedPct}%`}
+                    />
+                    <div
+                      className="bg-neutral-border/60 transition-all duration-300"
+                      style={{ width: `${bufferPct}%` }}
+                      title={`Unallocated Buffer: ${bufferPct}%`}
+                    />
+                  </div>
+                );
+              })()}
+
+              <div className="flex flex-wrap items-center gap-4 text-[11px] font-mono text-neutral-muted pt-0.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-status-success inline-block" />
+                  <span>Actuals Paid</span>
                 </div>
-                <div className="flex justify-between text-neutral-muted">
-                  <span>Remaining balance:</span>
-                  <span className="text-secondary font-semibold">
-                    {formatCurrency(vendorFinancials.totalRemaining, event.currency)}
-                  </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-primary inline-block" />
+                  <span>Planned Allocations</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-neutral-border/80 inline-block" />
+                  <span>Safety Buffer</span>
                 </div>
               </div>
             </div>
 
-            {onNavigateTab && (
-              <button
-                type="button"
-                onClick={() => onNavigateTab('vendors')}
-                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 transition-transform active:translate-x-0.5"
-              >
-                <span>Open Vendor Book</span>
-                <ArrowRight className="w-3 h-3" />
-              </button>
+            {/* Top Category Allocations WITH Names and Values */}
+            {categorySummaries.length > 0 && (
+              <div className="pt-2 border-t border-neutral-border/50">
+                <span className="text-[11px] font-mono uppercase text-neutral-muted font-semibold block mb-1.5">
+                  Category Allocation Breakdown:
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {categorySummaries.slice(0, 6).map((cat) => (
+                    <div
+                      key={cat.category.id}
+                      className="p-2 rounded-md bg-neutral-subtle/70 border border-neutral-border text-xs flex flex-col justify-between"
+                    >
+                      <span className="font-semibold text-neutral-text text-xs leading-snug">
+                        {cat.category.name}
+                      </span>
+                      <strong className="font-mono text-secondary text-xs mt-1">
+                        {formatCurrency(cat.allocatedAmount, event.currency)}
+                      </strong>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* RITUAL SCHEDULE HORIZON (Span 5 cols on lg) */}
+        <section className="lg:col-span-5 bg-neutral-surface border border-neutral-border rounded-xl p-5 shadow-card flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-3 border-b border-neutral-border/60 pb-2.5">
+              <div>
+                <span className="text-[11px] font-mono uppercase tracking-wider text-secondary font-bold block">
+                  Ritual Timeline
+                </span>
+                <h3 className="font-display text-lg font-bold text-neutral-text">
+                  Milestone Sequence
+                </h3>
+              </div>
+
+              {onNavigateTab && (
+                <button
+                  type="button"
+                  onClick={() => onNavigateTab('timeline')}
+                  className="text-xs font-bold text-secondary hover:text-secondary-hover underline flex items-center gap-1 active:scale-[0.98] transition-all"
+                >
+                  <span>Open Timeline</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+
+            <p className="text-xs text-neutral-muted mb-3">
+              Upcoming scheduled ritual checkpoints and preparation tasks.
+            </p>
+
+            {/* Formatted Milestone Horizon Cards */}
+            {upcomingMilestones.length > 0 ? (
+              <div className="space-y-2.5">
+                {upcomingMilestones.map((m, idx) => {
+                  const isCurrent = idx === 0;
+                  return (
+                    <div
+                      key={m.id}
+                      className={`p-3 rounded-lg border transition-all ${
+                        isCurrent
+                          ? 'bg-primary-subtle/30 border-primary/40 ring-1 ring-primary/20'
+                          : 'bg-neutral-subtle/50 border-neutral-border'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="space-y-0.5 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            {isCurrent && (
+                              <span className="w-2 h-2 rounded-full bg-primary shrink-0 animate-pulse" />
+                            )}
+                            <h4 className="font-semibold text-xs text-neutral-text">
+                              {m.title}
+                            </h4>
+                          </div>
+                          <span className="text-[11px] text-neutral-muted font-mono block">
+                            {formatDateDisplay(m.effectiveDate)}
+                          </span>
+                        </div>
+
+                        <span
+                          className={`font-mono text-[11px] font-bold px-2 py-0.5 rounded shrink-0 ${
+                            isCurrent
+                              ? 'bg-primary text-neutral-text'
+                              : 'bg-neutral-subtle text-secondary border border-neutral-border'
+                          }`}
+                        >
+                          {m.offsetDays === 0
+                            ? 'Event Day'
+                            : m.offsetDays < 0
+                            ? `${Math.abs(m.offsetDays)}d prior`
+                            : `+${m.offsetDays}d post`}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-6 text-neutral-muted text-xs">
+                <Clock className="w-8 h-8 text-neutral-muted/60 mx-auto mb-2" />
+                No milestone checkpoints defined yet.
+              </div>
             )}
           </div>
 
-          {/* Guest Attendance Card */}
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-neutral-muted">
-                  Guest Register &amp; RSVPs
-                </span>
-                <span className="w-7 h-7 rounded bg-primary-subtle flex items-center justify-center text-primary">
+          <div className="mt-4 pt-3 border-t border-neutral-border/60 flex items-center justify-between text-xs font-mono text-neutral-muted">
+            <span>Checklist Execution:</span>
+            <span className="font-bold text-neutral-text">
+              {taskMetrics.completed} of {taskMetrics.total} tasks completed ({taskMetrics.pct}%)
+            </span>
+          </div>
+        </section>
+      </div>
+
+      {/* =========================================================================
+          4. 3 CORE OPERATIONS CARDS (Guests, Seating, Vendors)
+          (High-density, balanced, zero awkward empty whitespace)
+      ========================================================================= */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+        {/* CARD A: GUEST REGISTER & HOSPITALITY */}
+        <section className="bg-neutral-surface border border-neutral-border rounded-xl p-5 shadow-card flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-3 border-b border-neutral-border/60 pb-2.5">
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-md bg-primary-subtle flex items-center justify-center text-primary">
                   <Users className="w-3.5 h-3.5" />
                 </span>
+                <div>
+                  <span className="text-[10px] font-mono uppercase text-secondary font-bold block">
+                    Attendance
+                  </span>
+                  <h3 className="font-display text-base font-bold text-neutral-text">
+                    Guest &amp; Hospitality
+                  </h3>
+                </div>
               </div>
 
-              <p className="font-mono text-xl font-bold text-neutral-text">
-                {attendanceSummary.expectedAttendance}
-              </p>
-              <p className="text-xs text-neutral-muted mt-0.5 font-mono">
-                Expected attendees ({attendanceSummary.confirmedCount} + {attendanceSummary.expectedPlusOnes} +1s)
-              </p>
+              {onNavigateTab && (
+                <button
+                  type="button"
+                  onClick={() => onNavigateTab('guests')}
+                  className="text-xs font-bold text-secondary hover:text-secondary-hover underline flex items-center gap-1 active:scale-[0.98] transition-all"
+                >
+                  <span>Open Register</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              )}
+            </div>
 
-              <div className="mt-3 pt-3 border-t border-neutral-border/50 text-xs space-y-1 font-mono">
-                <div className="flex justify-between text-neutral-muted">
-                  <span>Pending replies:</span>
-                  <span className="text-status-warning font-semibold">
-                    {attendanceSummary.pendingCount}
-                  </span>
-                </div>
-                <div className="flex justify-between text-neutral-muted">
-                  <span>Declined:</span>
-                  <span className="text-neutral-muted">{attendanceSummary.declinedCount}</span>
-                </div>
+            {/* Attendance Big Number & Target */}
+            <div className="flex items-baseline justify-between mb-2.5">
+              <div>
+                <span className="font-mono text-2xl font-bold text-neutral-text">
+                  {attendanceSummary.expectedAttendance}
+                </span>
+                <span className="text-xs text-neutral-muted font-mono ml-1.5">
+                  expected attendees
+                </span>
+              </div>
+              <span className="text-xs font-mono text-neutral-muted">
+                Target: <strong>{event.guestTarget}</strong>
+              </span>
+            </div>
+
+            {/* Mini Response Breakdown Bar */}
+            <div className="space-y-1 mb-3">
+              <div className="w-full h-2 bg-neutral-subtle rounded-full overflow-hidden flex border border-neutral-border/60">
+                <div
+                  className="bg-status-success"
+                  style={{
+                    width: `${
+                      attendanceSummary.totalNamedGuests > 0
+                        ? (attendanceSummary.confirmedCount / attendanceSummary.totalNamedGuests) *
+                          100
+                        : 0
+                    }%`,
+                  }}
+                  title="Confirmed"
+                />
+                <div
+                  className="bg-status-warning"
+                  style={{
+                    width: `${
+                      attendanceSummary.totalNamedGuests > 0
+                        ? (attendanceSummary.pendingCount / attendanceSummary.totalNamedGuests) * 100
+                        : 0
+                    }%`,
+                  }}
+                  title="Pending"
+                />
+                <div
+                  className="bg-neutral-border"
+                  style={{
+                    width: `${
+                      attendanceSummary.totalNamedGuests > 0
+                        ? (attendanceSummary.declinedCount / attendanceSummary.totalNamedGuests) *
+                          100
+                        : 0
+                    }%`,
+                  }}
+                  title="Declined"
+                />
               </div>
             </div>
 
-            {onNavigateTab && (
-              <button
-                type="button"
-                onClick={() => onNavigateTab('guests')}
-                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 transition-transform active:translate-x-0.5"
-              >
-                <span>Manage Guests &amp; Groups</span>
-                <ArrowRight className="w-3 h-3" />
-              </button>
+            {/* 3-Row Compact Key-Value Stats */}
+            <div className="bg-neutral-subtle/50 rounded-lg p-2.5 space-y-1.5 text-xs font-mono">
+              <div className="flex justify-between text-neutral-muted">
+                <span>Confirmed Attendees:</span>
+                <span className="text-status-success font-bold">
+                  {attendanceSummary.confirmedCount} ({attendanceSummary.expectedPlusOnes} +1s)
+                </span>
+              </div>
+              <div className="flex justify-between text-neutral-muted">
+                <span>Pending Responses:</span>
+                <span className="text-status-warning font-bold">
+                  {attendanceSummary.pendingCount} awaiting
+                </span>
+              </div>
+              <div className="flex justify-between text-neutral-muted">
+                <span>Declined:</span>
+                <span className="text-neutral-text font-medium">
+                  {attendanceSummary.declinedCount}
+                </span>
+              </div>
+            </div>
+
+            {/* Dietary Summary Note if Any */}
+            {Object.keys(attendanceSummary.dietaryBreakdown).length > 0 && (
+              <div className="mt-2.5 flex items-center gap-1.5 text-[11px] text-neutral-muted font-mono">
+                <Utensils className="w-3 h-3 text-secondary shrink-0" />
+                <span className="truncate">
+                  Diets: {Object.entries(attendanceSummary.dietaryBreakdown).map(([d, c]) => `${d} (${c})`).join(', ')}
+                </span>
+              </div>
             )}
           </div>
+        </section>
 
-          {/* Seating Allocation Card */}
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-neutral-muted">
-                  Banquet Seating
-                </span>
-                <span className="w-7 h-7 rounded bg-secondary-subtle/80 flex items-center justify-center text-secondary">
+        {/* CARD B: BANQUET SEATING ARRANGEMENT */}
+        <section className="bg-neutral-surface border border-neutral-border rounded-xl p-5 shadow-card flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-3 border-b border-neutral-border/60 pb-2.5">
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-md bg-secondary-subtle flex items-center justify-center text-secondary">
                   <Armchair className="w-3.5 h-3.5" />
                 </span>
-              </div>
-
-              <p className="font-mono text-xl font-bold text-neutral-text">
-                {seatingSummary.seatingProgressPct}%
-              </p>
-              <p className="text-xs text-neutral-muted mt-0.5 font-mono">
-                {attendanceSummary.expectedAttendance === 0
-                  ? '0 seated (no guests registered)'
-                  : `${seatingSummary.expectedAssigned} / ${attendanceSummary.expectedAttendance} expected seated`}
-              </p>
-
-              <div className="mt-3 pt-3 border-t border-neutral-border/50 text-xs space-y-1 font-mono">
-                <div className="flex justify-between text-neutral-muted">
-                  <span>Tables configured:</span>
-                  <span className="text-neutral-text font-semibold">
-                    {seatingSummary.totalTables} ({seatingSummary.totalSeats} seats)
+                <div>
+                  <span className="text-[10px] font-mono uppercase text-secondary font-bold block">
+                    Floor Arrangement
                   </span>
-                </div>
-                <div className="flex justify-between text-neutral-muted">
-                  <span>Unassigned queue:</span>
-                  <span className="text-secondary font-semibold">
-                    {seatingSummary.unassignedExpected} attendee(s)
-                  </span>
+                  <h3 className="font-display text-base font-bold text-neutral-text">
+                    Banquet Seating
+                  </h3>
                 </div>
               </div>
+
+              {onNavigateTab && (
+                <button
+                  type="button"
+                  onClick={() => onNavigateTab('seating')}
+                  className="text-xs font-bold text-secondary hover:text-secondary-hover underline flex items-center gap-1 active:scale-[0.98] transition-all"
+                >
+                  <span>Open Seating</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              )}
             </div>
 
-            {onNavigateTab && (
-              <button
-                type="button"
-                onClick={() => onNavigateTab('seating')}
-                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 transition-transform active:translate-x-0.5"
-              >
-                <span>Open Seating Planner</span>
-                <ArrowRight className="w-3 h-3" />
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Deterministic Financial Snapshot */}
-      <div>
-        <div className="flex items-center justify-between mb-3.5">
-          <div>
-            <h3 className="font-display text-xl font-semibold text-neutral-text">
-              Financial &amp; Allocation Snapshot
-            </h3>
-            <p className="text-xs text-neutral-muted">
-              All financial arithmetic, variance, and guest metrics are computed deterministically.
-            </p>
-          </div>
-          {onNavigateTab && (
-            <button
-              type="button"
-              onClick={() => onNavigateTab('budget')}
-              className="text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 transition-transform active:translate-x-0.5"
-            >
-              <span>Manage Ledger</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
-                Budget Cap
-              </p>
-              <p className="font-mono text-xl font-bold text-neutral-text">
-                {formatCurrency(summary.budgetCap, event.currency)}
-              </p>
-            </div>
-            <p className="text-xs text-neutral-muted mt-2 font-mono">
-              Authoritative ceiling
-            </p>
-          </div>
-
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
-                Allocated Planned
-              </p>
-              <p className="font-mono text-xl font-bold text-neutral-text">
-                {formatCurrency(summary.totalAllocated, event.currency)}
-              </p>
-            </div>
-            <p className="text-xs text-neutral-muted mt-2 font-mono">
-              {categories.length} {categories.length === 1 ? 'category' : 'categories'} defined
-            </p>
-          </div>
-
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
-                Recorded Actuals
-              </p>
-              <p className="font-mono text-xl font-bold text-neutral-text">
-                {formatCurrency(summary.totalActual, event.currency)}
-              </p>
-            </div>
-            <p className="text-xs text-neutral-muted mt-2 font-mono">
-              {expenses.length} expense items recorded
-            </p>
-          </div>
-
-          <div className="bg-neutral-surface border border-neutral-border rounded-lg p-5 shadow-card hover:border-neutral-border-strong transition-all flex flex-col justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-neutral-muted mb-1.5 h-8 flex items-start leading-4">
-                Unallocated Reserve
-              </p>
-              <p
-                className={`font-mono text-xl font-bold ${
-                  summary.unallocatedBudget < 0 ? 'text-status-danger' : 'text-neutral-text'
-                }`}
-              >
-                {formatCurrency(summary.unallocatedBudget, event.currency)}
-              </p>
-            </div>
-            <p className="text-xs text-neutral-muted mt-2 font-mono">
-              {summary.unallocatedBudget >= 0 ? 'Safety buffer' : 'Over allocated'}
-            </p>
-          </div>
-        </div>
-
-        {summary.isOverAllocated && (
-          <div
-            role="alert"
-            className="mt-4 bg-status-danger-subtle text-status-danger border border-status-danger/30 p-4 rounded-md text-xs flex items-center gap-2"
-          >
-            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-            <span>
-              <strong>Budget Cap Alert:</strong> Total category allocations exceed your planned budget cap by{' '}
-              {formatCurrency(Math.abs(summary.unallocatedBudget), event.currency)}. Re-balance category budgets to avoid overallocation.
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* 4. Timeline Countdown & Next Task */}
-      <div className="bg-neutral-surface border border-neutral-border rounded-lg p-6 shadow-card space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono uppercase text-secondary font-semibold">
-                Celebration Timeline
+            {/* Seating Progress & Capacity */}
+            <div className="flex items-baseline justify-between mb-2.5">
+              <div>
+                <span className="font-mono text-2xl font-bold text-neutral-text">
+                  {seatingSummary.seatingProgressPct}%
+                </span>
+                <span className="text-xs text-neutral-muted font-mono ml-1.5">
+                  attendees seated
+                </span>
+              </div>
+              <span className="text-xs font-mono text-neutral-muted">
+                Seats: <strong>{seatingSummary.totalSeats}</strong>
               </span>
-              <CouponBadge variant="marigold">Timeline Active</CouponBadge>
             </div>
-            <h3 className="font-display text-xl font-semibold text-neutral-text">
-              Timeline Milestones &amp; Critical Next Steps
-            </h3>
-          </div>
 
-          {onNavigateTab && (
-            <button
-              type="button"
-              onClick={() => onNavigateTab('timeline')}
-              className="text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1 self-start sm:self-center transition-transform active:translate-x-0.5"
-            >
-              <span>Open Timeline</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          )}
-        </div>
+            {/* Progress Bar */}
+            <div className="w-full bg-neutral-subtle rounded-full h-2 overflow-hidden border border-neutral-border/60 mb-3">
+              <div
+                className="h-full bg-primary transition-all duration-500 rounded-full"
+                style={{ width: `${Math.min(100, seatingSummary.seatingProgressPct)}%` }}
+              />
+            </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
-              Milestone Anchors
-            </span>
-            <p className="font-mono text-xl font-bold text-neutral-text">
-              {milestones.length}
-            </p>
-            <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
-              Relative day offsets
-            </span>
-          </div>
+            {/* 3-Row Compact Key-Value Stats */}
+            <div className="bg-neutral-subtle/50 rounded-lg p-2.5 space-y-1.5 text-xs font-mono">
+              <div className="flex justify-between text-neutral-muted">
+                <span>Configured Tables:</span>
+                <span className="text-neutral-text font-bold">
+                  {seatingSummary.totalTables} tables ({seatingSummary.totalSeats} seats)
+                </span>
+              </div>
+              <div className="flex justify-between text-neutral-muted">
+                <span>Allocated Seated:</span>
+                <span className="text-status-success font-bold">
+                  {seatingSummary.expectedAssigned} attendees
+                </span>
+              </div>
+              <div className="flex justify-between text-neutral-muted">
+                <span>Unassigned Queue:</span>
+                <span
+                  className={`font-bold ${
+                    seatingSummary.unassignedExpected > 0 ? 'text-secondary' : 'text-neutral-text'
+                  }`}
+                >
+                  {seatingSummary.unassignedExpected} attendee(s)
+                </span>
+              </div>
+            </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
-              Checklist Tasks
-            </span>
-            <p className="font-mono text-xl font-bold text-neutral-text">
-              {taskMetrics.total}
-            </p>
-            <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
-              {taskMetrics.completed} completed ({taskMetrics.pct}%)
-            </span>
+            <div className="mt-2.5 flex items-center gap-1.5 text-[11px] text-status-success font-mono">
+              <Check className="w-3 h-3" />
+              <span>All tables within designated capacity</span>
+            </div>
           </div>
+        </section>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
-              Overdue Tasks
-            </span>
-            <p
-              className={`font-mono text-xl font-bold ${
-                taskMetrics.overdue > 0 ? 'text-status-danger' : 'text-status-success'
-              }`}
-            >
-              {taskMetrics.overdue}
-            </p>
-            <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
-              {taskMetrics.overdue > 0 ? 'Needs urgent attention' : 'All tasks on track'}
-            </span>
-          </div>
+        {/* CARD C: COMMERCIAL COMMITMENTS (VENDORS) */}
+        <section className="bg-neutral-surface border border-neutral-border rounded-xl p-5 shadow-card flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-3 border-b border-neutral-border/60 pb-2.5">
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-md bg-secondary-subtle flex items-center justify-center text-secondary">
+                  <Briefcase className="w-3.5 h-3.5" />
+                </span>
+                <div>
+                  <span className="text-[10px] font-mono uppercase text-secondary font-bold block">
+                    Contracts
+                  </span>
+                  <h3 className="font-display text-base font-bold text-neutral-text">
+                    Commercial Commitments
+                  </h3>
+                </div>
+              </div>
 
-          <div className="bg-neutral-subtle/70 border border-neutral-border p-3.5 rounded-md">
-            <span className="text-xs uppercase font-semibold text-neutral-muted block mb-1">
-              Countdown
-            </span>
-            <p className="font-mono text-xl font-bold text-secondary">
-              {daysLeft > 0 ? `${daysLeft}d` : 'Today'}
-            </p>
-            <span className="text-xs text-neutral-muted font-mono mt-0.5 block">
-              Until celebration
-            </span>
+              {onNavigateTab && (
+                <button
+                  type="button"
+                  onClick={() => onNavigateTab('vendors')}
+                  className="text-xs font-bold text-secondary hover:text-secondary-hover underline flex items-center gap-1 active:scale-[0.98] transition-all"
+                >
+                  <span>Open Vendors</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+
+            {/* Total Agreed Figure */}
+            <div className="flex items-baseline justify-between mb-2.5">
+              <div>
+                <span className="font-mono text-xl sm:text-2xl font-bold text-neutral-text tracking-tight">
+                  {formatCurrency(vendorFinancials.totalAgreed, event.currency)}
+                </span>
+              </div>
+              <span className="text-xs font-mono text-neutral-muted">
+                Booked: <strong>{vendorFinancials.bookedCount}</strong>
+              </span>
+            </div>
+
+            {/* Progress Bar for Paid Settlement */}
+            <div className="space-y-1 mb-3">
+              {(() => {
+                const agreed = vendorFinancials.totalAgreed;
+                const paid = vendorFinancials.totalPaid;
+                const pct = agreed > 0 ? Math.min(100, Math.round((paid / agreed) * 100)) : 0;
+                return (
+                  <div className="w-full bg-neutral-subtle rounded-full h-2 overflow-hidden border border-neutral-border/60">
+                    <div
+                      className="h-full bg-status-success transition-all duration-500 rounded-full"
+                      style={{ width: `${pct}%` }}
+                      title={`${pct}% settled`}
+                    />
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* 3-Row Compact Key-Value Stats */}
+            <div className="bg-neutral-subtle/50 rounded-lg p-2.5 space-y-1.5 text-xs font-mono">
+              <div className="flex justify-between text-neutral-muted">
+                <span>Advances Paid:</span>
+                <span className="text-status-success font-bold">
+                  {formatCurrency(vendorFinancials.totalPaid, event.currency)}
+                </span>
+              </div>
+              <div className="flex justify-between text-neutral-muted">
+                <span>Outstanding Balances:</span>
+                <span className="text-secondary font-bold">
+                  {formatCurrency(vendorFinancials.totalRemaining, event.currency)}
+                </span>
+              </div>
+              <div className="flex justify-between text-neutral-muted">
+                <span>Tracked Suppliers:</span>
+                <span className="text-neutral-text font-medium">
+                  {vendorFinancials.vendorCount} vendors
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-2.5 flex items-center gap-1.5 text-[11px] text-neutral-muted font-mono">
+              <Clock className="w-3 h-3 text-secondary shrink-0" />
+              <span>Contractual payments isolated from actuals</span>
+            </div>
           </div>
-        </div>
+        </section>
       </div>
 
-      {/* 5. AI Assistant Spotlight Banner */}
-      <div className="bg-gradient-to-r from-primary-subtle/50 via-neutral-surface to-secondary-subtle/30 border border-primary/40 rounded-lg p-5 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* =========================================================================
+          5. AI CELEBRATION ADVISOR DOCK
+          (Sleek, integrated, review-first)
+      ========================================================================= */}
+      <section className="bg-primary-subtle border border-primary/40 rounded-xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-start gap-3.5">
           <div className="p-2.5 rounded-lg bg-primary text-neutral-text shadow-sm shrink-0">
             <Sparkles className="w-5 h-5 text-neutral-text" />
           </div>
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-display text-lg font-semibold text-neutral-text">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <h3 className="font-display text-base sm:text-lg font-bold text-neutral-text">
                 AI Celebration Advisor
               </h3>
-              <CouponBadge variant="marigold">Smart Advisory</CouponBadge>
+              <CouponBadge variant="marigold">Smart Staged Diff</CouponBadge>
             </div>
-            <p className="text-xs text-neutral-muted max-w-2xl leading-relaxed">
-              Ask your assistant for cultural tradition advice, budget reallocation suggestions, or missing milestone tasks. All AI suggestions are staged for your review with before/after diffs before any changes touch your event.
+            <p className="text-xs text-neutral-text/90 max-w-xl leading-relaxed">
+              Synthesize ritual traditions, detect budget variance, and receive structured proposals. Every change is presented as a before/after review diff before touching your live event.
             </p>
           </div>
         </div>
@@ -620,177 +1059,13 @@ export function OverviewTab({
           <button
             type="button"
             onClick={() => onNavigateTab('ai')}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-primary text-neutral-text font-semibold text-xs sm:text-sm hover:bg-primary-hover shadow-sm transition-all self-start md:self-center shrink-0 active:translate-y-0.5"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary text-neutral-text font-bold text-xs hover:bg-primary-hover shadow-sm transition-all shrink-0 active:scale-[0.98]"
           >
             <span>Consult AI Assistant</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         )}
-      </div>
-
-      {/* 6. Planning Modules Toolkit */}
-      <div>
-        <div className="mb-3.5">
-          <h3 className="font-display text-xl font-semibold text-neutral-text">
-            Your Planning Toolkit
-          </h3>
-          <p className="text-xs text-neutral-muted">
-            Event Pilot is structured across focused planning modules.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
-          <div className="bg-neutral-surface border border-neutral-border rounded-xl p-5 shadow-card hover:border-neutral-border-strong hover:shadow-md transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between gap-2 mb-3.5">
-                <div className="w-9 h-9 rounded-lg bg-secondary-subtle flex items-center justify-center text-secondary shrink-0 shadow-xs">
-                  <Wallet className="w-4 h-4" />
-                </div>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-subtle text-primary-hover border border-primary/25 shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  Active
-                </span>
-              </div>
-              <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
-                Budget &amp; Ledger
-              </h4>
-              <p className="text-xs text-neutral-muted leading-relaxed">
-                Expense lines, deposit payment milestones, and category variance.
-              </p>
-            </div>
-            {onNavigateTab && (
-              <button
-                type="button"
-                onClick={() => onNavigateTab('budget')}
-                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1.5 self-start group"
-              >
-                <span>Open Ledger</span>
-                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-              </button>
-            )}
-          </div>
-
-          <div className="bg-neutral-surface border border-neutral-border rounded-xl p-5 shadow-card hover:border-neutral-border-strong hover:shadow-md transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between gap-2 mb-3.5">
-                <div className="w-9 h-9 rounded-lg bg-secondary-subtle flex items-center justify-center text-secondary shrink-0 shadow-xs">
-                  <Clock className="w-4 h-4" />
-                </div>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-subtle text-primary-hover border border-primary/25 shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  Active
-                </span>
-              </div>
-              <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
-                Celebration Timeline
-              </h4>
-              <p className="text-xs text-neutral-muted leading-relaxed">
-                Relative day offsets, checklist tasks, and date-reanchoring.
-              </p>
-            </div>
-            {onNavigateTab && (
-              <button
-                type="button"
-                onClick={() => onNavigateTab('timeline')}
-                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1.5 self-start group"
-              >
-                <span>Open Timeline</span>
-                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-              </button>
-            )}
-          </div>
-
-          <div className="bg-neutral-surface border border-neutral-border rounded-xl p-5 shadow-card hover:border-neutral-border-strong hover:shadow-md transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between gap-2 mb-3.5">
-                <div className="w-9 h-9 rounded-lg bg-secondary-subtle flex items-center justify-center text-secondary shrink-0 shadow-xs">
-                  <Briefcase className="w-4 h-4" />
-                </div>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-subtle text-primary-hover border border-primary/25 shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  Active
-                </span>
-              </div>
-              <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
-                Vendors &amp; Contacts
-              </h4>
-              <p className="text-xs text-neutral-muted leading-relaxed">
-                Quotes, agreed rates, deposits, balances, and contact personnel.
-              </p>
-            </div>
-            {onNavigateTab && (
-              <button
-                type="button"
-                onClick={() => onNavigateTab('vendors')}
-                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1.5 self-start group"
-              >
-                <span>Open Vendors</span>
-                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-              </button>
-            )}
-          </div>
-
-          <div className="bg-neutral-surface border border-neutral-border rounded-xl p-5 shadow-card hover:border-neutral-border-strong hover:shadow-md transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between gap-2 mb-3.5">
-                <div className="w-9 h-9 rounded-lg bg-secondary-subtle flex items-center justify-center text-secondary shrink-0 shadow-xs">
-                  <Users className="w-4 h-4" />
-                </div>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-subtle text-primary-hover border border-primary/25 shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  Active
-                </span>
-              </div>
-              <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
-                Guests &amp; Seating
-              </h4>
-              <p className="text-xs text-neutral-muted leading-relaxed">
-                Households, RSVP statuses, partner plus-ones, and table planner.
-              </p>
-            </div>
-            {onNavigateTab && (
-              <button
-                type="button"
-                onClick={() => onNavigateTab('guests')}
-                className="mt-4 text-xs font-semibold text-secondary hover:text-secondary-hover underline flex items-center gap-1.5 self-start group"
-              >
-                <span>Open Guests</span>
-                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-              </button>
-            )}
-          </div>
-
-          <div className="bg-neutral-surface border border-primary/40 rounded-xl p-5 shadow-card hover:border-primary hover:shadow-md transition-all flex flex-col justify-between ring-1 ring-primary/20">
-            <div>
-              <div className="flex items-center justify-between gap-2 mb-3.5">
-                <div className="w-9 h-9 rounded-lg bg-primary-subtle flex items-center justify-center text-primary shrink-0 shadow-xs">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-subtle text-primary-hover border border-primary/30 shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                  AI Ready
-                </span>
-              </div>
-              <h4 className="font-display text-base font-semibold text-neutral-text mb-1">
-                AI Planning Assistant
-              </h4>
-              <p className="text-xs text-neutral-muted leading-relaxed">
-                Smart event suggestions with review-first staged diffs.
-              </p>
-            </div>
-            {onNavigateTab && (
-              <button
-                type="button"
-                onClick={() => onNavigateTab('ai')}
-                className="mt-4 text-xs font-semibold text-primary-hover hover:underline flex items-center gap-1.5 self-start group"
-              >
-                <span>Open Assistant</span>
-                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+      </section>
     </div>
   );
 }
