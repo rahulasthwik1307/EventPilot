@@ -44,22 +44,10 @@ export default function RootLayout({
       className={`${plusJakartaSans.variable} ${eczar.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
-      <head>
-        {/* Anti-FOUC critical styling: guarantees almanac cream palette and prevents raw unstyled flash */}
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `
-              html, body {
-                background-color: #FDFBF7 !important;
-                color: #1C1917 !important;
-                margin: 0;
-                padding: 0;
-              }
-            `,
-          }}
-        />
-      </head>
-      <body className="min-h-screen bg-neutral-bg text-neutral-text antialiased font-sans">
+      <body
+        className="min-h-screen bg-neutral-bg text-neutral-text antialiased font-sans"
+        suppressHydrationWarning
+      >
         {children}
       </body>
     </html>
