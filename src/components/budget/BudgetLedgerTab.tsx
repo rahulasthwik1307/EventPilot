@@ -769,7 +769,7 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
           </div>
         ) : (
           <div className="overflow-x-auto rounded-lg border border-neutral-border">
-            <table className="w-full text-left text-xs">
+            <table className="w-full min-w-[640px] text-left text-xs">
               <thead className="bg-neutral-subtle/80 text-neutral-muted uppercase tracking-wider font-semibold border-b border-neutral-border">
                 <tr>
                   <th scope="col" className="py-3 px-3.5">

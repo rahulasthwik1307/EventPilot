@@ -137,25 +137,25 @@ export function Dialog({
         )}
 
         {/* Pinned Dialog Header */}
-        <div className="flex items-start justify-between border-b border-neutral-border px-6 py-5 sm:px-8 sm:py-6 flex-shrink-0 bg-neutral-surface">
+        <div className="flex items-start justify-between border-b border-neutral-border px-4 py-4 sm:px-8 sm:py-6 flex-shrink-0 bg-neutral-surface">
           <div className="pr-2 flex-1 min-w-0">
             {typeof title === 'string' ? (
               <h2
                 id="dialog-title"
-                className="font-display text-2xl font-semibold text-neutral-text leading-tight"
+                className="font-display text-xl sm:text-2xl font-semibold text-neutral-text leading-tight break-words"
               >
                 {title}
               </h2>
             ) : (
-              <div id="dialog-title">{title}</div>
+              <div id="dialog-title" className="break-words">{title}</div>
             )}
             {description && (
-              <p id="dialog-description" className="text-sm text-neutral-muted mt-1 leading-normal">
+              <p id="dialog-description" className="text-xs sm:text-sm text-neutral-muted mt-1 leading-normal">
                 {description}
               </p>
             )}
           </div>
-          <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+          <div className="flex items-center gap-2 flex-shrink-0 ml-3 sm:ml-4">
             {headerActions}
             <button
               type="button"
@@ -169,7 +169,7 @@ export function Dialog({
         </div>
 
         {/* Scrollable Content Body */}
-        <div className={`flex-1 overflow-y-auto ${contentPadding ? 'px-6 py-5 sm:px-8 sm:py-6' : ''}`}>
+        <div className={`flex-1 overflow-y-auto ${contentPadding ? 'px-4 py-4 sm:px-8 sm:py-6' : ''}`}>
           {children}
         </div>
       </div>

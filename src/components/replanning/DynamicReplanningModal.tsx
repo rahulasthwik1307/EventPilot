@@ -382,7 +382,7 @@ export function DynamicReplanningModal({
         )}
 
         {/* Footer Actions */}
-        <div className="border-t border-neutral-border pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="border-t border-neutral-border pt-4 flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
           <button
             type="button"
             onClick={onClose}

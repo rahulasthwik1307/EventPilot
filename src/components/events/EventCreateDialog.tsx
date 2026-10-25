@@ -220,7 +220,7 @@ export function EventCreateDialog({
               <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-text mb-2">
                 Celebration Archetype <span className="text-secondary">*</span>
               </label>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
                 {[
                   { id: 'wedding' as EventType, label: 'Wedding / Vivaha', icon: Heart },
                   { id: 'birthday' as EventType, label: 'Milestone Birthday', icon: Cake },
@@ -243,14 +243,14 @@ export function EventCreateDialog({
                           });
                         }
                       }}
-                      className={`flex flex-col items-center justify-center p-3 rounded-md border text-center transition-all ${
+                      className={`flex sm:flex-col items-center justify-start sm:justify-center p-3 rounded-md border text-left sm:text-center transition-all ${
                         isSelected
                           ? 'border-primary bg-primary-subtle/50 text-neutral-text font-semibold shadow-sm'
                           : 'border-neutral-border bg-neutral-surface hover:bg-neutral-subtle text-neutral-text/80'
                       }`}
                     >
                       <Icon
-                        className={`w-5 h-5 mb-1.5 ${
+                        className={`w-5 h-5 mr-3 sm:mr-0 sm:mb-1.5 flex-shrink-0 ${
                           isSelected ? 'text-primary-hover' : 'text-neutral-muted'
                         }`}
                       />
@@ -569,19 +569,19 @@ export function EventCreateDialog({
             </div>
 
             {/* Step 1 Actions */}
-            <div className="border-t border-neutral-border pt-4 flex items-center justify-between gap-3">
+            <div className="border-t border-neutral-border pt-4 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2.5 rounded-md text-sm font-medium text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border transition-all active:scale-[0.98]"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-md text-sm font-medium text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border transition-all active:scale-[0.98] text-center"
               >
                 Cancel
               </button>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={handleProceedToStep2}
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-md text-sm font-medium text-neutral-text bg-neutral-subtle hover:bg-neutral-border/40 border border-neutral-border transition-all active:scale-[0.98]"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-md text-sm font-medium text-neutral-text bg-neutral-subtle hover:bg-neutral-border/40 border border-neutral-border transition-all active:scale-[0.98]"
                 >
                   <span>Next: Personalize</span>
                   <ArrowRight className="w-4 h-4 text-primary" />
@@ -589,7 +589,7 @@ export function EventCreateDialog({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-6 py-2.5 rounded-md text-sm font-semibold text-neutral-text bg-primary hover:bg-primary-hover hover:text-white transition-all shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-md text-sm font-semibold text-neutral-text bg-primary hover:bg-primary-hover hover:text-white transition-all shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-center"
                 >
                   {isSubmitting ? 'Establishing Plan...' : 'Create Celebration Plan'}
                 </button>
@@ -616,28 +616,28 @@ export function EventCreateDialog({
             </div>
 
             {/* Step 2 Actions */}
-            <div className="border-t border-neutral-border pt-4 flex items-center justify-between gap-3">
+            <div className="border-t border-neutral-border pt-4 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-md text-sm font-medium text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border transition-all active:scale-[0.98]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-md text-sm font-medium text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border transition-all active:scale-[0.98]"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back</span>
               </button>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
                 <button
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => createEventWithData(false)}
-                  className="px-4 py-2.5 rounded-md text-sm font-medium text-neutral-muted hover:text-neutral-text transition-all"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-md text-sm font-medium text-neutral-muted hover:text-neutral-text transition-all text-center"
                 >
                   Skip Personalization
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-6 py-2.5 rounded-md text-sm font-semibold text-neutral-text bg-primary hover:bg-primary-hover hover:text-white transition-all shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-md text-sm font-semibold text-neutral-text bg-primary hover:bg-primary-hover hover:text-white transition-all shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-center"
                 >
                   {isSubmitting ? 'Establishing Plan...' : 'Save & Create Celebration Plan'}
                 </button>

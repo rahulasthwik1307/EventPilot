@@ -46,13 +46,14 @@ export function HouseholdDeleteDialog({
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-3 border-t border-neutral-border">
-          <Button variant="ghost" type="button" onClick={onClose}>
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 sm:gap-3 pt-3 border-t border-neutral-border">
+          <Button variant="ghost" type="button" onClick={onClose} className="w-full sm:w-auto">
             Keep Group
           </Button>
           <Button
             variant="danger"
             type="button"
+            className="w-full sm:w-auto"
             onClick={() => {
               onConfirm();
               onClose();

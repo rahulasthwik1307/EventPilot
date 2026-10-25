@@ -574,7 +574,7 @@ export function QuotationDialog({
         </div>
 
         {/* Footer */}
-        <div className="p-4 sm:p-5 border-t border-[#E7DFD5] flex items-center justify-between bg-[#FAF8F5]">
+        <div className="p-4 sm:p-5 border-t border-[#E7DFD5] flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 bg-[#FAF8F5]">
           <div className="text-xs font-mono text-[#78716C]">
             {parsedTotal > 0 && (
               <span>
@@ -582,18 +582,18 @@ export function QuotationDialog({
               </span>
             )}
           </div>
-          <div className="flex gap-2.5">
+          <div className="flex flex-col-reverse sm:flex-row gap-2.5 w-full sm:w-auto">
             <button
               type="button"
               onClick={onClose}
-              className="px-3.5 py-2 text-xs font-mono font-semibold text-[#78716C] hover:text-[#1C1917]"
+              className="w-full sm:w-auto px-3.5 py-2 text-xs font-mono font-semibold text-[#78716C] hover:text-[#1C1917] text-center"
             >
               Cancel
             </button>
             <Button
               variant="primary"
               onClick={handleSave}
-              className="text-xs font-mono font-bold bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm"
+              className="w-full sm:w-auto text-xs font-mono font-bold bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm"
             >
               <CheckCircle2 className="w-4 h-4 mr-1.5" />
               <span>Save Quotation</span>

@@ -254,11 +254,11 @@ export function QuoteProposalReviewModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3.5 border-t border-[#E7DFD5] flex items-center justify-between bg-[#FAF8F5]">
+        <div className="px-4 sm:px-6 py-3.5 border-t border-[#E7DFD5] flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-2.5 bg-[#FAF8F5]">
           <button
             type="button"
             onClick={onClose}
-            className="text-xs font-mono text-[#78716C] hover:text-[#1C1917] transition-colors"
+            className="w-full sm:w-auto text-xs font-mono text-[#78716C] hover:text-[#1C1917] transition-colors text-center py-2 sm:py-0"
           >
             Cancel
           </button>
@@ -267,7 +267,7 @@ export function QuoteProposalReviewModal({
             variant="primary"
             onClick={handleApply}
             disabled={!proposal.canApply}
-            className="text-xs font-mono shadow-sm"
+            className="w-full sm:w-auto text-xs font-mono shadow-sm"
           >
             <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
             <span>Apply Changes</span>

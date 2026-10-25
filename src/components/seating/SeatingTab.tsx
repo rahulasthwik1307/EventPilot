@@ -389,7 +389,7 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
             value={tableTypeFilter}
             onChange={(e) => setTableTypeFilter(e.target.value)}
             aria-label="Filter by table type"
-            className="px-2.5 py-1.5 text-xs bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#D97706] text-[#1C1917]"
+            className="w-full sm:w-auto px-2.5 py-1.5 text-xs bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#D97706] text-[#1C1917]"
           >
             <option value="all">All Table Styles</option>
             {TABLE_TYPES.map((t) => (
@@ -403,7 +403,7 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
             value={occupancyFilter}
             onChange={(e) => setOccupancyFilter(e.target.value)}
             aria-label="Filter by occupancy"
-            className="px-2.5 py-1.5 text-xs bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#D97706] text-[#1C1917]"
+            className="w-full sm:w-auto px-2.5 py-1.5 text-xs bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#D97706] text-[#1C1917]"
           >
             <option value="all">All Occupancy States</option>
             <option value="has-vacancy">Has Open Seats</option>

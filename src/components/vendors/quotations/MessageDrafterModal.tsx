@@ -229,16 +229,16 @@ export function MessageDrafterModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3.5 border-t border-[#E7DFD5] flex items-center justify-between bg-[#FAF8F5]">
+        <div className="px-4 sm:px-6 py-3.5 border-t border-[#E7DFD5] flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-2.5 bg-[#FAF8F5]">
           <button
             type="button"
             onClick={onClose}
-            className="text-xs font-mono text-[#78716C] hover:text-[#1C1917] transition-colors"
+            className="w-full sm:w-auto text-xs font-mono text-[#78716C] hover:text-[#1C1917] transition-colors text-center py-2 sm:py-0"
           >
             Cancel
           </button>
 
-          <Button variant="primary" onClick={handleCopyMessage} className="text-xs font-mono shadow-sm">
+          <Button variant="primary" onClick={handleCopyMessage} className="w-full sm:w-auto text-xs font-mono shadow-sm">
             {copied ? (
               <>
                 <Check className="w-3.5 h-3.5 mr-1.5 text-emerald-600" />

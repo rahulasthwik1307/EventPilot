@@ -447,11 +447,11 @@ export function EventEditDialog({
           </div>
         )}
 
-        <div className="border-t border-neutral-border pt-4 flex items-center justify-end gap-3">
+        <div className="border-t border-neutral-border pt-4 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 sm:gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-md text-sm font-medium text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border transition-colors"
+            className="w-full sm:w-auto px-4 py-2.5 rounded-md text-sm font-medium text-neutral-text bg-neutral-surface hover:bg-neutral-subtle border border-neutral-border transition-colors text-center"
           >
             Cancel
           </button>
@@ -459,7 +459,7 @@ export function EventEditDialog({
             type="submit"
             disabled={isSaving || isStale}
             title={isStale ? 'Event data changed in another session. Please recalculate or refresh before saving.' : undefined}
-            className="px-5 py-2 rounded-md text-sm font-semibold text-neutral-text bg-primary hover:bg-primary-hover hover:text-white transition-colors shadow-xs disabled:opacity-60"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-md text-sm font-semibold text-neutral-text bg-primary hover:bg-primary-hover hover:text-white transition-colors shadow-xs disabled:opacity-60 text-center"
           >
             {isSaving ? 'Saving...' : 'Save Changes'}
           </button>

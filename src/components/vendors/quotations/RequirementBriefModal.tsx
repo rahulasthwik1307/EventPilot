@@ -359,20 +359,20 @@ export function RequirementBriefModal({
         </div>
 
         {/* Footer */}
-        <div className="p-5 border-t border-[#E7DFD5] flex items-center justify-between bg-[#FAF8F5]">
+        <div className="p-4 sm:p-5 border-t border-[#E7DFD5] flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 bg-[#FAF8F5]">
           <button
             type="button"
             onClick={onClose}
-            className="text-xs font-mono font-semibold text-[#78716C] hover:text-[#1C1917]"
+            className="w-full sm:w-auto text-xs font-mono font-semibold text-[#78716C] hover:text-[#1C1917] text-center py-2 sm:py-0"
           >
             Close
           </button>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <Button
               variant="outline"
               onClick={handleDownloadPdf}
-              className="text-xs font-mono font-semibold border-[#FED7AA] bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#9A3412] shadow-xs"
+              className="w-full sm:w-auto text-xs font-mono font-semibold border-[#FED7AA] bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#9A3412] shadow-xs"
             >
               <Download className="w-3.5 h-3.5 mr-1.5 text-[#C2410C]" />
               <span>Download as PDF</span>
@@ -380,7 +380,7 @@ export function RequirementBriefModal({
             <Button
               variant="primary"
               onClick={handleCopy}
-              className="text-xs font-mono font-bold bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm"
+              className="w-full sm:w-auto text-xs font-mono font-bold bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm"
             >
               {copied ? (
                 <>

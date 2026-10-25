@@ -56,7 +56,7 @@ export function WorkspaceHeader({
             </div>
 
             <div className="flex items-center gap-2.5">
-              <h1 className="font-display text-2xl sm:text-3xl font-semibold text-neutral-text tracking-tight truncate">
+              <h1 className="font-display text-2xl sm:text-3xl font-semibold text-neutral-text tracking-tight break-words sm:truncate">
                 {event.title}
               </h1>
               <span className="hidden sm:inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary-subtle text-primary" title="Auspicious Milestone Planning">
@@ -92,7 +92,7 @@ export function WorkspaceHeader({
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-2.5 pt-2 md:pt-0 self-start md:self-auto flex-shrink-0">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 pt-2 md:pt-0 self-start md:self-auto flex-shrink-0">
             {onReplan && (
               <button
                 type="button"

@@ -260,7 +260,7 @@ export function EditorialNocturneHero({
               </div>
 
               {/* Folio Metrics Breakdown */}
-              <div className="grid grid-cols-3 gap-3 bg-neutral-subtle p-4 rounded-lg">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-neutral-subtle p-4 rounded-lg">
                 <div>
                   <p className="text-sm font-medium text-neutral-text">Guest Scale</p>
                   <p className="text-lg font-bold text-neutral-text mt-0.5">
