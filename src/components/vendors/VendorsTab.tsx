@@ -316,11 +316,11 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
           {/* Card 1: Total Quotes Received */}
           <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+              <div className="flex items-start justify-between gap-1.5 mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted leading-tight">
                   Total Quotes Received
                 </span>
-                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-neutral-surface border border-neutral-border text-neutral-muted">
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-neutral-surface border border-neutral-border text-neutral-muted whitespace-nowrap shrink-0">
                   Market
                 </span>
               </div>
@@ -336,11 +336,11 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
           {/* Card 2: Agreed Commitments */}
           <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+              <div className="flex items-start justify-between gap-1.5 mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted leading-tight">
                   Agreed Commitments
                 </span>
-                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-primary-subtle border border-primary/30 text-primary">
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-primary-subtle border border-primary/30 text-primary whitespace-nowrap shrink-0">
                   {financials.bookedCount} Booked
                 </span>
               </div>
@@ -356,11 +356,11 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
           {/* Card 3: Total Paid to Date */}
           <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+              <div className="flex items-start justify-between gap-1.5 mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted leading-tight">
                   Total Paid to Date
                 </span>
-                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-status-success-subtle border border-status-success/30 text-status-success">
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-status-success-subtle border border-status-success/30 text-status-success whitespace-nowrap shrink-0">
                   {overallSettlementPct}%
                 </span>
               </div>
@@ -376,11 +376,11 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
           {/* Card 4: Outstanding Balances */}
           <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+              <div className="flex items-start justify-between gap-1.5 mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted leading-tight">
                   Outstanding Balances
                 </span>
-                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-secondary-subtle border border-secondary/30 text-secondary">
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-secondary-subtle border border-secondary/30 text-secondary whitespace-nowrap shrink-0">
                   Payable
                 </span>
               </div>
