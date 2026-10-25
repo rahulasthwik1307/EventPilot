@@ -137,35 +137,49 @@ export function Dialog({
         )}
 
         {/* Pinned Dialog Header */}
-        <div className="flex items-start justify-between border-b border-neutral-border px-4 py-4 sm:px-8 sm:py-6 flex-shrink-0 bg-neutral-surface">
-          <div className="pr-2 flex-1 min-w-0">
-            {typeof title === 'string' ? (
-              <h2
-                id="dialog-title"
-                className="font-display text-xl sm:text-2xl font-semibold text-neutral-text leading-tight break-words"
+        <div className="border-b border-neutral-border px-4 py-4 sm:px-8 sm:py-6 flex-shrink-0 bg-neutral-surface">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0 pr-1 sm:pr-2">
+              {typeof title === 'string' ? (
+                <h2
+                  id="dialog-title"
+                  className="font-display text-xl sm:text-2xl font-semibold text-neutral-text leading-tight"
+                >
+                  {title}
+                </h2>
+              ) : (
+                <div id="dialog-title">{title}</div>
+              )}
+              {description && (
+                <p id="dialog-description" className="text-xs sm:text-sm text-neutral-muted mt-1 leading-normal">
+                  {description}
+                </p>
+              )}
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0 ml-2 sm:ml-4">
+              {/* Desktop headerActions */}
+              {headerActions && (
+                <div className="hidden sm:flex items-center gap-2">
+                  {headerActions}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close dialog"
+                className="text-neutral-muted hover:text-neutral-text hover:bg-neutral-subtle p-1.5 rounded-md transition-colors"
               >
-                {title}
-              </h2>
-            ) : (
-              <div id="dialog-title" className="break-words">{title}</div>
-            )}
-            {description && (
-              <p id="dialog-description" className="text-xs sm:text-sm text-neutral-muted mt-1 leading-normal">
-                {description}
-              </p>
-            )}
+                <X className="w-5 h-5" aria-hidden="true" />
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-2 flex-shrink-0 ml-3 sm:ml-4">
-            {headerActions}
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close dialog"
-              className="text-neutral-muted hover:text-neutral-text hover:bg-neutral-subtle p-1.5 rounded-md transition-colors"
-            >
-              <X className="w-5 h-5" aria-hidden="true" />
-            </button>
-          </div>
+
+          {/* Mobile headerActions sub-row */}
+          {headerActions && (
+            <div className="sm:hidden mt-3 pt-3 border-t border-neutral-border/60 flex items-center justify-between gap-2 w-full">
+              {headerActions}
+            </div>
+          )}
         </div>
 
         {/* Scrollable Content Body */}

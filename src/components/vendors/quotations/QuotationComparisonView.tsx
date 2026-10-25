@@ -132,15 +132,15 @@ export function QuotationComparisonView({
       onClose={onClose}
       title={
         <div>
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex flex-wrap items-center gap-2 mb-1.5">
             <span className="text-[11px] font-mono uppercase tracking-wider text-[#C2410C] font-bold">
               Vendor Procurement
             </span>
             <CouponBadge variant="marigold">Side-by-Side Comparison</CouponBadge>
           </div>
-          <span className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917] tracking-tight">
+          <h2 className="font-serif text-xl sm:text-3xl font-bold text-[#1C1917] tracking-tight leading-snug">
             Quotation Comparison &amp; Scope Alignment
-          </span>
+          </h2>
         </div>
       }
       description="Objective side-by-side comparison across pricing, scope deliverables, hidden charges, and contract terms."
@@ -148,7 +148,7 @@ export function QuotationComparisonView({
         <Button
           variant="outline"
           onClick={() => onAddNewQuote(selectedCategory)}
-          className="text-xs font-mono font-bold border-neutral-border bg-neutral-surface text-neutral-text hover:bg-neutral-subtle shadow-sm"
+          className="w-full sm:w-auto text-xs font-mono font-bold border-neutral-border bg-neutral-surface text-neutral-text hover:bg-neutral-subtle shadow-sm justify-center"
         >
           <Plus className="w-3.5 h-3.5 mr-1.5 text-primary" />
           <span>Add Quotation</span>
@@ -162,7 +162,7 @@ export function QuotationComparisonView({
 
         {/* Category Tabs */}
         {availableCategories.length > 1 && (
-          <div className="flex border-b border-[#E7DFD5] px-6 overflow-x-auto gap-2 py-2.5 bg-[#FAF8F5]">
+          <div className="flex border-b border-[#E7DFD5] px-4 sm:px-6 overflow-x-auto gap-2 py-2.5 bg-[#FAF8F5]">
             {availableCategories.map((cat) => (
               <button
                 key={cat}
@@ -181,9 +181,9 @@ export function QuotationComparisonView({
         )}
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1 bg-[#FAF8F5]/30">
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-4 sm:space-y-6 flex-1 bg-[#FAF8F5]/30">
           {categoryQuotes.length === 0 ? (
-            <div className="p-12 text-center border border-dashed border-[#E7DFD5] rounded-xl space-y-3 bg-white">
+            <div className="p-8 sm:p-12 text-center border border-dashed border-[#E7DFD5] rounded-xl space-y-3 bg-white">
               <FileText className="w-10 h-10 text-[#A8A29E] mx-auto opacity-60" />
               <p className="text-sm font-semibold text-[#1C1917]">
                 No quotations recorded for {selectedCategory}.
@@ -204,28 +204,28 @@ export function QuotationComparisonView({
             <>
               {/* Variance & Metrics Header Card */}
               {categoryQuotes.length > 1 && !comparisonResult.hasCurrencyMismatch && (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 bg-white border border-[#E7DFD5] rounded-xl p-4 shadow-sm">
-                  <div className="p-3 bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg">
-                    <span className="text-[11px] font-mono uppercase tracking-wider text-[#78716C] font-semibold block mb-1">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3.5 bg-white border border-[#E7DFD5] rounded-xl p-3 sm:p-4 shadow-sm">
+                  <div className="p-2.5 sm:p-3 bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg flex sm:flex-col items-center sm:items-start justify-between sm:justify-start">
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-[#78716C] font-semibold block sm:mb-1">
                       Lowest Quoted Total
                     </span>
-                    <span className="font-mono text-xl font-bold text-[#059669]">
+                    <span className="font-mono text-base sm:text-xl font-bold text-[#059669]">
                       {formatCurrency(comparisonResult.basePriceComparison.lowestQuotedTotal, comparisonResult.currency)}
                     </span>
                   </div>
-                  <div className="p-3 bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg">
-                    <span className="text-[11px] font-mono uppercase tracking-wider text-[#78716C] font-semibold block mb-1">
+                  <div className="p-2.5 sm:p-3 bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg flex sm:flex-col items-center sm:items-start justify-between sm:justify-start">
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-[#78716C] font-semibold block sm:mb-1">
                       Highest Quoted Total
                     </span>
-                    <span className="font-mono text-xl font-bold text-[#1C1917]">
+                    <span className="font-mono text-base sm:text-xl font-bold text-[#1C1917]">
                       {formatCurrency(comparisonResult.basePriceComparison.highestQuotedTotal, comparisonResult.currency)}
                     </span>
                   </div>
-                  <div className="p-3 bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg">
-                    <span className="text-[11px] font-mono uppercase tracking-wider text-[#C2410C] font-semibold block mb-1">
+                  <div className="p-2.5 sm:p-3 bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg flex sm:flex-col items-center sm:items-start justify-between sm:justify-start">
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-[#C2410C] font-semibold block sm:mb-1">
                       Price Variance
                     </span>
-                    <span className="font-mono text-xl font-bold text-[#C2410C]">
+                    <span className="font-mono text-base sm:text-xl font-bold text-[#C2410C]">
                       {formatCurrency(comparisonResult.basePriceComparison.variance, comparisonResult.currency)}
                     </span>
                   </div>
@@ -453,7 +453,7 @@ export function QuotationComparisonView({
                       variant="outline"
                       onClick={handleFetchAiInsights}
                       disabled={isFetchingAiInsights}
-                      className="text-xs font-mono self-start sm:self-auto border-[#E7DFD5] bg-white text-[#1C1917] hover:bg-[#FAF8F5]"
+                      className="w-full sm:w-auto text-xs font-mono justify-center border-[#E7DFD5] bg-white text-[#1C1917] hover:bg-[#FAF8F5]"
                     >
                       <Sparkles className="w-3.5 h-3.5 mr-1.5 text-[#D97706]" />
                       <span>{isFetchingAiInsights ? 'Analyzing Insights...' : 'Analyze Qualitative Insights'}</span>
@@ -486,10 +486,10 @@ export function QuotationComparisonView({
                         </div>
 
                         <div className="space-y-1 flex-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <span className="font-bold text-[#1C1917]">{f.summary}</span>
                             <span
-                              className={`px-1.5 py-0.2 rounded text-[10px] font-mono uppercase font-semibold ${
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-mono uppercase font-semibold ${
                                 isAi
                                   ? 'bg-[#F3E8FF] text-[#6B21A8] border border-[#E9D5FF]'
                                   : 'bg-[#FAF8F5] text-[#78716C] border border-[#E7DFD5]'

@@ -1,6 +1,6 @@
 {
  "url": "http://localhost:3000",
- "at": "2026-10-25T15:35:46.410Z",
+ "at": "2026-10-25T15:52:16.896Z",
  "allow": [],
  "viewports": [
   {
@@ -17,8 +17,8 @@
     0.58
    ],
    "motion": {
-    "elements": 30,
-    "css": 29,
+    "elements": 29,
+    "css": 28,
     "transitions": 0,
     "scripted": 1,
     "videos": 0,

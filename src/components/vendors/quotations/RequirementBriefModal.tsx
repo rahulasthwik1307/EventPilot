@@ -77,30 +77,36 @@ export function RequirementBriefModal({
       onClose={onClose}
       title={
         <div>
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex flex-wrap items-center gap-2 mb-1.5">
             <span className="text-[11px] font-mono uppercase tracking-wider text-[#C2410C] font-bold">
               Vendor Procurement
             </span>
             <CouponBadge variant="marigold">Requirement Brief</CouponBadge>
           </div>
-          <span className="font-serif text-2xl font-bold text-[#1C1917] tracking-tight">
+          <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#1C1917] tracking-tight leading-snug">
             Vendor Requirement Brief Generator
-          </span>
+          </h2>
         </div>
       }
       description="Professional, privacy-safe scope summary tailored to your celebration parameters and confirmed preferences."
       headerActions={
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value as VendorCategory)}
-          className="bg-neutral-surface border border-neutral-border rounded-lg px-3 py-1.5 text-xs font-mono font-medium text-neutral-text focus:outline-none focus:ring-1 focus:ring-primary shadow-sm"
-        >
-          {VENDOR_CATEGORIES.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.label}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <label htmlFor="requirement-brief-category" className="text-xs font-mono font-bold text-[#78716C] shrink-0 sm:sr-only">
+            Service Category:
+          </label>
+          <select
+            id="requirement-brief-category"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value as VendorCategory)}
+            className="w-full sm:w-auto bg-neutral-surface border border-neutral-border rounded-lg px-3 py-1.5 text-xs font-mono font-medium text-neutral-text focus:outline-none focus:ring-1 focus:ring-primary shadow-sm"
+          >
+            {VENDOR_CATEGORIES.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.label}
+              </option>
+            ))}
+          </select>
+        </div>
       }
       maxWidth="2xl"
       accentBar
@@ -109,18 +115,18 @@ export function RequirementBriefModal({
       <div className="flex flex-col flex-1 min-h-0 bg-white">
 
         {/* Privacy Notice Banner */}
-        <div className="px-6 py-2.5 bg-[#ECFDF5] border-b border-[#A7F3D0] flex items-center gap-2 text-xs font-mono text-[#065F46]">
-          <ShieldCheck className="w-4 h-4 text-[#059669] shrink-0" />
-          <span>
+        <div className="px-4 sm:px-6 py-2.5 bg-[#ECFDF5] border-b border-[#A7F3D0] flex items-start sm:items-center gap-2.5 text-xs font-mono text-[#065F46] leading-relaxed">
+          <ShieldCheck className="w-4 h-4 text-[#059669] shrink-0 mt-0.5 sm:mt-0" />
+          <span className="flex-1 min-w-0">
             Privacy Shield Active: Private guest lists, individual contact details, and internal host notes are strictly excluded from this brief.
           </span>
         </div>
 
         {/* Parameter Strip (Redesigned Balanced Grid - Zero Dead Space, Zero Clipping, Rich Hierarchy) */}
-        <div className="px-6 py-3.5 bg-[#FAF8F5] border-b border-[#E7DFD5]">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-mono">
+        <div className="px-4 sm:px-6 py-3 sm:py-3.5 bg-[#FAF8F5] border-b border-[#E7DFD5]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 text-xs font-mono">
             {/* Card 1: Target Date */}
-            <div className="p-3 bg-white border border-[#E7DFD5] rounded-xl flex items-start gap-3 shadow-[0_1px_2px_rgba(28,25,23,0.03)] hover:border-[#D6CCC2] transition-colors">
+            <div className="p-2.5 sm:p-3 bg-white border border-[#E7DFD5] rounded-xl flex items-start gap-2.5 sm:gap-3 shadow-[0_1px_2px_rgba(28,25,23,0.03)] hover:border-[#D6CCC2] transition-colors">
               <div className="w-8 h-8 rounded-lg bg-[#FFF7ED] border border-[#FFEDD5] flex items-center justify-center shrink-0 mt-0.5">
                 <Calendar className="w-4 h-4 text-[#C2410C]" />
               </div>
@@ -139,7 +145,7 @@ export function RequirementBriefModal({
             </div>
 
             {/* Card 2: Headcount */}
-            <div className="p-3 bg-white border border-[#E7DFD5] rounded-xl flex items-start gap-3 shadow-[0_1px_2px_rgba(28,25,23,0.03)] hover:border-[#D6CCC2] transition-colors">
+            <div className="p-2.5 sm:p-3 bg-white border border-[#E7DFD5] rounded-xl flex items-start gap-2.5 sm:gap-3 shadow-[0_1px_2px_rgba(28,25,23,0.03)] hover:border-[#D6CCC2] transition-colors">
               <div className="w-8 h-8 rounded-lg bg-[#FEF3C7] border border-[#FDE68A] flex items-center justify-center shrink-0 mt-0.5">
                 <Users className="w-4 h-4 text-[#D97706]" />
               </div>
@@ -158,7 +164,7 @@ export function RequirementBriefModal({
             </div>
 
             {/* Card 3: Location */}
-            <div className="p-3 bg-white border border-[#E7DFD5] rounded-xl flex items-start gap-3 shadow-[0_1px_2px_rgba(28,25,23,0.03)] hover:border-[#D6CCC2] transition-colors">
+            <div className="p-2.5 sm:p-3 bg-white border border-[#E7DFD5] rounded-xl flex items-start gap-2.5 sm:gap-3 shadow-[0_1px_2px_rgba(28,25,23,0.03)] hover:border-[#D6CCC2] transition-colors">
               <div className="w-8 h-8 rounded-lg bg-[#F5F5F4] border border-[#E7E5E4] flex items-center justify-center shrink-0 mt-0.5">
                 <MapPin className="w-4 h-4 text-[#78716C]" />
               </div>
@@ -177,7 +183,7 @@ export function RequirementBriefModal({
             </div>
 
             {/* Card 4: Category Budget */}
-            <div className="p-3 bg-white border border-[#E7DFD5] rounded-xl flex items-start gap-3 shadow-[0_1px_2px_rgba(28,25,23,0.03)] hover:border-[#D6CCC2] transition-colors">
+            <div className="p-2.5 sm:p-3 bg-white border border-[#E7DFD5] rounded-xl flex items-start gap-2.5 sm:gap-3 shadow-[0_1px_2px_rgba(28,25,23,0.03)] hover:border-[#D6CCC2] transition-colors">
               <div className="w-8 h-8 rounded-lg bg-[#ECFDF5] border border-[#A7F3D0] flex items-center justify-center shrink-0 mt-0.5">
                 <Wallet className="w-4 h-4 text-[#059669]" />
               </div>
@@ -198,12 +204,12 @@ export function RequirementBriefModal({
         </div>
 
         {/* View Mode Toggle: Formatted Document vs Raw Markdown Editor */}
-        <div className="flex items-center justify-between px-6 pt-3 pb-2 border-b border-[#E7DFD5] bg-white">
-          <div className="flex gap-2">
+        <div className="flex items-center justify-between px-4 sm:px-6 pt-3 pb-2 border-b border-[#E7DFD5] bg-white">
+          <div className="flex gap-2 w-full sm:w-auto">
             <button
               type="button"
               onClick={() => setActiveTab('formatted')}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
+              className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
                 activeTab === 'formatted'
                   ? 'bg-[#FFEDD5] text-[#9A3412] border border-[#FED7AA]'
                   : 'bg-[#FAF8F5] text-[#78716C] hover:text-[#1C1917] border border-[#E7DFD5]'
@@ -215,7 +221,7 @@ export function RequirementBriefModal({
             <button
               type="button"
               onClick={() => setActiveTab('raw')}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
+              className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
                 activeTab === 'raw'
                   ? 'bg-[#FFEDD5] text-[#9A3412] border border-[#FED7AA]'
                   : 'bg-[#FAF8F5] text-[#78716C] hover:text-[#1C1917] border border-[#E7DFD5]'
@@ -232,19 +238,19 @@ export function RequirementBriefModal({
         </div>
 
         {/* Content Body */}
-        <div className="p-6 overflow-y-auto space-y-4 flex-1 bg-[#FAF8F5]/40">
+        <div className="p-3.5 sm:p-6 overflow-y-auto space-y-4 flex-1 bg-[#FAF8F5]/40">
           {activeTab === 'formatted' ? (
             /* 1. Formatted Document Preview */
-            <div className="bg-white border border-[#E7DFD5] rounded-xl p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="bg-white border border-[#E7DFD5] rounded-xl p-4 sm:p-8 shadow-sm space-y-5 sm:space-y-6">
               {/* Document Letterhead */}
               <div className="border-b border-[#E7DFD5] pb-5">
                 <span className="text-[11px] font-mono uppercase tracking-widest text-[#C2410C] font-bold block mb-1">
                   Official Procurement Brief
                 </span>
-                <h3 className="font-serif text-2xl font-bold text-[#1C1917]">
+                <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#1C1917] leading-snug">
                   Vendor Requirement Brief: {brief.categoryLabel}
                 </h3>
-                <p className="text-xs text-[#78716C] mt-1 font-mono">
+                <p className="text-xs text-[#78716C] mt-1.5 font-mono leading-relaxed">
                   <strong>Celebration:</strong> {event.title} ({event.type || 'Celebration'}) · <strong>Date:</strong> {brief.eventDate}
                   {brief.location ? (
                     <> · <strong>Location:</strong> {brief.location}</>
@@ -300,10 +306,10 @@ export function RequirementBriefModal({
                     {brief.timingConstraints.map((t, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center justify-between p-2.5 rounded-lg bg-[#FAF8F5] border border-[#E7DFD5] text-xs"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 p-2.5 rounded-lg bg-[#FAF8F5] border border-[#E7DFD5] text-xs"
                       >
                         <span className="font-semibold text-[#1C1917]">{t.milestone}</span>
-                        <span className="font-mono text-[11px] text-[#78716C] bg-white px-2 py-0.5 rounded border border-[#E7DFD5]">
+                        <span className="font-mono text-[11px] text-[#78716C] bg-white px-2 py-0.5 rounded border border-[#E7DFD5] self-start sm:self-auto shrink-0">
                           Due by {t.dueDate}
                         </span>
                       </div>
