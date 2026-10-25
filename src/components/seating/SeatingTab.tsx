@@ -501,58 +501,61 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
                     }`}
                   >
                     <div>
-                      {/* Table Header: Type + Status on top, Action Buttons right, Table Name full width below */}
+                      {/* Table Header: Clean, Attractive & Balanced */}
                       <div className="mb-3 space-y-2">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#FAF8F5] border border-[#E7DFD5] text-[#78716C] font-semibold">
-                              {tableTypeLabel}
-                            </span>
-                            {occ.isOverCapacity ? (
-                              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded bg-[#FEF2F2] text-[#DC2626] border border-[#FCA5A5]">
-                                Over by {occ.currentOccupancy - table.capacity}
-                              </span>
-                            ) : occ.isFull ? (
-                              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0]">
-                                Table Full
-                              </span>
-                            ) : (
-                              <span className="text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-[#FAF8F5] border border-[#E7DFD5] text-[#047857]">
-                                {occ.availableSeats} seat(s) open
-                              </span>
-                            )}
-                          </div>
+                        {/* Row 1: Table Title on left, Sleek actions on right */}
+                        <div className="flex items-start justify-between gap-2.5">
+                          <h4 className="font-serif text-lg font-bold text-[#1C1917] tracking-tight leading-snug">
+                            {table.name}
+                          </h4>
 
-                          <div className="flex items-center gap-1 shrink-0">
-                            <Button
-                              variant="ghost"
-                              size="sm"
+                          <div className="flex items-center gap-1 shrink-0 -mt-0.5">
+                            <button
+                              type="button"
                               onClick={() => {
                                 setEditingTable(table);
                                 setIsTableDialogOpen(true);
                               }}
-                              className="text-xs text-[#78716C] hover:text-[#1C1917] hover:bg-[#FAF8F5] px-2 py-1 h-auto"
+                              className="p-1.5 text-[#78716C] hover:text-[#1C1917] hover:bg-[#FAF8F5] rounded-lg transition-colors border border-transparent hover:border-[#E7DFD5]"
                               title="Edit table"
+                              aria-label={`Edit ${table.name}`}
                             >
-                              <Edit2 className="w-3.5 h-3.5 mr-1" />
-                              <span>Edit</span>
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
                               onClick={() => setDeletingTable(table)}
-                              className="text-xs text-[#DC2626] hover:bg-[#FEF2F2] px-2 py-1 h-auto"
+                              className="p-1.5 text-[#A8A29E] hover:text-[#DC2626] hover:bg-[#FEF2F2] rounded-lg transition-colors border border-transparent hover:border-[#FCA5A5]"
                               title="Delete table"
+                              aria-label={`Delete ${table.name}`}
                             >
-                              <Trash2 className="w-3.5 h-3.5 mr-1" />
-                              <span>Delete</span>
-                            </Button>
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         </div>
 
-                        <h4 className="font-serif text-lg font-bold text-[#1C1917] tracking-tight leading-snug">
-                          {table.name}
-                        </h4>
+                        {/* Row 2: Table Metadata & Status Pills in a Single Neat Row */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="inline-flex items-center text-[11px] font-mono px-2 py-0.5 rounded-md bg-[#FAF8F5] border border-[#E7DFD5] text-[#78716C] font-semibold whitespace-nowrap">
+                            {tableTypeLabel}
+                          </span>
+                          {occ.isOverCapacity ? (
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#FEF2F2] text-[#DC2626] border border-[#FCA5A5] whitespace-nowrap">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#DC2626]" />
+                              Over by {occ.currentOccupancy - table.capacity}
+                            </span>
+                          ) : occ.isFull ? (
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0] whitespace-nowrap">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#059669]" />
+                              Table Full
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium px-2 py-0.5 rounded-md bg-[#FAF8F5] border border-[#E7DFD5] text-[#047857] whitespace-nowrap">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#047857]" />
+                              {occ.availableSeats} seat(s) open
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {/* Capacity Meter Bar */}
