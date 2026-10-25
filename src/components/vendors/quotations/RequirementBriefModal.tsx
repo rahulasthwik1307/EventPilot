@@ -6,6 +6,7 @@ import { VendorCategory } from '@/features/vendors/types';
 import { generateVendorRequirementBrief } from '@/features/vendors/quotations/brief-engine';
 import { downloadVendorBriefPdf } from '@/features/vendors/quotations/brief-pdf';
 import { VENDOR_CATEGORIES } from '@/features/vendors/vendor-engine';
+import { formatDateDisplay } from '@/features/events/validation';
 import { Button } from '../../ui/Button';
 import { Dialog } from '../../ui/Dialog';
 import { CouponBadge } from '../../ui/Badge';
@@ -17,7 +18,6 @@ import {
   Download,
   Edit3,
   FileCheck2,
-  FileText,
   MapPin,
   ShieldCheck,
   Users,
@@ -71,18 +71,6 @@ export function RequirementBriefModal({
     downloadVendorBriefPdf(brief);
   };
 
-  const handleDownloadTxt = () => {
-    const blob = new Blob([briefText], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Requirement-Brief-${selectedCategory}-${event.title.replace(/\s+/g, '_')}.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <Dialog
       isOpen={isOpen}
@@ -128,41 +116,81 @@ export function RequirementBriefModal({
           </span>
         </div>
 
-        {/* Parameter Strip (Single-Row Compact Cards - Fully responsive without clipping) */}
+        {/* Parameter Strip (Redesigned Balanced Grid - Zero Dead Space, Zero Clipping, Rich Hierarchy) */}
         <div className="px-6 py-3.5 bg-[#FAF8F5] border-b border-[#E7DFD5]">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
-            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-start gap-2.5 min-h-[58px]">
-              <Calendar className="w-4 h-4 text-[#C2410C] shrink-0 mt-0.5" />
-              <div className="min-w-0 flex-1">
-                <span className="text-[10px] uppercase font-bold text-[#78716C] block">Target Date</span>
-                <span className="text-[#1C1917] font-bold text-[11px] sm:text-xs leading-snug break-words block">{brief.eventDate}</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-mono">
+            {/* Card 1: Target Date */}
+            <div className="p-3 bg-white border border-[#E7DFD5] rounded-xl flex items-start gap-3 shadow-[0_1px_2px_rgba(28,25,23,0.03)] hover:border-[#D6CCC2] transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-[#FFF7ED] border border-[#FFEDD5] flex items-center justify-center shrink-0 mt-0.5">
+                <Calendar className="w-4 h-4 text-[#C2410C]" />
               </div>
-            </div>
-
-            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-start gap-2.5 min-h-[58px]">
-              <Users className="w-4 h-4 text-[#D97706] shrink-0 mt-0.5" />
               <div className="min-w-0 flex-1">
-                <span className="text-[10px] uppercase font-bold text-[#78716C] block">Headcount</span>
-                <span className="text-[#1C1917] font-bold text-[11px] sm:text-xs leading-snug break-words block">{brief.guestTarget} guests</span>
-              </div>
-            </div>
-
-            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-start gap-2.5 min-h-[58px]">
-              <MapPin className="w-4 h-4 text-[#78716C] shrink-0 mt-0.5" />
-              <div className="min-w-0 flex-1">
-                <span className="text-[10px] uppercase font-bold text-[#78716C] block">Location</span>
-                <span className="text-[#1C1917] font-bold text-[11px] sm:text-xs leading-snug break-words block">
-                  {brief.location || 'To be finalized'}
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#78716C] block">Target Date</span>
+                  <span className="text-[9px] text-[#A8A29E] font-medium hidden sm:inline">Celebration</span>
+                </div>
+                <span className="text-[#1C1917] font-bold text-xs sm:text-sm font-mono leading-snug block">
+                  {formatDateDisplay(brief.eventDate)}
+                </span>
+                <span className="text-[10px] text-[#A8A29E] font-medium leading-tight block mt-0.5">
+                  Confirmed Timeline
                 </span>
               </div>
             </div>
 
-            <div className="p-2.5 bg-white border border-[#E7DFD5] rounded-lg flex items-start gap-2.5 min-h-[58px]">
-              <Wallet className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
+            {/* Card 2: Headcount */}
+            <div className="p-3 bg-white border border-[#E7DFD5] rounded-xl flex items-start gap-3 shadow-[0_1px_2px_rgba(28,25,23,0.03)] hover:border-[#D6CCC2] transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-[#FEF3C7] border border-[#FDE68A] flex items-center justify-center shrink-0 mt-0.5">
+                <Users className="w-4 h-4 text-[#D97706]" />
+              </div>
               <div className="min-w-0 flex-1">
-                <span className="text-[10px] uppercase font-bold text-[#78716C] block">Category Budget</span>
-                <span className="text-[#059669] font-bold text-[11px] sm:text-xs leading-snug break-words block">
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#78716C] block">Headcount</span>
+                  <span className="text-[9px] text-[#A8A29E] font-medium hidden sm:inline">Attendance</span>
+                </div>
+                <span className="text-[#1C1917] font-bold text-xs sm:text-sm font-mono leading-snug block">
+                  {brief.guestTarget} guests
+                </span>
+                <span className="text-[10px] text-[#A8A29E] font-medium leading-tight block mt-0.5">
+                  Planning Base Scope
+                </span>
+              </div>
+            </div>
+
+            {/* Card 3: Location */}
+            <div className="p-3 bg-white border border-[#E7DFD5] rounded-xl flex items-start gap-3 shadow-[0_1px_2px_rgba(28,25,23,0.03)] hover:border-[#D6CCC2] transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-[#F5F5F4] border border-[#E7E5E4] flex items-center justify-center shrink-0 mt-0.5">
+                <MapPin className="w-4 h-4 text-[#78716C]" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#78716C] block">Location</span>
+                  <span className="text-[9px] text-[#A8A29E] font-medium hidden sm:inline">Venue</span>
+                </div>
+                <span className="text-[#1C1917] font-bold text-xs sm:text-sm font-mono leading-snug break-words block">
+                  {brief.location || 'To be finalized'}
+                </span>
+                <span className="text-[10px] text-[#A8A29E] font-medium leading-tight block mt-0.5">
+                  Celebration Venue
+                </span>
+              </div>
+            </div>
+
+            {/* Card 4: Category Budget */}
+            <div className="p-3 bg-white border border-[#E7DFD5] rounded-xl flex items-start gap-3 shadow-[0_1px_2px_rgba(28,25,23,0.03)] hover:border-[#D6CCC2] transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-[#ECFDF5] border border-[#A7F3D0] flex items-center justify-center shrink-0 mt-0.5">
+                <Wallet className="w-4 h-4 text-[#059669]" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#78716C] block">Category Budget</span>
+                  <span className="text-[9px] text-[#059669]/70 font-medium hidden sm:inline">Envelope</span>
+                </div>
+                <span className="text-[#059669] font-bold text-xs sm:text-sm font-mono leading-snug block">
                   {brief.allocatedCategoryBudgetFormatted || 'Envelope open'}
+                </span>
+                <span className="text-[10px] text-[#059669]/75 font-medium leading-tight block mt-0.5">
+                  Allocated Cap
                 </span>
               </div>
             </div>
@@ -348,14 +376,6 @@ export function RequirementBriefModal({
             >
               <Download className="w-3.5 h-3.5 mr-1.5 text-[#C2410C]" />
               <span>Download as PDF</span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleDownloadTxt}
-              className="text-xs font-mono border-[#E7DFD5] text-[#78716C] bg-white hover:bg-[#FAF8F5]"
-            >
-              <FileText className="w-3.5 h-3.5 mr-1.5" />
-              <span>Download .txt</span>
             </Button>
             <Button
               variant="primary"

@@ -805,14 +805,12 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
                       className="hover:bg-primary-subtle/20 transition-colors group"
                     >
                       <td className="py-3 px-3.5">
-                        <div className="font-semibold text-neutral-text text-sm leading-tight">
+                        <div
+                          className="font-semibold text-neutral-text text-sm leading-tight"
+                          title={exp.notes || undefined}
+                        >
                           {exp.title}
                         </div>
-                        {exp.notes && (
-                          <div className="text-[11px] text-neutral-muted mt-0.5 max-w-md line-clamp-1">
-                            {exp.notes}
-                          </div>
-                        )}
                       </td>
                       <td className="py-3 px-3 whitespace-nowrap">
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-neutral-subtle border border-neutral-border text-neutral-text text-xs font-medium">

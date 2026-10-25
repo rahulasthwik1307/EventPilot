@@ -229,7 +229,7 @@ describe('Quotation UI Components', () => {
       expect(screen.getAllByText('Udaipur, Rajasthan').length).toBeGreaterThanOrEqual(1);
     });
 
-    it('renders Download as PDF, Download .txt, and Copy Brief action buttons', () => {
+    it('renders Download as PDF and Copy Brief action buttons (txt download removed)', () => {
       render(
         <RequirementBriefModal
           isOpen={true}
@@ -240,7 +240,7 @@ describe('Quotation UI Components', () => {
       );
 
       expect(screen.getByRole('button', { name: /Download as PDF/i })).toBeDefined();
-      expect(screen.getByRole('button', { name: /Download \.txt/i })).toBeDefined();
+      expect(screen.queryByRole('button', { name: /Download \.txt/i })).toBeNull();
       expect(screen.getByRole('button', { name: /Copy Brief/i })).toBeDefined();
     });
   });
