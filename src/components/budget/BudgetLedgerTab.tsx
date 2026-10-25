@@ -341,11 +341,11 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
           {/* Card 1: Budget Cap */}
           <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+              <div className="flex items-start justify-between gap-1.5 mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted leading-tight">
                   Budget Cap
                 </span>
-                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-neutral-surface border border-neutral-border text-neutral-muted">
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-neutral-surface border border-neutral-border text-neutral-muted whitespace-nowrap shrink-0">
                   Ceiling
                 </span>
               </div>
@@ -361,16 +361,12 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
           {/* Card 2: Allocated Planned */}
           <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between gap-1.5 mb-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+              <div className="flex items-start justify-between gap-1.5 mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted leading-tight">
                   Total Allocated
                 </span>
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-primary-subtle border border-primary/30 text-primary whitespace-nowrap shrink-0 shadow-xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                  <span>
-                    <strong className="font-bold">{categories.length}</strong>{' '}
-                    {categories.length === 1 ? 'Category' : 'Categories'}
-                  </span>
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-primary-subtle border border-primary/30 text-primary whitespace-nowrap shrink-0">
+                  {categories.length} {categories.length === 1 ? 'Category' : 'Categories'}
                 </span>
               </div>
               <p className="font-mono text-xl sm:text-2xl font-bold text-primary tracking-tight">
@@ -387,11 +383,11 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
           {/* Card 3: Actual Spent */}
           <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+              <div className="flex items-start justify-between gap-1.5 mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted leading-tight">
                   Actual Spent
                 </span>
-                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-status-success-subtle border border-status-success/30 text-status-success">
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-status-success-subtle border border-status-success/30 text-status-success whitespace-nowrap shrink-0">
                   Cleared
                 </span>
               </div>
@@ -407,12 +403,12 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
           {/* Card 4: Safety Reserve Buffer */}
           <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+              <div className="flex items-start justify-between gap-1.5 mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted leading-tight">
                   Unallocated Pool
                 </span>
                 <span
-                  className={`text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded border ${
+                  className={`text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded border whitespace-nowrap shrink-0 ${
                     summary.unallocatedBudget < 0
                       ? 'bg-status-danger-subtle border-status-danger/30 text-status-danger'
                       : 'bg-neutral-surface border-neutral-border text-neutral-text'

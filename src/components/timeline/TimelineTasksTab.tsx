@@ -327,11 +327,11 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
           {/* Card 1: Overall Progress */}
           <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+              <div className="flex items-start justify-between gap-1.5 mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted leading-tight">
                   Overall Progress
                 </span>
-                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-primary-subtle border border-primary/30 text-primary">
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-primary-subtle border border-primary/30 text-primary whitespace-nowrap shrink-0">
                   {metrics.pct}%
                 </span>
               </div>
@@ -353,11 +353,11 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
           {/* Card 2: Pending Tasks */}
           <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+              <div className="flex items-start justify-between gap-1.5 mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted leading-tight">
                   Pending Tasks
                 </span>
-                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-neutral-surface border border-neutral-border text-neutral-muted">
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-neutral-surface border border-neutral-border text-neutral-muted whitespace-nowrap shrink-0">
                   Active
                 </span>
               </div>
@@ -373,12 +373,12 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
           {/* Card 3: Overdue Tasks */}
           <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+              <div className="flex items-start justify-between gap-1.5 mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted leading-tight">
                   Overdue Tasks
                 </span>
                 <span
-                  className={`text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded border ${
+                  className={`text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded border whitespace-nowrap shrink-0 ${
                     metrics.overdue > 0
                       ? 'bg-status-danger-subtle border-status-danger/30 text-status-danger'
                       : 'bg-status-success-subtle border-status-success/30 text-status-success'
@@ -403,11 +403,11 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
           {/* Card 4: Celebration Date */}
           <div className="bg-neutral-subtle/60 border border-neutral-border rounded-lg p-3.5 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between gap-1.5 mb-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted">
+              <div className="flex items-start justify-between gap-1.5 mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-muted leading-tight">
                   Celebration Date
                 </span>
-                <span className="inline-flex items-center text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-neutral-surface border border-neutral-border text-neutral-muted whitespace-nowrap shrink-0 shadow-xs">
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-neutral-surface border border-neutral-border text-neutral-muted whitespace-nowrap shrink-0">
                   Anchor Day 0
                 </span>
               </div>
