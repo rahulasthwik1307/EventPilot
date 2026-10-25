@@ -489,13 +489,32 @@ export function AiAssistantTab({
       </section>
 
       {/* Main Interactive Assistant Console */}
-      <section className="bg-white border border-[#E7DFD5] rounded-xl p-6 sm:p-8 shadow-sm space-y-6">
-        {/* Intent Selection Tabs */}
-        <div>
-          <label className="block text-[11px] font-mono font-bold text-[#78716C] uppercase tracking-wider mb-2.5">
-            1. Select Planning Focus Area
-          </label>
-          <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Planning Intent">
+      <section className="bg-white border border-[#E7DFD5] rounded-xl p-6 sm:p-8 shadow-sm space-y-7">
+        {/* Focus Area Selection Deck */}
+        <div className="space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1 border-b border-[#E7DFD5]/60">
+            <div>
+              <h3 className="font-serif text-lg font-bold text-[#1C1917] tracking-tight">
+                Select Planning Focus Area
+              </h3>
+              <p className="text-xs text-[#78716C]">
+                Target assistant recommendations and structured proposals to a specific dimension of your celebration.
+              </p>
+            </div>
+            <div className="self-start sm:self-auto flex items-center gap-1.5 text-xs font-mono px-3 py-1 rounded-full bg-[#FAF8F5] border border-[#E7DFD5] text-[#78716C]">
+              <span>Focus:</span>
+              <strong className="text-[#C2410C]">
+                {INTENT_OPTIONS.find((opt) => opt.id === intent)?.label}
+              </strong>
+            </div>
+          </div>
+
+          {/* 6 Responsive Focus Area Cards (2 cols mobile, 3 cols tablet, 6 cols desktop) */}
+          <div
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5"
+            role="radiogroup"
+            aria-label="Planning Intent"
+          >
             {INTENT_OPTIONS.map((opt) => {
               const Icon = opt.icon;
               const isSelected = intent === opt.id;
@@ -506,26 +525,52 @@ export function AiAssistantTab({
                   onClick={() => setIntent(opt.id)}
                   aria-checked={isSelected}
                   role="radio"
-                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all ${
+                  className={`group relative p-3 rounded-xl border transition-all duration-200 flex flex-col items-center justify-center text-center gap-2 ${
                     isSelected
-                      ? 'bg-[#FFEDD5] text-[#9A3412] font-bold shadow-xs border border-[#FED7AA] ring-1 ring-[#FED7AA]'
-                      : 'bg-[#FAF8F5] text-[#78716C] hover:bg-[#F5F2EB] hover:text-[#1C1917] border border-[#E7DFD5]'
+                      ? 'bg-[#FFFBEB] border-[#D97706] ring-1 ring-[#D97706]/40 shadow-xs'
+                      : 'bg-[#FAF8F5] border-[#E7DFD5] hover:bg-white hover:border-[#D6CCC2] hover:shadow-xs'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-[#C2410C]' : 'text-[#A8A29E]'}`} />
-                  <span>{opt.label}</span>
+                  <div
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
+                      isSelected
+                        ? 'bg-[#FEF3C7] text-[#C2410C] border border-[#FDE68A]'
+                        : 'bg-white text-[#78716C] border border-[#E7DFD5] group-hover:text-[#1C1917] group-hover:border-[#D6CCC2]'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <span
+                    className={`text-xs leading-snug transition-colors ${
+                      isSelected ? 'font-bold text-[#9A3412]' : 'font-medium text-[#57534E] group-hover:text-[#1C1917]'
+                    }`}
+                  >
+                    {opt.label}
+                  </span>
+                  {isSelected && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] absolute bottom-1.5 left-1/2 -translate-x-1/2" />
+                  )}
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Suggested Starter Prompts */}
-        <div>
-          <label className="block text-[11px] font-mono font-bold text-[#78716C] uppercase tracking-wider mb-2">
-            2. Choose a Suggested Question or Type Your Own
-          </label>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {/* Suggested Inquiries / Starter Cards */}
+        <div className="space-y-3 pt-1">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#D97706]" />
+              <h4 className="font-serif text-base font-bold text-[#1C1917]">
+                Suggested Questions for {INTENT_OPTIONS.find((opt) => opt.id === intent)?.label}
+              </h4>
+            </div>
+            <span className="text-[11px] font-mono text-[#A8A29E] hidden sm:inline">
+              Click any inquiry to ask immediately
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 items-stretch">
             {starterPrompts.map((starter, idx) => (
               <button
                 key={idx}
@@ -535,26 +580,48 @@ export function AiAssistantTab({
                   handleSubmit(starter);
                 }}
                 disabled={isLoading}
-                className="text-left p-3.5 rounded-xl border border-[#E7DFD5] bg-[#FAF8F5] hover:bg-white hover:border-[#D97706] hover:shadow-sm transition-all text-xs text-[#1C1917] line-clamp-3 disabled:opacity-50 group"
+                className="text-left p-4 rounded-xl border border-[#E7DFD5] bg-[#FAF8F5] hover:bg-white hover:border-[#D97706] hover:shadow-md transition-all text-xs text-[#1C1917] disabled:opacity-50 group flex flex-col justify-between h-full"
               >
-                <span className="font-mono text-[10px] uppercase font-bold text-[#D97706] block mb-1 group-hover:text-[#C2410C]">
-                  Idea {idx + 1}
-                </span>
-                <span className="leading-relaxed">{starter}</span>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-mono text-[10px] uppercase font-bold text-[#92400E] px-2 py-0.5 rounded bg-[#FEF3C7] border border-[#FDE68A]">
+                      Idea {idx + 1}
+                    </span>
+                    <span className="text-[11px] font-mono text-[#A8A29E] group-hover:text-[#D97706] group-hover:translate-x-0.5 transition-all">
+                      &rarr;
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-[13px] text-[#1C1917] leading-relaxed font-sans font-normal">
+                    {starter}
+                  </p>
+                </div>
+
+                <div className="mt-3.5 pt-2.5 border-t border-[#E7DFD5]/70 flex items-center justify-between text-[11px] font-mono text-[#78716C] group-hover:text-[#D97706]">
+                  <span>Submit to assistant</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity font-semibold">
+                    Ask now &rarr;
+                  </span>
+                </div>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Prompt Input Form */}
+        {/* Custom Prompt Input Form */}
         <form
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
           }}
-          className="space-y-3"
+          className="space-y-3 pt-1"
         >
-          <div className="relative">
+          <div className="bg-[#FAF8F5] border border-[#E7DFD5] rounded-xl p-3 focus-within:bg-white focus-within:border-[#D97706] focus-within:ring-1 focus-within:ring-[#D97706]/40 transition-all">
+            <label
+              htmlFor="ai-assistant-prompt"
+              className="block text-[11px] font-mono font-semibold uppercase text-[#78716C] mb-1.5"
+            >
+              Custom Inquiries &amp; Celebration Instructions
+            </label>
             <textarea
               id="ai-assistant-prompt"
               rows={3}
@@ -562,20 +629,23 @@ export function AiAssistantTab({
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Ask the planning assistant for advice on budgeting, timeline milestones, vendor vetting questions, or cultural traditions..."
               disabled={isLoading}
-              className="w-full rounded-xl border border-[#E7DFD5] bg-[#FAF8F5] px-4 py-3 text-xs sm:text-sm text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:ring-1 focus:ring-[#D97706] focus:bg-white resize-y transition-all disabled:opacity-60 leading-relaxed"
+              className="w-full bg-transparent text-xs sm:text-sm text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none resize-y transition-all disabled:opacity-60 leading-relaxed min-h-[72px]"
             />
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-xs text-[#78716C]">
-              Press Ask Assistant to generate cultural recommendations and staged proposals.
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+            <p className="text-xs text-[#78716C] flex items-center gap-1.5">
+              <Compass className="w-3.5 h-3.5 text-[#D97706] shrink-0" />
+              <span>
+                Generates culturally tailored advice, calculation sanity checks, and staged diff proposals.
+              </span>
             </p>
 
             <Button
               type="submit"
               variant="primary"
               disabled={isLoading || !prompt.trim()}
-              className="min-w-[140px] font-bold text-xs font-mono active:scale-[0.98] transition-all bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm px-4 py-2"
+              className="self-end sm:self-auto min-w-[150px] font-bold text-xs font-mono active:scale-[0.98] transition-all bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm px-5 py-2.5"
             >
               {isLoading ? (
                 <>
