@@ -135,7 +135,7 @@ export const STARTER_TASKS: Record<EventType, TaskTemplate[]> = {
     },
     {
       idSuffix: 't3',
-      title: 'Finalize photography & cinema team',
+      title: 'Finalize photo & cinema',
       description: 'Verify candid coverage, traditional album specs, and drone permissions.',
       milestoneIdSuffix: '6m',
       priority: 'medium',
@@ -143,7 +143,7 @@ export const STARTER_TASKS: Record<EventType, TaskTemplate[]> = {
     },
     {
       idSuffix: 't4',
-      title: 'Design & print Lagna Patrika invites',
+      title: 'Design & print Lagna Patrika',
       description: 'Coordinate with calligrapher and ensure traditional turmeric-tipped cards.',
       milestoneIdSuffix: '3m',
       priority: 'high',
@@ -151,7 +151,7 @@ export const STARTER_TASKS: Record<EventType, TaskTemplate[]> = {
     },
     {
       idSuffix: 't5',
-      title: 'Curate wedding silk sarees & dhotis',
+      title: 'Curate silk sarees & dhotis',
       description: 'Procure authentic Kanchipuram silk for Muhurtham rituals.',
       milestoneIdSuffix: '3m',
       priority: 'medium',
@@ -159,7 +159,7 @@ export const STARTER_TASKS: Record<EventType, TaskTemplate[]> = {
     },
     {
       idSuffix: 't6',
-      title: 'Catering menu tasting & tiffins',
+      title: 'Catering tasting & tiffins',
       description: 'Confirm traditional banana leaf service items, filter coffee, and dessert counters.',
       milestoneIdSuffix: '1m',
       priority: 'high',
@@ -167,7 +167,7 @@ export const STARTER_TASKS: Record<EventType, TaskTemplate[]> = {
     },
     {
       idSuffix: 't7',
-      title: 'Reconfirm Nadaswaram & live artists',
+      title: 'Reconfirm Nadaswaram & music',
       description: 'Finalize entrance raagam and sound system power backup check.',
       milestoneIdSuffix: '2w',
       priority: 'medium',

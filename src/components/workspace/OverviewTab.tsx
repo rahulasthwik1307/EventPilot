@@ -59,9 +59,10 @@ function getCrispMilestoneTitle(title: string): string {
 function getCrispTaskTitle(title: string): string {
   if (
     title === 'Catering menu tasting & tiffin spread selection' ||
-    title === 'Catering menu tasting & tiffins'
+    title === 'Catering menu tasting & tiffins' ||
+    title === 'Catering tasting & tiffins'
   ) {
-    return 'Catering menu tasting & tiffins';
+    return 'Catering tasting & tiffins';
   }
   if (
     title === 'Reconfirm Nadaswaram, live instrumentalists and DJ' ||
@@ -72,19 +73,23 @@ function getCrispTaskTitle(title: string): string {
   }
   if (
     title === 'Finalize photography & cinematography team' ||
-    title === 'Finalize photography & cinema team'
+    title === 'Finalize photography & cinema team' ||
+    title === 'Finalize photo & cinema team' ||
+    title === 'Finalize photo & cinema'
   ) {
-    return 'Finalize photo & cinema team';
+    return 'Finalize photo & cinema';
   }
   if (
     title === 'Design and print physical Lagna Patrika invitations' ||
-    title === 'Design & print Lagna Patrika invites'
+    title === 'Design & print Lagna Patrika invites' ||
+    title === 'Design & print Lagna Patrika'
   ) {
     return 'Design & print Lagna Patrika';
   }
   if (
     title === 'Curate wedding silk sarees and dhoti sets' ||
-    title === 'Curate wedding silk sarees & dhotis'
+    title === 'Curate wedding silk sarees & dhotis' ||
+    title === 'Curate silk sarees & dhotis'
   ) {
     return 'Curate silk sarees & dhotis';
   }
@@ -105,6 +110,26 @@ function formatCrispTaskDate(dateStr: string): string {
     .replace('October', 'Oct')
     .replace('November', 'Nov')
     .replace('December', 'Dec');
+}
+
+const DIET_SHORT_NAMES: Record<string, string> = {
+  vegetarian: 'Veg',
+  vegan: 'Vegan',
+  jain: 'Jain',
+  halal: 'Halal',
+  gluten_free: 'GF',
+  other: 'Other',
+};
+
+function formatCrispDietaryLabel(key: string): string {
+  const normalized = key.toLowerCase().trim();
+  if (DIET_SHORT_NAMES[normalized]) {
+    return DIET_SHORT_NAMES[normalized];
+  }
+  return key
+    .replace(/[_-]+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 export function OverviewTab({
@@ -829,26 +854,26 @@ export function OverviewTab({
                     return (
                       <div
                         key={task.id}
-                        className={`p-2 rounded-md border text-xs flex items-center justify-between gap-2 ${
+                        className={`p-2 rounded-md border text-xs flex items-center justify-between gap-1.5 ${
                           isOverdue
                             ? 'bg-status-danger-subtle/30 border-status-danger/40'
                             : 'bg-neutral-subtle/50 border-neutral-border'
                         }`}
                       >
-                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 min-w-0 flex-1">
                           <CheckCircle2
                             className={`w-3.5 h-3.5 shrink-0 ${
                               isOverdue ? 'text-status-danger' : 'text-neutral-muted'
                             }`}
                           />
-                          <span className="font-medium text-xs text-neutral-text truncate">
+                          <span className="font-medium text-[11.5px] leading-tight text-neutral-text truncate">
                             {getCrispTaskTitle(task.title)}
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-1.5 shrink-0">
+                        <div className="flex items-center gap-1 shrink-0">
                           {isOverdue && (
-                            <span className="text-[10px] font-mono font-bold text-status-danger bg-status-danger-subtle px-1.5 py-0.5 rounded">
+                            <span className="text-[10px] font-mono font-bold text-status-danger bg-status-danger-subtle px-1 py-0.5 rounded">
                               Overdue
                             </span>
                           )}
@@ -1047,18 +1072,22 @@ export function OverviewTab({
             </div>
 
             {/* Subline / Dietary Status */}
-            <div className="pt-2 border-t border-neutral-border/40 text-[11px] text-neutral-muted flex items-center gap-1.5">
+            <div className="pt-2 border-t border-neutral-border/40 text-[11px] text-neutral-muted flex items-start gap-1.5 min-h-[28px]">
               {Object.keys(attendanceSummary.dietaryBreakdown).length > 0 ? (
                 <>
-                  <Utensils className="w-3 h-3 text-secondary shrink-0" />
-                  <span className="truncate">
-                    Diets: {Object.entries(attendanceSummary.dietaryBreakdown).map(([d, c]) => `${d} (${c})`).join(', ')}
+                  <Utensils className="w-3 h-3 text-secondary shrink-0 mt-0.5" />
+                  <span className="leading-snug break-words">
+                    Diets:{' '}
+                    {Object.entries(attendanceSummary.dietaryBreakdown)
+                      .sort(([, a], [, b]) => b - a)
+                      .map(([diet, count]) => `${formatCrispDietaryLabel(diet)} (${count})`)
+                      .join(', ')}
                   </span>
                 </>
               ) : (
                 <>
-                  <CheckCircle2 className="w-3 h-3 text-status-success shrink-0" />
-                  <span>RSVP responses reconciled dynamically</span>
+                  <CheckCircle2 className="w-3 h-3 text-status-success shrink-0 mt-0.5" />
+                  <span className="leading-snug">RSVP responses reconciled dynamically</span>
                 </>
               )}
             </div>
@@ -1157,9 +1186,9 @@ export function OverviewTab({
             </div>
 
             {/* Subline / Capacity Status */}
-            <div className="pt-2 border-t border-neutral-border/40 text-[11px] text-status-success flex items-center gap-1.5">
-              <Check className="w-3 h-3 shrink-0" />
-              <span>All tables within designated capacity</span>
+            <div className="pt-2 border-t border-neutral-border/40 text-[11px] text-status-success flex items-start gap-1.5 min-h-[28px]">
+              <Check className="w-3 h-3 shrink-0 mt-0.5" />
+              <span className="leading-snug">All tables within designated capacity</span>
             </div>
           </div>
 
@@ -1257,9 +1286,9 @@ export function OverviewTab({
             </div>
 
             {/* Subline / Isolation Note */}
-            <div className="pt-2 border-t border-neutral-border/40 text-[11px] text-neutral-muted flex items-center gap-1.5">
-              <Clock className="w-3 h-3 text-secondary shrink-0" />
-              <span>Contractual payments isolated from actuals</span>
+            <div className="pt-2 border-t border-neutral-border/40 text-[11px] text-neutral-muted flex items-start gap-1.5 min-h-[28px]">
+              <Clock className="w-3 h-3 text-secondary shrink-0 mt-0.5" />
+              <span className="leading-snug">Contractual payments isolated from actuals</span>
             </div>
           </div>
         </div>
