@@ -152,4 +152,135 @@ describe('EventCreateDialog Component', () => {
     expect(created.preferences?.logistics?.provenance).toBe('explicit');
     expect(created.preferences?.logistics?.value.accessibilityRequirements).toContain('wheelchair_access');
   });
+
+  it('initializes with archetype-specific suggested defaults for Wedding (250 guests, ₹15,00,000)', () => {
+    render(
+      <EventCreateDialog
+        isOpen={true}
+        onClose={handleClose}
+        onSuccess={handleSuccess}
+        initialType="wedding"
+      />
+    );
+
+    const guestInput = screen.getByLabelText(/Expected Guests/i) as HTMLInputElement;
+    const budgetInput = screen.getByLabelText(/Total Budget Cap/i) as HTMLInputElement;
+
+    expect(guestInput.value).toBe('250');
+    expect(budgetInput.value).toBe('1500000');
+  });
+
+  it('updates suggested values when switching archetypes if fields have not been manually edited', () => {
+    render(
+      <EventCreateDialog
+        isOpen={true}
+        onClose={handleClose}
+        onSuccess={handleSuccess}
+        initialType="wedding"
+      />
+    );
+
+    const guestInput = screen.getByLabelText(/Expected Guests/i) as HTMLInputElement;
+    const budgetInput = screen.getByLabelText(/Total Budget Cap/i) as HTMLInputElement;
+
+    expect(guestInput.value).toBe('250');
+    expect(budgetInput.value).toBe('1500000');
+
+    // Switch to Milestone Birthday
+    fireEvent.click(screen.getByRole('button', { name: /Milestone Birthday/i }));
+    expect(guestInput.value).toBe('50');
+    expect(budgetInput.value).toBe('150000');
+
+    // Switch to Community Festival
+    fireEvent.click(screen.getByRole('button', { name: /Community Festival/i }));
+    expect(guestInput.value).toBe('500');
+    expect(budgetInput.value).toBe('500000');
+
+    // Switch back to Wedding
+    fireEvent.click(screen.getByRole('button', { name: /Wedding \/ Vivaha/i }));
+    expect(guestInput.value).toBe('250');
+    expect(budgetInput.value).toBe('1500000');
+  });
+
+  it('preserves manually edited guest count while updating untouched budget cap on archetype switch', () => {
+    render(
+      <EventCreateDialog
+        isOpen={true}
+        onClose={handleClose}
+        onSuccess={handleSuccess}
+        initialType="wedding"
+      />
+    );
+
+    const guestInput = screen.getByLabelText(/Expected Guests/i) as HTMLInputElement;
+    const budgetInput = screen.getByLabelText(/Total Budget Cap/i) as HTMLInputElement;
+
+    // Manually edit guest count to 320
+    fireEvent.change(guestInput, { target: { value: '320' } });
+    expect(guestInput.value).toBe('320');
+
+    // Switch to Milestone Birthday: guest count stays 320, budget updates to birthday default (150000)
+    fireEvent.click(screen.getByRole('button', { name: /Milestone Birthday/i }));
+    expect(guestInput.value).toBe('320');
+    expect(budgetInput.value).toBe('150000');
+
+    // Switch to Community Festival: guest count still stays 320, budget updates to 500000
+    fireEvent.click(screen.getByRole('button', { name: /Community Festival/i }));
+    expect(guestInput.value).toBe('320');
+    expect(budgetInput.value).toBe('500000');
+  });
+
+  it('preserves manually edited budget cap while updating untouched guest count on archetype switch', () => {
+    render(
+      <EventCreateDialog
+        isOpen={true}
+        onClose={handleClose}
+        onSuccess={handleSuccess}
+        initialType="wedding"
+      />
+    );
+
+    const guestInput = screen.getByLabelText(/Expected Guests/i) as HTMLInputElement;
+    const budgetInput = screen.getByLabelText(/Total Budget Cap/i) as HTMLInputElement;
+
+    // Manually edit budget cap to 800000
+    fireEvent.change(budgetInput, { target: { value: '800000' } });
+    expect(budgetInput.value).toBe('800000');
+
+    // Switch to Community Festival: guest count updates to 500, budget stays 800000
+    fireEvent.click(screen.getByRole('button', { name: /Community Festival/i }));
+    expect(guestInput.value).toBe('500');
+    expect(budgetInput.value).toBe('800000');
+  });
+
+  it('persists community festival with default archetype values on submission', () => {
+    render(
+      <EventCreateDialog
+        isOpen={true}
+        onClose={handleClose}
+        onSuccess={handleSuccess}
+        initialType="wedding"
+      />
+    );
+
+    // Switch to Community Festival
+    fireEvent.click(screen.getByRole('button', { name: /Community Festival/i }));
+
+    fireEvent.change(screen.getByLabelText(/Celebration Title/i), {
+      target: { value: 'Bengaluru Habba 2026' },
+    });
+    fireEvent.change(screen.getByLabelText(/Celebration Date/i), {
+      target: { value: '2026-11-20' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /Create Celebration Plan/i }));
+
+    expect(handleSuccess).toHaveBeenCalledTimes(1);
+    const created = handleSuccess.mock.calls[0][0];
+    expect(created.type).toBe('community');
+    expect(created.guestTarget).toBe(500);
+    expect(created.budgetCap).toBe(500000);
+    expect(created.categories.length).toBeGreaterThan(0);
+    expect(created.milestones.length).toBeGreaterThan(0);
+  });
 });

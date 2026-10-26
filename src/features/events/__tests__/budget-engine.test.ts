@@ -4,6 +4,7 @@ import {
   calculateCategorySummaries,
   canDeleteCategory,
   generateStarterCategories,
+  recalculatePerGuestExpenses,
 } from '../budget-engine';
 import { BudgetCategory, Expense } from '../types';
 
@@ -268,6 +269,95 @@ describe('Budget Engine - Deterministic Calculations', () => {
       const check = canDeleteCategory('cat-target', expenses);
       expect(check.canDelete).toBe(false);
       expect(check.associatedCount).toBe(2);
+    });
+  });
+
+  describe('recalculatePerGuestExpenses', () => {
+    it('scales variable per-guest expenses accurately with new guest target', () => {
+      const expenses: Expense[] = [
+        {
+          id: 'exp-fixed',
+          categoryId: 'cat-1',
+          title: 'Mandap Booking',
+          estimatedAmount: 50000,
+          costModel: 'fixed',
+          paymentStatus: 'projected',
+          createdAt: '2026-01-01',
+          updatedAt: '2026-01-01',
+        },
+        {
+          id: 'exp-variable',
+          categoryId: 'cat-2',
+          title: 'Sadya Feast Catering',
+          estimatedAmount: 100000, // 200 guests * 500
+          costModel: 'per_guest',
+          unitCost: 500,
+          paymentStatus: 'projected',
+          createdAt: '2026-01-01',
+          updatedAt: '2026-01-01',
+        },
+      ];
+
+      // Scale to 300 guests
+      const scaled = recalculatePerGuestExpenses(expenses, 300);
+
+      expect(scaled[0].estimatedAmount).toBe(50000); // fixed expense unchanged
+      expect(scaled[1].estimatedAmount).toBe(150000); // 300 * 500
+      expect(scaled[1].unitCost).toBe(500); // unitCost preserved
+    });
+
+    it('handles zero or invalid guest target gracefully without crashing', () => {
+      const expenses: Expense[] = [
+        {
+          id: 'exp-var',
+          categoryId: 'cat-1',
+          title: 'Sweets',
+          estimatedAmount: 20000,
+          costModel: 'per_guest',
+          unitCost: 100,
+          paymentStatus: 'projected',
+          createdAt: '2026-01-01',
+          updatedAt: '2026-01-01',
+        },
+      ];
+
+      const zeroGuests = recalculatePerGuestExpenses(expenses, 0);
+      expect(zeroGuests[0].estimatedAmount).toBe(0);
+
+      const negGuests = recalculatePerGuestExpenses(expenses, -50);
+      expect(negGuests[0].estimatedAmount).toBe(0);
+
+      const nanGuests = recalculatePerGuestExpenses(expenses, NaN);
+      expect(nanGuests[0].estimatedAmount).toBe(0);
+    });
+
+    it('preserves expenses without costModel or without valid unitCost', () => {
+      const expenses: Expense[] = [
+        {
+          id: 'exp-legacy',
+          categoryId: 'cat-1',
+          title: 'Photography',
+          estimatedAmount: 75000,
+          paymentStatus: 'projected',
+          createdAt: '2026-01-01',
+          updatedAt: '2026-01-01',
+        },
+        {
+          id: 'exp-incomplete-var',
+          categoryId: 'cat-1',
+          title: 'Snacks',
+          estimatedAmount: 10000,
+          costModel: 'per_guest',
+          unitCost: undefined,
+          paymentStatus: 'projected',
+          createdAt: '2026-01-01',
+          updatedAt: '2026-01-01',
+        },
+      ];
+
+      const res = recalculatePerGuestExpenses(expenses, 400);
+      expect(res[0].estimatedAmount).toBe(75000);
+      expect(res[1].estimatedAmount).toBe(10000);
     });
   });
 });

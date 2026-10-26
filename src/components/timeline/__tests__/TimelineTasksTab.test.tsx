@@ -114,4 +114,32 @@ describe('TimelineTasksTab Component', () => {
 
     expect(screen.getByRole('heading', { name: 'Add Checklist Task' })).toBeInTheDocument();
   });
+
+  it('renders Export Calendar (.ics) action button and triggers download', () => {
+    const createObjectURLMock = vi.fn().mockReturnValue('blob:http://localhost/dummy');
+    global.URL.createObjectURL = createObjectURLMock;
+    global.URL.revokeObjectURL = vi.fn();
+
+    const clickMock = vi.fn();
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
+      const el = originalCreateElement(tagName);
+      if (tagName === 'a') {
+        el.click = clickMock;
+      }
+      return el;
+    });
+
+    render(<TimelineTasksTab event={mockEvent} onUpdateEvent={vi.fn()} />);
+
+    const exportBtn = screen.getByRole('button', { name: /Export Milestones Calendar \(\.ics\)/i });
+    expect(exportBtn).toBeInTheDocument();
+
+    fireEvent.click(exportBtn);
+
+    expect(createObjectURLMock).toHaveBeenCalledTimes(1);
+    expect(clickMock).toHaveBeenCalledTimes(1);
+
+    vi.restoreAllMocks();
+  });
 });

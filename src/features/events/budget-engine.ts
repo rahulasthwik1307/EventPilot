@@ -183,3 +183,32 @@ export function canDeleteCategory(
     associatedCount: associated.length,
   };
 }
+
+/**
+ * Deterministically recalculates estimated amounts for variable (per-guest) expenses
+ * whenever the event's guest target changes.
+ * Pure function: Does not mutate input array or objects.
+ */
+export function recalculatePerGuestExpenses(
+  expenses: Expense[],
+  guestTarget: number
+): Expense[] {
+  const safeGuests =
+    Number.isFinite(guestTarget) && guestTarget >= 0 ? Math.round(guestTarget) : 0;
+  return expenses.map((exp) => {
+    if (
+      exp.costModel === 'per_guest' &&
+      typeof exp.unitCost === 'number' &&
+      Number.isFinite(exp.unitCost) &&
+      exp.unitCost >= 0
+    ) {
+      const recalculatedEstimate = Math.round(exp.unitCost * safeGuests);
+      return {
+        ...exp,
+        estimatedAmount: recalculatedEstimate,
+      };
+    }
+    return exp;
+  });
+}
+

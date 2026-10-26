@@ -120,12 +120,113 @@ describe('BudgetLedgerTab Component', () => {
     expect(screen.getByRole('heading', { name: 'Add Expense Item' })).toBeInTheDocument();
   });
 
-  it('opens what-if simulation modal when clicking What-If Simulation', () => {
+  it('renders per-guest variable expense with rate badge and headcount breakdown', () => {
+    const eventWithVariableExpense: Event = {
+      ...mockEvent,
+      expenses: [
+        {
+          id: 'exp-catering',
+          categoryId: 'cat-venue',
+          title: 'Traditional Sadya Feast',
+          estimatedAmount: 160000, // 200 guests * 800
+          costModel: 'per_guest',
+          unitCost: 800,
+          paymentStatus: 'projected',
+          createdAt: '2026-01-01',
+          updatedAt: '2026-01-01',
+        },
+      ],
+    };
+
+    render(<BudgetLedgerTab event={eventWithVariableExpense} onUpdateEvent={vi.fn()} />);
+
+    expect(screen.getByText('Traditional Sadya Feast')).toBeInTheDocument();
+    // Unit rate badge
+    expect(screen.getByText(/₹800 \/ guest/i)).toBeInTheDocument();
+    // Breakdown in estimated amount
+    expect(screen.getByText(/200 × ₹800/i)).toBeInTheDocument();
+  });
+
+  it('records a new per-guest expense via the expense dialog with costModel and unitCost', () => {
+    const onUpdate = vi.fn();
+    render(<BudgetLedgerTab event={mockEvent} onUpdateEvent={onUpdate} />);
+
+    // Open Record Expense modal
+    fireEvent.click(screen.getByRole('button', { name: /record expense/i }));
+    expect(screen.getByRole('heading', { name: 'Add Expense Item' })).toBeInTheDocument();
+
+    // Fill title
+    fireEvent.change(screen.getByLabelText(/Expense Title/i), {
+      target: { value: 'Welcome Drink Stalls' },
+    });
+
+    // Select Per-Guest Rate cost model
+    fireEvent.click(screen.getByRole('button', { name: /Per-Guest Rate/i }));
+
+    // Enter unit cost: 150
+    fireEvent.change(screen.getByLabelText(/Rate per Guest/i), {
+      target: { value: '150' },
+    });
+
+    // Save
+    fireEvent.click(screen.getByRole('button', { name: /Add to Ledger/i }));
+
+    expect(onUpdate).toHaveBeenCalledTimes(1);
+    const updatedEvent = onUpdate.mock.calls[0][0];
+    const newExpense = updatedEvent.expenses.find(
+      (e: { title: string }) => e.title === 'Welcome Drink Stalls'
+    );
+    expect(newExpense).toBeDefined();
+    expect(newExpense.costModel).toBe('per_guest');
+    expect(newExpense.unitCost).toBe(150);
+    expect(newExpense.estimatedAmount).toBe(30000); // 150 * 200 guests
+  });
+
+  it('triggers temporary undo toast when deleting an expense and restores it upon undo', () => {
+    const onUpdate = vi.fn();
+    render(<BudgetLedgerTab event={mockEvent} onUpdateEvent={onUpdate} />);
+
+    // Click delete on exp-1 (Hall Advance Booking)
+    const deleteBtn = screen.getByLabelText('Delete Hall Advance Booking');
+    fireEvent.click(deleteBtn);
+
+    // Initial delete update called
+    expect(onUpdate).toHaveBeenCalledTimes(1);
+    const deleteResult: Event = onUpdate.mock.calls[0][0];
+    expect(deleteResult.expenses.find((e) => e.id === 'exp-1')).toBeUndefined();
+
+    // Undo toast is now visible
+    expect(screen.getByText(/Expense "Hall Advance Booking" deleted/i)).toBeInTheDocument();
+    const undoBtn = screen.getByRole('button', { name: /Undo deletion/i });
+    expect(undoBtn).toBeInTheDocument();
+
+    // Click Undo
+    fireEvent.click(undoBtn);
+
+    // Second update called with restored expense
+    expect(onUpdate).toHaveBeenCalledTimes(2);
+    const restoreResult: Event = onUpdate.mock.calls[1][0];
+    const restored = restoreResult.expenses.find((e) => e.id === 'exp-1');
+    expect(restored).toBeDefined();
+    expect(restored?.title).toBe('Hall Advance Booking');
+    expect(restored?.estimatedAmount).toBe(300000);
+    expect(restored?.paymentStatus).toBe('settled');
+  });
+
+  it('expires the undo toast when dismissed', () => {
     render(<BudgetLedgerTab event={mockEvent} onUpdateEvent={vi.fn()} />);
 
-    const simBtn = screen.getByRole('button', { name: /what-if simulation/i });
-    fireEvent.click(simBtn);
+    // Click delete on exp-2
+    const deleteBtn = screen.getByLabelText('Delete Floral Jasmine Strings');
+    fireEvent.click(deleteBtn);
 
-    expect(screen.getByRole('heading', { name: 'What-If Scenario Simulation' })).toBeInTheDocument();
+    expect(screen.getByText(/Expense "Floral Jasmine Strings" deleted/i)).toBeInTheDocument();
+
+    // Click dismiss (X)
+    const dismissBtn = screen.getByRole('button', { name: /Dismiss notification/i });
+    fireEvent.click(dismissBtn);
+
+    // Toast should disappear
+    expect(screen.queryByText(/Expense "Floral Jasmine Strings" deleted/i)).not.toBeInTheDocument();
   });
 });

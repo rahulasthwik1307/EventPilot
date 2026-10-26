@@ -17,6 +17,8 @@ import {
 } from '../../features/guests/guest-engine';
 import { CouponBadge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { UndoToast } from '../ui/UndoToast';
+import { SeatingAssignment } from '../../features/seating/types';
 import { GuestDialog } from './GuestDialog';
 import { HouseholdDialog } from './HouseholdDialog';
 import { HouseholdDeleteDialog } from './HouseholdDeleteDialog';
@@ -59,6 +61,10 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
   const [isHouseholdDialogOpen, setIsHouseholdDialogOpen] = useState(false);
   const [editingHousehold, setEditingHousehold] = useState<GuestHousehold | null>(null);
   const [deletingHousehold, setDeletingHousehold] = useState<GuestHousehold | null>(null);
+  const [pendingUndoGuest, setPendingUndoGuest] = useState<{
+    guest: Guest;
+    assignments: SeatingAssignment[];
+  } | null>(null);
 
   const guests = useMemo(() => event.guests || [], [event.guests]);
   const households = useMemo(() => event.households || [], [event.households]);
@@ -162,10 +168,41 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
   };
 
   const handleDeleteGuest = (guestId: string) => {
+    const deletedGuest = guests.find((g) => g.id === guestId);
+    if (!deletedGuest) return;
+
     const now = new Date().toISOString();
     const updatedGuests = guests.filter((g) => g.id !== guestId);
-    // Also remove any seating assignments for this guest
-    const updatedAssignments = (event.assignments || []).filter((a) => a.guestId !== guestId);
+    const removedAssignments = (event.assignments || []).filter((a) => a.guestId === guestId);
+    const remainingAssignments = (event.assignments || []).filter((a) => a.guestId !== guestId);
+
+    setPendingUndoGuest({
+      guest: deletedGuest,
+      assignments: removedAssignments,
+    });
+
+    onUpdateEvent({
+      ...event,
+      guests: updatedGuests,
+      assignments: remainingAssignments,
+      updatedAt: now,
+    });
+  };
+
+  const handleUndoDeleteGuest = () => {
+    if (!pendingUndoGuest) return;
+    const { guest: restoredGuest, assignments: restoredAssignments } = pendingUndoGuest;
+    setPendingUndoGuest(null);
+
+    const now = new Date().toISOString();
+    const updatedGuests = [...guests, restoredGuest];
+
+    // Restore seating assignments, keeping only those where table still exists
+    const validTableIds = new Set((event.tables || []).map((t) => t.id));
+    const safeRestoredAssignments = restoredAssignments.filter((a) =>
+      validTableIds.has(a.tableId)
+    );
+    const updatedAssignments = [...(event.assignments || []), ...safeRestoredAssignments];
 
     onUpdateEvent({
       ...event,
@@ -844,6 +881,14 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
             ? guests.filter((g) => g.householdId === deletingHousehold.id).length
             : 0
         }
+      />
+
+      <UndoToast
+        isOpen={Boolean(pendingUndoGuest)}
+        message={`Guest "${pendingUndoGuest ? `${pendingUndoGuest.guest.firstName} ${pendingUndoGuest.guest.lastName || ''}`.trim() : ''}" removed.`}
+        onUndo={handleUndoDeleteGuest}
+        onDismiss={() => setPendingUndoGuest(null)}
+        durationMs={5000}
       />
     </div>
   );

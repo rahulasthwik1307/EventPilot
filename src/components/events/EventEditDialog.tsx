@@ -6,6 +6,7 @@ import { CurrencyCode, Event, EventType, EventPreferences } from '../../features
 import { validateEventInput } from '../../features/events/validation';
 import { eventStorage } from '../../features/events/storage';
 import { reanchorTimelineOnDateChange } from '../../features/events/timeline-engine';
+import { recalculatePerGuestExpenses } from '../../features/events/budget-engine';
 import { Dialog } from '../ui/Dialog';
 import { PreferencesForm } from '../preferences/PreferencesForm';
 import { createEmptyPreferences } from '../../features/preferences/preferences';
@@ -156,6 +157,11 @@ export function EventEditDialog({
           });
         }
       }
+    }
+
+    // Deterministically update variable (per-guest) expenses if guest target changed
+    if (finalGuestTarget !== event.guestTarget) {
+      updatedExpenses = recalculatePerGuestExpenses(updatedExpenses, finalGuestTarget);
     }
 
     const validation = validateEventInput({

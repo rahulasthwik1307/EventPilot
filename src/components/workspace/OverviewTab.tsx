@@ -37,6 +37,7 @@ import { isTaskOverdue, calculateMilestoneDate } from '../../features/events/tim
 import { calculateVendorFinancials } from '../../features/vendors/vendor-engine';
 import { calculateAttendanceSummary } from '../../features/guests/guest-engine';
 import { calculateSeatingSummary } from '../../features/seating/seating-engine';
+import { calculateReadinessScore } from '../../features/events/readiness-engine';
 import { CouponBadge } from '../ui/Badge';
 import { WorkspaceTab } from './WorkspaceNavigation';
 
@@ -222,30 +223,23 @@ export function OverviewTab({
       .slice(0, 3);
   }, [tasks, todayStr]);
 
-  // Deterministic Celebration Readiness Composite Score (0-100%)
+  // Deterministic Celebration Readiness Composite Score (10-100%)
   const readiness = useMemo(() => {
-    const budgetScore =
-      event.budgetCap > 0
-        ? Math.min(Math.round((summary.totalAllocated / event.budgetCap) * 100), 100)
-        : 0;
-    const taskScore = taskMetrics.pct;
-    const rsvpScore =
-      event.guestTarget > 0
-        ? Math.min(Math.round((attendanceSummary.expectedAttendance / event.guestTarget) * 100), 100)
-        : 0;
-    const composite = Math.round(budgetScore * 0.4 + taskScore * 0.3 + rsvpScore * 0.3);
-    return {
-      score: Math.max(10, Math.min(composite, 100)),
-      budgetScore,
-      taskScore,
-      rsvpScore,
-    };
+    return calculateReadinessScore({
+      type: event.type,
+      budgetCap: event.budgetCap,
+      totalAllocated: summary.totalAllocated,
+      guestTarget: event.guestTarget,
+      expectedAttendance: attendanceSummary.expectedAttendance,
+      taskMetrics,
+    });
   }, [
-    summary.totalAllocated,
+    event.type,
     event.budgetCap,
-    taskMetrics.pct,
-    attendanceSummary.expectedAttendance,
+    summary.totalAllocated,
     event.guestTarget,
+    attendanceSummary.expectedAttendance,
+    taskMetrics,
   ]);
 
   // Action Radar Items (Urgent bottlenecks needing immediate human attention)

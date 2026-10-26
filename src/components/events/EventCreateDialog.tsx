@@ -18,18 +18,31 @@ export interface EventCreateDialogProps {
   initialType?: EventType;
 }
 
+export const ARCHETYPE_SUGGESTED_DEFAULTS: Record<
+  EventType,
+  { guestTarget: number; budgetCap: number }
+> = {
+  wedding: { guestTarget: 250, budgetCap: 1500000 },
+  birthday: { guestTarget: 50, budgetCap: 150000 },
+  community: { guestTarget: 500, budgetCap: 500000 },
+};
+
 export function EventCreateDialog({
   isOpen,
   onClose,
   onSuccess,
   initialType = 'wedding',
 }: EventCreateDialogProps) {
+  const initialDefaults =
+    ARCHETYPE_SUGGESTED_DEFAULTS[initialType] || ARCHETYPE_SUGGESTED_DEFAULTS.wedding;
   const [type, setType] = useState<EventType>(initialType);
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
   const [location, setLocation] = useState('');
-  const [guestTarget, setGuestTarget] = useState<string>('150');
-  const [budgetCap, setBudgetCap] = useState<string>('1000000');
+  const [guestTarget, setGuestTarget] = useState<string>(String(initialDefaults.guestTarget));
+  const [budgetCap, setBudgetCap] = useState<string>(String(initialDefaults.budgetCap));
+  const [isGuestTargetDirty, setIsGuestTargetDirty] = useState(false);
+  const [isBudgetCapDirty, setIsBudgetCapDirty] = useState(false);
   const [currency, setCurrency] = useState<CurrencyCode>('INR');
   const [traditionOrTheme, setTraditionOrTheme] = useState('');
   const [notes, setNotes] = useState('');
@@ -44,12 +57,51 @@ export function EventCreateDialog({
   React.useEffect(() => {
     if (isOpen) {
       setType(initialType);
+      const defaults =
+        ARCHETYPE_SUGGESTED_DEFAULTS[initialType] || ARCHETYPE_SUGGESTED_DEFAULTS.wedding;
+      setGuestTarget(String(defaults.guestTarget));
+      setBudgetCap(String(defaults.budgetCap));
+      setIsGuestTargetDirty(false);
+      setIsBudgetCapDirty(false);
       setStep(1);
       setPreferences(createEmptyPreferences());
       setErrors({});
       setSubmitError(null);
     }
   }, [isOpen, initialType]);
+
+  const handleSelectArchetype = (newType: EventType) => {
+    setType(newType);
+    const defaults =
+      ARCHETYPE_SUGGESTED_DEFAULTS[newType] || ARCHETYPE_SUGGESTED_DEFAULTS.wedding;
+    if (!isGuestTargetDirty) {
+      setGuestTarget(String(defaults.guestTarget));
+      if (errors.guestTarget) {
+        setErrors((prev) => {
+          const next = { ...prev };
+          delete next.guestTarget;
+          return next;
+        });
+      }
+    }
+    if (!isBudgetCapDirty) {
+      setBudgetCap(String(defaults.budgetCap));
+      if (errors.budgetCap) {
+        setErrors((prev) => {
+          const next = { ...prev };
+          delete next.budgetCap;
+          return next;
+        });
+      }
+    }
+    if (errors.type) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.type;
+        return next;
+      });
+    }
+  };
 
   const handleProceedToStep2 = () => {
     const validation = validateEventInput({
@@ -233,16 +285,7 @@ export function EventCreateDialog({
                       key={item.id}
                       type="button"
                       aria-pressed={isSelected}
-                      onClick={() => {
-                        setType(item.id);
-                        if (errors.type) {
-                          setErrors((prev) => {
-                            const next = { ...prev };
-                            delete next.type;
-                            return next;
-                          });
-                        }
-                      }}
+                      onClick={() => handleSelectArchetype(item.id)}
                       className={`flex sm:flex-col items-center justify-start sm:justify-center p-3 rounded-md border text-left sm:text-center transition-all ${
                         isSelected
                           ? 'border-primary bg-primary-subtle/50 text-neutral-text font-semibold shadow-sm'
@@ -377,6 +420,7 @@ export function EventCreateDialog({
                   value={guestTarget}
                   onChange={(e) => {
                     setGuestTarget(e.target.value);
+                    setIsGuestTargetDirty(true);
                     if (errors.guestTarget) {
                       setErrors((prev) => {
                         const next = { ...prev };
@@ -398,12 +442,13 @@ export function EventCreateDialog({
                 )}
                 <div className="flex items-center gap-1.5 mt-2 flex-wrap">
                   <span className="text-xs text-neutral-muted">Quick:</span>
-                  {[50, 150, 300, 500].map((count) => (
+                  {[50, 150, 250, 500].map((count) => (
                     <button
                       key={count}
                       type="button"
                       onClick={() => {
                         setGuestTarget(String(count));
+                        setIsGuestTargetDirty(true);
                         if (errors.guestTarget) {
                           setErrors((prev) => {
                             const next = { ...prev };
@@ -451,6 +496,7 @@ export function EventCreateDialog({
                     value={budgetCap}
                     onChange={(e) => {
                       setBudgetCap(e.target.value);
+                      setIsBudgetCapDirty(true);
                       if (errors.budgetCap) {
                         setErrors((prev) => {
                           const next = { ...prev };

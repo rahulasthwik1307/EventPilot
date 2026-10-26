@@ -21,9 +21,11 @@ import {
   Check,
   ShieldCheck,
   ArrowRight,
+  Users,
 } from 'lucide-react';
 import {
   BudgetCategory,
+  CostModelType,
   Event,
   Expense,
   PaymentStatus,
@@ -34,6 +36,7 @@ import {
 } from '../../features/events/budget-engine';
 import { formatCurrency } from '../../features/events/validation';
 import { CouponBadge } from '../ui/Badge';
+import { UndoToast } from '../ui/UndoToast';
 import { CategoryDialog } from './CategoryDialog';
 import { CategoryDeleteDialog } from './CategoryDeleteDialog';
 import { ExpenseDialog } from './ExpenseDialog';
@@ -78,6 +81,7 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
   const [defaultExpenseCatId, setDefaultExpenseCatId] = useState<string | undefined>(undefined);
   const [isScenarioSimulationOpen, setIsScenarioSimulationOpen] = useState(false);
   const [isDynamicReplanningOpen, setIsDynamicReplanningOpen] = useState(false);
+  const [pendingUndoExpense, setPendingUndoExpense] = useState<Expense | null>(null);
 
   // Filters
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
@@ -172,6 +176,8 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
     actualAmount?: number;
     paymentStatus: PaymentStatus;
     notes?: string;
+    costModel?: CostModelType;
+    unitCost?: number;
   }) => {
     const existingIndex = expenses.findIndex((e) => e.id === expenseData.id);
     const now = new Date().toISOString();
@@ -203,7 +209,26 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
   };
 
   const handleDeleteExpense = (expenseId: string) => {
+    const deletedExp = expenses.find((e) => e.id === expenseId);
+    if (!deletedExp) return;
+
     const updatedExpenses = expenses.filter((e) => e.id !== expenseId);
+    setPendingUndoExpense(deletedExp);
+
+    onUpdateEvent({
+      ...event,
+      expenses: updatedExpenses,
+      updatedAt: new Date().toISOString(),
+    });
+  };
+
+  const handleUndoDeleteExpense = () => {
+    if (!pendingUndoExpense) return;
+    const restoredExpense = pendingUndoExpense;
+    setPendingUndoExpense(null);
+
+    // Re-insert expense with original ID, category, amounts, and attributes
+    const updatedExpenses = [...expenses, restoredExpense];
     onUpdateEvent({
       ...event,
       expenses: updatedExpenses,
@@ -807,6 +832,14 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
                         >
                           {exp.title}
                         </div>
+                        {exp.costModel === 'per_guest' &&
+                          typeof exp.unitCost === 'number' &&
+                          exp.unitCost > 0 && (
+                            <div className="inline-flex items-center gap-1 text-[11px] text-primary font-medium mt-0.5">
+                              <Users className="w-3 h-3 text-primary shrink-0" />
+                              <span>{formatCurrency(exp.unitCost, event.currency)} / guest</span>
+                            </div>
+                          )}
                       </td>
                       <td className="py-3 px-3 whitespace-nowrap">
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-neutral-subtle border border-neutral-border text-neutral-text text-xs font-medium">
@@ -825,7 +858,14 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
                         )}
                       </td>
                       <td className="py-3 px-3 text-right font-mono text-neutral-text whitespace-nowrap tabular-nums">
-                        {formatCurrency(exp.estimatedAmount, event.currency)}
+                        <div>{formatCurrency(exp.estimatedAmount, event.currency)}</div>
+                        {exp.costModel === 'per_guest' &&
+                          typeof exp.unitCost === 'number' &&
+                          exp.unitCost > 0 && (
+                            <div className="text-[10px] text-neutral-muted">
+                              {event.guestTarget || 0} × {formatCurrency(exp.unitCost, event.currency)}
+                            </div>
+                          )}
                       </td>
                       <td className="py-3 px-3 text-right font-mono whitespace-nowrap tabular-nums">
                         {typeof exp.actualAmount === 'number' ? (
@@ -910,6 +950,14 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
         onClose={() => setIsDynamicReplanningOpen(false)}
         event={event}
         onApplyPlan={(updated) => onUpdateEvent(updated, { alreadySaved: true })}
+      />
+
+      <UndoToast
+        isOpen={Boolean(pendingUndoExpense)}
+        message={`Expense "${pendingUndoExpense?.title}" deleted.`}
+        onUndo={handleUndoDeleteExpense}
+        onDismiss={() => setPendingUndoExpense(null)}
+        durationMs={5000}
       />
     </div>
   );

@@ -125,4 +125,63 @@ describe('GuestsTab Component', () => {
     expect(screen.getAllByText('The Sharma Family').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Priya Sharma')).toBeInTheDocument();
   });
+
+  it('triggers temporary undo toast when deleting a guest and restores them upon undo', () => {
+    const eventWithSeatedGuest: Event = {
+      ...mockEvent,
+      tables: [{ id: 'tbl-1', name: 'Family Table 1', tableType: 'round', capacity: 8 }],
+      assignments: [
+        { id: 'asgn-1', tableId: 'tbl-1', guestId: 'gst-1', isPlusOne: false, assignedAt: '2026-01-01' },
+      ],
+    };
+
+    const onUpdate = vi.fn();
+    render(<GuestsTab event={eventWithSeatedGuest} onUpdateEvent={onUpdate} />);
+
+    // Click Delete on Priya Sharma
+    const deleteBtn = screen.getByLabelText('Delete Priya Sharma');
+    fireEvent.click(deleteBtn);
+
+    // Initial delete update called
+    expect(onUpdate).toHaveBeenCalledTimes(1);
+    const deleteResult: Event = onUpdate.mock.calls[0][0];
+    expect(deleteResult.guests.find((g) => g.id === 'gst-1')).toBeUndefined();
+    expect(deleteResult.assignments.find((a) => a.guestId === 'gst-1')).toBeUndefined();
+
+    // Undo toast is now visible
+    expect(screen.getByText(/Guest "Priya Sharma" removed/i)).toBeInTheDocument();
+    const undoBtn = screen.getByRole('button', { name: /Undo deletion/i });
+    expect(undoBtn).toBeInTheDocument();
+
+    // Click Undo
+    fireEvent.click(undoBtn);
+
+    // Second update called with restored guest and seating assignment
+    expect(onUpdate).toHaveBeenCalledTimes(2);
+    const restoreResult: Event = onUpdate.mock.calls[1][0];
+    const restored = restoreResult.guests.find((g) => g.id === 'gst-1');
+    expect(restored).toBeDefined();
+    expect(restored?.firstName).toBe('Priya');
+    expect(restored?.householdId).toBe('hh-1');
+    expect(restored?.dietaryPreference).toBe('jain');
+
+    // Seating assignment restored
+    const restoredAssignment = restoreResult.assignments.find((a) => a.guestId === 'gst-1');
+    expect(restoredAssignment).toBeDefined();
+    expect(restoredAssignment?.tableId).toBe('tbl-1');
+  });
+
+  it('expires the guest undo toast when dismissed', () => {
+    render(<GuestsTab event={mockEvent} onUpdateEvent={vi.fn()} />);
+
+    const deleteBtn = screen.getByLabelText('Delete Rohan Sharma');
+    fireEvent.click(deleteBtn);
+
+    expect(screen.getByText(/Guest "Rohan Sharma" removed/i)).toBeInTheDocument();
+
+    const dismissBtn = screen.getByRole('button', { name: /Dismiss notification/i });
+    fireEvent.click(dismissBtn);
+
+    expect(screen.queryByText(/Guest "Rohan Sharma" removed/i)).not.toBeInTheDocument();
+  });
 });

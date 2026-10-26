@@ -42,6 +42,7 @@ import { CouponBadge } from '../ui/Badge';
 import { MilestoneDialog } from './MilestoneDialog';
 import { TaskDialog } from './TaskDialog';
 import { DynamicReplanningModal } from '../replanning/DynamicReplanningModal';
+import { downloadMilestonesIcs } from '../../features/timeline/ics-export';
 
 export interface TimelineTasksTabProps {
   event: Event;
@@ -262,6 +263,16 @@ export function TimelineTasksTab({ event, onUpdateEvent }: TimelineTasksTabProps
 
         {/* Master Action Button Cluster - unclipped, perfectly responsive */}
         <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap sm:flex-nowrap shrink-0">
+          <button
+            type="button"
+            onClick={() => downloadMilestonesIcs(event)}
+            aria-label="Export Milestones Calendar (.ics)"
+            title="Download offline .ics calendar for Apple Calendar, Google Calendar, or Outlook"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-neutral-surface text-neutral-text hover:bg-neutral-subtle border border-neutral-border rounded-lg transition-all active:scale-[0.98] shadow-xs"
+          >
+            <Calendar className="w-3.5 h-3.5 text-primary" />
+            <span>Export Calendar (.ics)</span>
+          </button>
           <button
             type="button"
             onClick={() => setIsReplanningOpen(true)}
