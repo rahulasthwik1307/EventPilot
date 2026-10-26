@@ -3,6 +3,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { AiAssistantTab } from '../AiAssistantTab';
 import { Event } from '../../../features/events/types';
+import { aiConversationStorage } from '../../../features/ai/conversation-storage';
 
 describe('AiAssistantTab Component', () => {
   const mockEvent: Event = {
@@ -403,5 +404,188 @@ describe('AiAssistantTab Component', () => {
     // Event B must NOT display Event A's answer or proposals!
     expect(screen.queryByText(/Secret Answer specifically for Event A Wedding/i)).toBeNull();
     expect(screen.queryByText(/Event A Specific Mandap Proposal/i)).toBeNull();
+  });
+
+  describe('Local-First Persistence & State Restoration', () => {
+    beforeEach(() => {
+      window.localStorage.clear();
+    });
+
+    it('restores saved conversation history and proposals from local storage on mount', () => {
+      aiConversationStorage.saveConversation(mockEvent.id, {
+        messages: [
+          {
+            id: 'msg-u1',
+            sender: 'user',
+            text: 'How should we stage our mandap floral setup?',
+            timestamp: '10:15 AM',
+          },
+          {
+            id: 'msg-a1',
+            sender: 'assistant',
+            text: 'Staging mandap floral setup requires coordinating with decorators 4 hours prior.',
+            timestamp: '10:15 AM',
+          },
+        ],
+        lastAnswer: 'Staging mandap floral setup requires coordinating with decorators 4 hours prior.',
+        proposals: [
+          {
+            id: 'prop-persisted-1',
+            actionType: 'adjust_budget_allocation',
+            title: 'Floral Décor Staging Buffer',
+            explanation: 'Allocate additional 25,000 INR for seasonal marigold garlands.',
+            status: 'staged',
+            payload: {
+              actionType: 'adjust_budget_allocation',
+              categoryName: 'Venue & Banquets',
+              currentAllocated: 500000,
+              proposedAllocated: 525000,
+              rationale: 'Seasonal décor buffer',
+            },
+          },
+        ],
+      });
+
+      render(
+        <AiAssistantTab
+          event={mockEvent}
+          onUpdateEvent={vi.fn()}
+        />
+      );
+
+      // Verify conversation history stream rendered
+      expect(screen.getByText(/Conversation History \(2 messages\)/i)).toBeDefined();
+      expect(screen.getByText('Stored Locally in Browser')).toBeDefined();
+      expect(screen.getByText('How should we stage our mandap floral setup?')).toBeDefined();
+      expect(
+        screen.getByText(
+          'Staging mandap floral setup requires coordinating with decorators 4 hours prior.'
+        )
+      ).toBeDefined();
+
+      // Verify proposal card rendered
+      expect(screen.getByText('Floral Décor Staging Buffer')).toBeDefined();
+    });
+
+    it('clears conversation history and proposals when clicking Clear History', async () => {
+      aiConversationStorage.saveConversation(mockEvent.id, {
+        messages: [
+          {
+            id: 'msg-u1',
+            sender: 'user',
+            text: 'Test question to clear',
+            timestamp: '11:00 AM',
+          },
+          {
+            id: 'msg-a1',
+            sender: 'assistant',
+            text: 'Test answer to clear',
+            timestamp: '11:00 AM',
+          },
+        ],
+        lastAnswer: 'Test answer to clear',
+        proposals: [
+          {
+            id: 'prop-to-clear',
+            actionType: 'adjust_budget_allocation',
+            title: 'Temporary Proposal To Clear',
+            explanation: 'Will be removed',
+            status: 'staged',
+            payload: {
+              actionType: 'adjust_budget_allocation',
+              categoryName: 'Venue & Banquets',
+              currentAllocated: 500000,
+              proposedAllocated: 510000,
+              rationale: 'Temporary adjustment',
+            },
+          },
+        ],
+      });
+
+      render(
+        <AiAssistantTab
+          event={mockEvent}
+          onUpdateEvent={vi.fn()}
+        />
+      );
+
+      expect(screen.getByText('Test question to clear')).toBeDefined();
+      expect(screen.getByText('Temporary Proposal To Clear')).toBeDefined();
+
+      const clearBtn = screen.getByRole('button', { name: /Clear conversation history/i });
+      fireEvent.click(clearBtn);
+
+      // Conversational answer, messages, and proposals should now be cleared
+      expect(screen.queryByText('Test question to clear')).toBeNull();
+      expect(screen.queryByText('Temporary Proposal To Clear')).toBeNull();
+
+      // Verify local storage is also cleared
+      const stored = aiConversationStorage.getConversation(mockEvent.id);
+      expect(stored.data).toBeNull();
+    });
+
+    it('re-validates staged proposals against current event state when loaded from local storage', () => {
+      // Create a proposal that references a non-existent category
+      aiConversationStorage.saveConversation(mockEvent.id, {
+        messages: [
+          {
+            id: 'msg-u1',
+            sender: 'user',
+            text: 'Help with fireworks',
+            timestamp: '12:00 PM',
+          },
+        ],
+        lastAnswer: 'Here is a fireworks adjustment proposal',
+        proposals: [
+          {
+            id: 'prop-stale-cat',
+            actionType: 'adjust_budget_allocation',
+            title: 'Fireworks Category Allocation',
+            explanation: 'Allocates to Fireworks which does not exist in categories',
+            status: 'staged',
+            payload: {
+              actionType: 'adjust_budget_allocation',
+              categoryName: 'NonExistent Fireworks Category',
+              currentAllocated: 0,
+              proposedAllocated: 50000,
+              rationale: 'Fireworks display',
+            },
+          },
+        ],
+      });
+
+      render(
+        <AiAssistantTab
+          event={mockEvent}
+          onUpdateEvent={vi.fn()}
+        />
+      );
+
+      // Proposal title renders
+      expect(screen.getByText('Fireworks Category Allocation')).toBeDefined();
+
+      // Proposal must display a conflict warning because the category does not exist
+      expect(screen.getByText('Cannot Apply Proposal')).toBeDefined();
+      expect(
+        screen.getByText(/Budget category "NonExistent Fireworks Category" no longer exists/i)
+      ).toBeDefined();
+    });
+
+    it('mounts with isLoading false and no stuck loading state even after remount', () => {
+      render(
+        <AiAssistantTab
+          event={mockEvent}
+          onUpdateEvent={vi.fn()}
+        />
+      );
+
+      // Should not have any loading indicator or banner on clean mount
+      expect(screen.queryByText(/Consulting AI Planning Assistant/i)).toBeNull();
+      expect(screen.queryByRole('status')).toBeNull();
+
+      // Button should say "Ask Assistant" and not be in disabled loading state
+      const button = screen.getByRole('button', { name: /Ask Assistant/i });
+      expect(button).toBeDefined();
+    });
   });
 });

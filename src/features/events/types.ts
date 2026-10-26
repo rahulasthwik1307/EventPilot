@@ -200,6 +200,15 @@ export interface UpdateEventOptions {
   alreadySaved?: boolean;
 }
 
+export type WorkspaceTab =
+  | 'overview'
+  | 'budget'
+  | 'timeline'
+  | 'vendors'
+  | 'guests'
+  | 'seating'
+  | 'ai';
+
 export interface EventStorage {
   getPersonalEvents(): StorageResult<Event[]>;
   getPersonalEvent(id: string): StorageResult<Event | null>;
@@ -210,4 +219,6 @@ export interface EventStorage {
   resetSampleEvent(): StorageResult<Event>;
   getActiveEventId(): StorageResult<string | null>;
   setActiveEventId(id: string | null): StorageResult<void>;
+  getLastTab(eventId: string): StorageResult<WorkspaceTab | null>;
+  setLastTab(eventId: string, tab: WorkspaceTab): StorageResult<void>;
 }

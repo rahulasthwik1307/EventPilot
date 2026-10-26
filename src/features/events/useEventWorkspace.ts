@@ -97,6 +97,7 @@ export function useEventWorkspace(eventId: string | undefined): UseEventWorkspac
         const sampleRes = eventStorage.getSampleEvent();
         if (sampleRes.success && sampleRes.data) {
           setEvent(sampleRes.data);
+          eventStorage.setActiveEventId(eventId);
         } else {
           setStorageError(sampleRes.error?.message || 'Failed to load sample event sandbox.');
         }
@@ -106,6 +107,7 @@ export function useEventWorkspace(eventId: string | undefined): UseEventWorkspac
           const found = listRes.data.find((e) => e.id === eventId);
           if (found) {
             setEvent(found);
+            eventStorage.setActiveEventId(eventId);
           } else {
             setNotFound(true);
           }

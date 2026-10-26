@@ -246,6 +246,43 @@ describe("EventWorkspacePage - Dedicated Workspace Routes and Tabs", () => {
     });
   });
 
+  it("restores last saved workspace tab when visiting /events/[id] without ?tab parameter", async () => {
+    // Pre-save last tab as 'vendors' for sample event
+    eventStorage.setLastTab("sample", "vendors");
+
+    window.history.pushState({}, "", "/events/sample");
+
+    render(<EventWorkspacePage />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { level: 1, name: "Aarav & Meera's Vivaha Celebration" })
+      ).toBeInTheDocument();
+      // Vendors directory should be rendered because of restored last tab
+      expect(screen.getByText("Vendor Directory & Contracts")).toBeInTheDocument();
+    });
+  });
+
+  it("updates stored last tab when navigating across workspace tabs", async () => {
+    window.history.pushState({}, "", "/events/sample");
+
+    render(<EventWorkspacePage />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { level: 1, name: "Aarav & Meera's Vivaha Celebration" })
+      ).toBeInTheDocument();
+    });
+
+    const nav = screen.getByRole("navigation", { name: /Workspace navigation/i });
+    const timelineTabBtn = within(nav).getByRole("button", { name: /^Timeline & Tasks$/i });
+    fireEvent.click(timelineTabBtn);
+
+    await waitFor(() => {
+      expect(eventStorage.getLastTab("sample").data).toBe("timeline");
+    });
+  });
+
   it("renders Celebration Not Found view when celebration does not exist in storage", async () => {
     window.history.pushState({}, "", "/events/non-existent-id");
 

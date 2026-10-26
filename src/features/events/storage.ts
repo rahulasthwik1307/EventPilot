@@ -4,17 +4,29 @@
  * while keeping sample event state strictly isolated.
  */
 
-import { Event, EventStorage, SaveEventOptions, StorageError, StorageResult } from './types';
+import { Event, EventStorage, SaveEventOptions, StorageError, StorageResult, WorkspaceTab } from './types';
 import { validateEvent } from './validation';
 import { createFreshSampleEvent } from './sample-event';
 import { generateStarterCategories } from './budget-engine';
 import { generateStarterMilestones, generateStarterTasks } from './timeline-engine';
+import { aiConversationStorage } from '../ai/conversation-storage';
 
 export const STORAGE_KEYS = {
   PERSONAL_EVENTS: 'event_pilot_personal_events_v1',
   SAMPLE_EVENT: 'event_pilot_sample_v1',
   ACTIVE_ID: 'event_pilot_active_id_v1',
+  LAST_TAB_PREFIX: 'event_pilot_last_tab_v1_',
 } as const;
+
+export const VALID_WORKSPACE_TABS: readonly WorkspaceTab[] = [
+  'overview',
+  'budget',
+  'timeline',
+  'vendors',
+  'guests',
+  'seating',
+  'ai',
+] as const;
 
 export interface StorageContainer<T> {
   schemaVersion: 1;
@@ -92,10 +104,13 @@ export function migrateEventToM3(event: Event): Event {
 
 export class LocalStorageEventStorage implements EventStorage {
   private isAvailable(): boolean {
-    if (typeof window === 'undefined' || !window.localStorage) {
+    if (typeof window === 'undefined') {
       return false;
     }
     try {
+      if (!window.localStorage) {
+        return false;
+      }
       const testKey = '__ep_storage_test__';
       window.localStorage.setItem(testKey, testKey);
       window.localStorage.removeItem(testKey);
@@ -336,6 +351,14 @@ export class LocalStorageEventStorage implements EventStorage {
         this.setActiveEventId(null);
       }
 
+      // Cascade cleanup: remove last tab and conversation history for deleted event
+      try {
+        window.localStorage.removeItem(`${STORAGE_KEYS.LAST_TAB_PREFIX}${id}`);
+      } catch {
+        // Safe ignore
+      }
+      aiConversationStorage.deleteConversation(id);
+
       return { success: true };
     } catch (err) {
       return {
@@ -479,6 +502,17 @@ export class LocalStorageEventStorage implements EventStorage {
     if (!saveRes.success) {
       return { success: false, data: fresh, error: saveRes.error };
     }
+
+    // Reset sample conversation history and last tab
+    try {
+      window.localStorage.removeItem(`${STORAGE_KEYS.LAST_TAB_PREFIX}sample`);
+      window.localStorage.removeItem(`${STORAGE_KEYS.LAST_TAB_PREFIX}${fresh.id}`);
+    } catch {
+      // Safe ignore
+    }
+    aiConversationStorage.deleteConversation('sample');
+    aiConversationStorage.deleteConversation(fresh.id);
+
     return { success: true, data: fresh };
   }
 
@@ -509,6 +543,50 @@ export class LocalStorageEventStorage implements EventStorage {
       return {
         success: false,
         error: this.handleStorageError(err, 'Failed to set active event identifier.'),
+      };
+    }
+  }
+
+  getLastTab(eventId: string): StorageResult<WorkspaceTab | null> {
+    if (!eventId) {
+      return { success: true, data: null };
+    }
+    if (!this.isAvailable()) {
+      return { success: true, data: null };
+    }
+    try {
+      const key = `${STORAGE_KEYS.LAST_TAB_PREFIX}${eventId}`;
+      const tab = window.localStorage.getItem(key);
+      if (tab && (VALID_WORKSPACE_TABS as readonly string[]).includes(tab)) {
+        return { success: true, data: tab as WorkspaceTab };
+      }
+      return { success: true, data: null };
+    } catch {
+      return { success: true, data: null };
+    }
+  }
+
+  setLastTab(eventId: string, tab: WorkspaceTab): StorageResult<void> {
+    if (!eventId) {
+      return { success: true };
+    }
+    if (!this.isAvailable()) {
+      return { success: false, error: this.unavailableError() };
+    }
+    if (!(VALID_WORKSPACE_TABS as readonly string[]).includes(tab)) {
+      return {
+        success: false,
+        error: { code: 'VALIDATION_FAILED', message: `Invalid workspace tab: ${String(tab)}` },
+      };
+    }
+    try {
+      const key = `${STORAGE_KEYS.LAST_TAB_PREFIX}${eventId}`;
+      window.localStorage.setItem(key, tab);
+      return { success: true };
+    } catch (err) {
+      return {
+        success: false,
+        error: this.handleStorageError(err, 'Failed to save last visited tab.'),
       };
     }
   }

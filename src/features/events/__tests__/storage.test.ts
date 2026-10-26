@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { LocalStorageEventStorage, STORAGE_KEYS } from '../storage';
 import { Event } from '../types';
+import { getAiConversationStorageKey } from '../../ai/conversation-storage';
 
 describe('LocalStorageEventStorage Adapter', () => {
   let storage: LocalStorageEventStorage;
@@ -492,6 +493,63 @@ describe('LocalStorageEventStorage Adapter', () => {
       expect(finalStored.expenses).toHaveLength(1);
       expect(finalStored.expenses[0].title).toBe('Catering Advance Deposit');
       expect(finalStored.expenses[0].actualAmount).toBe(50000);
+    });
+  });
+
+  describe('Workspace Tab State & Cascading Deletion', () => {
+    it('returns null data (defaulting to overview) when nothing is saved', () => {
+      const tabRes = storage.getLastTab('evt-test-1');
+      expect(tabRes.success).toBe(true);
+      expect(tabRes.data).toBeNull();
+    });
+
+    it('saves and retrieves the active tab for an event', () => {
+      const saveRes = storage.setLastTab('evt-test-1', 'budget');
+      expect(saveRes.success).toBe(true);
+
+      const tabRes = storage.getLastTab('evt-test-1');
+      expect(tabRes.success).toBe(true);
+      expect(tabRes.data).toBe('budget');
+    });
+
+    it('rejects invalid tab values and falls back to null', () => {
+      // @ts-expect-error testing runtime validation of invalid tab
+      const saveRes = storage.setLastTab('evt-test-1', 'nonexistent_tab');
+      expect(saveRes.success).toBe(false);
+      expect(saveRes.error?.code).toBe('VALIDATION_FAILED');
+
+      expect(storage.getLastTab('evt-test-1').data).toBeNull();
+    });
+
+    it('cascades deletion of last tab and AI conversation when personal event is deleted', () => {
+      const event = createTestEvent({ id: 'evt-del-1' });
+      storage.savePersonalEvent(event);
+      storage.setLastTab(event.id, 'vendors');
+      const convKey = getAiConversationStorageKey(event.id);
+      window.localStorage.setItem(convKey, JSON.stringify({ schemaVersion: 1, eventId: event.id, messages: [] }));
+
+      expect(storage.getLastTab(event.id).data).toBe('vendors');
+      expect(window.localStorage.getItem(convKey)).not.toBeNull();
+
+      const delRes = storage.deletePersonalEvent(event.id);
+      expect(delRes.success).toBe(true);
+
+      expect(storage.getLastTab(event.id).data).toBeNull();
+      expect(window.localStorage.getItem(convKey)).toBeNull();
+    });
+
+    it('cleans up sample tab and conversation when sample is reset', () => {
+      storage.setLastTab('sample', 'seating');
+      const sampleConvKey = getAiConversationStorageKey('sample');
+      window.localStorage.setItem(sampleConvKey, JSON.stringify({ schemaVersion: 1, eventId: 'sample', messages: [] }));
+
+      expect(storage.getLastTab('sample').data).toBe('seating');
+      expect(window.localStorage.getItem(sampleConvKey)).not.toBeNull();
+
+      storage.resetSampleEvent();
+
+      expect(storage.getLastTab('sample').data).toBeNull();
+      expect(window.localStorage.getItem(sampleConvKey)).toBeNull();
     });
   });
 });

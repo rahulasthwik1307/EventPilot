@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useCallback, Suspense, useState, useEffect } from 'react';
+import React, { useCallback, Suspense, useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { WorkspaceShell, UpdateEventOptions } from '../../../components/workspace/WorkspaceShell';
 import { WorkspaceTab } from '../../../components/workspace/WorkspaceNavigation';
 import { AlertCircle, AlertTriangle, ArrowLeft, RefreshCw } from 'lucide-react';
 import { useEventWorkspace } from '../../../features/events/useEventWorkspace';
+import { eventStorage } from '../../../features/events/storage';
 import { Event } from '../../../features/events/types';
 
 const VALID_TABS: WorkspaceTab[] = [
@@ -26,8 +27,20 @@ function EventWorkspaceView() {
   const rawId = params?.id;
   const eventId = Array.isArray(rawId) ? rawId[0] : rawId;
   const tabParam = searchParams.get('tab') as WorkspaceTab | null;
-  const activeTab: WorkspaceTab =
-    tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'overview';
+
+  // Resolve active tab: explicit query parameter has priority, fallback to last saved tab for this event, then 'overview'
+  const activeTab: WorkspaceTab = useMemo(() => {
+    if (tabParam && VALID_TABS.includes(tabParam)) {
+      return tabParam;
+    }
+    if (typeof window !== 'undefined' && eventId) {
+      const savedTab = eventStorage.getLastTab(eventId).data;
+      if (savedTab && VALID_TABS.includes(savedTab)) {
+        return savedTab;
+      }
+    }
+    return 'overview';
+  }, [tabParam, eventId]);
 
   const {
     event,
@@ -42,6 +55,14 @@ function EventWorkspaceView() {
     resetSample,
     deleteEvent,
   } = useEventWorkspace(eventId);
+
+  // Keep last visited tab and active event pointer in sync
+  useEffect(() => {
+    if (eventId && activeTab) {
+      eventStorage.setLastTab(eventId, activeTab);
+      eventStorage.setActiveEventId(eventId);
+    }
+  }, [eventId, activeTab]);
 
   const [dismissedConflict, setDismissedConflict] = useState(false);
   const [dismissedStale, setDismissedStale] = useState(false);
@@ -73,6 +94,8 @@ function EventWorkspaceView() {
   const handleTabChange = useCallback(
     (tab: WorkspaceTab) => {
       if (!eventId) return;
+      eventStorage.setLastTab(eventId, tab);
+      eventStorage.setActiveEventId(eventId);
       const query = tab === 'overview' ? '' : `?tab=${tab}`;
       router.push(`/events/${eventId}${query}`);
     },
@@ -86,11 +109,13 @@ function EventWorkspaceView() {
     [updateEvent]
   );
 
-  if (!mounted && !event) {
+  // Guard against SSR / initial client hydration mismatch:
+  // Render loading pulse identical to server until client has mounted.
+  if (!mounted) {
     return (
       <div className="min-h-screen bg-neutral-bg flex items-center justify-center">
         <span className="text-neutral-muted text-sm font-medium animate-pulse">
-          Opening celebration workspace...
+          Loading celebration workspace...
         </span>
       </div>
     );
@@ -131,7 +156,7 @@ function EventWorkspaceView() {
     );
   }
 
-  if (notFound) {
+  if (notFound || !event) {
     return (
       <div className="min-h-screen bg-neutral-bg flex flex-col justify-between">
         <header className="bg-neutral-surface py-5 px-4 sm:px-8 border-b border-neutral-border">
@@ -168,16 +193,6 @@ function EventWorkspaceView() {
         <footer className="py-6 text-center text-xs text-neutral-muted border-t border-neutral-border bg-neutral-surface">
           Event Pilot · Panchang &amp; Utsav Almanac
         </footer>
-      </div>
-    );
-  }
-
-  if (!event) {
-    return (
-      <div className="min-h-screen bg-neutral-bg flex items-center justify-center">
-        <span className="text-neutral-muted text-sm font-medium animate-pulse">
-          Loading celebration workspace...
-        </span>
       </div>
     );
   }
@@ -297,7 +312,7 @@ export default function EventWorkspacePage() {
       fallback={
         <div className="min-h-screen bg-neutral-bg flex items-center justify-center">
           <span className="text-neutral-muted text-sm font-medium animate-pulse">
-            Loading celebration...
+            Loading celebration workspace...
           </span>
         </div>
       }

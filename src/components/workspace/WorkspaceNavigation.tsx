@@ -8,15 +8,9 @@ import {
   Armchair,
   Sparkles,
 } from 'lucide-react';
+import { WorkspaceTab } from '../../features/events/types';
 
-export type WorkspaceTab =
-  | 'overview'
-  | 'budget'
-  | 'timeline'
-  | 'vendors'
-  | 'guests'
-  | 'seating'
-  | 'ai';
+export type { WorkspaceTab };
 
 export interface WorkspaceNavigationProps {
   activeTab: WorkspaceTab;

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import {
   Sparkles,
   Send,
@@ -18,6 +18,7 @@ import {
   Briefcase,
   Users,
   Compass,
+  Trash2,
 } from 'lucide-react';
 import { Event } from '../../features/events/types';
 import { StagedProposal, AssistantIntent, ProjectedEventContext } from '../../features/ai/types';
@@ -28,6 +29,11 @@ import {
   dismissProposal,
   markProposalAccepted,
 } from '../../features/ai/proposal-engine';
+import {
+  aiConversationStorage,
+  StoredChatMessage,
+  getAiConversationStorageKey,
+} from '../../features/ai/conversation-storage';
 import { StagedProposalCard } from './StagedProposalCard';
 import { Button } from '../ui/Button';
 import { CouponBadge, StatusPill } from '../ui/Badge';
@@ -62,12 +68,7 @@ interface CachedAiResponse {
   latencyMs: number;
 }
 
-export interface SessionChatMessage {
-  id: string;
-  sender: 'user' | 'assistant';
-  text: string;
-  timestamp: string;
-}
+export type SessionChatMessage = StoredChatMessage;
 
 const memoryResponseCache = new Map<string, CachedAiResponse>();
 
@@ -81,15 +82,33 @@ export function AiAssistantTab({
   const [isLoading, setIsLoading] = useState(false);
   const [lastSubmittedPrompt, setLastSubmittedPrompt] = useState<string | null>(null);
 
-  const [sessionMessages, setSessionMessages] = useState<SessionChatMessage[]>([]);
+  // Synchronously load saved conversation from local storage for initial render
+  const initialSavedState = useMemo(() => {
+    if (typeof window === 'undefined' || !event?.id) return null;
+    const res = aiConversationStorage.getConversation(event.id);
+    return res.success ? res.data : null;
+  }, [event.id]);
+
+  const [sessionMessages, setSessionMessages] = useState<SessionChatMessage[]>(
+    () => initialSavedState?.messages || []
+  );
   const [activeEventId, setActiveEventId] = useState(event.id);
   const activeEventIdRef = useRef(event.id);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const [conversationalAnswer, setConversationalAnswer] = useState<string | null>(null);
-  const [activeModel, setActiveModel] = useState<string | null>(null);
-  const [activeProvider, setActiveProvider] = useState<'cloudflare' | 'gemini' | null>(null);
-  const [proposals, setProposals] = useState<StagedProposal[]>([]);
+  const [conversationalAnswer, setConversationalAnswer] = useState<string | null>(
+    () => initialSavedState?.lastAnswer || null
+  );
+  const [activeModel, setActiveModel] = useState<string | null>(
+    () => initialSavedState?.lastModel || null
+  );
+  const [activeProvider, setActiveProvider] = useState<'cloudflare' | 'gemini' | null>(
+    () => initialSavedState?.lastProvider || null
+  );
+  const [proposals, setProposals] = useState<StagedProposal[]>(() => {
+    if (!initialSavedState?.proposals) return [];
+    return detectProposalConflicts(event, initialSavedState.proposals);
+  });
   const [proposalFilter, setProposalFilter] = useState<'all' | 'staged' | 'applied' | 'dismissed'>('all');
   const [responseLatencyMs, setResponseLatencyMs] = useState<number | null>(null);
   const [elapsedMs, setElapsedMs] = useState<number>(0);
@@ -98,7 +117,34 @@ export function AiAssistantTab({
   const [is503DemandError, setIs503DemandError] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
 
-  // Synchronize active event reference and cancel in-flight queries when user switches event
+  // Helper to reload saved conversation for the active event
+  const loadSavedConversation = useCallback((targetEvent: Event) => {
+    try {
+      const res = aiConversationStorage.getConversation(targetEvent.id);
+      if (res.success && res.data) {
+        setSessionMessages(res.data.messages || []);
+        setConversationalAnswer(res.data.lastAnswer || null);
+        setActiveModel(res.data.lastModel || null);
+        setActiveProvider(res.data.lastProvider || null);
+        const storedProposals = res.data.proposals || [];
+        setProposals(detectProposalConflicts(targetEvent, storedProposals));
+      } else {
+        setSessionMessages([]);
+        setConversationalAnswer(null);
+        setActiveModel(null);
+        setActiveProvider(null);
+        setProposals([]);
+      }
+    } catch {
+      setSessionMessages([]);
+      setConversationalAnswer(null);
+      setActiveModel(null);
+      setActiveProvider(null);
+      setProposals([]);
+    }
+  }, []);
+
+  // Synchronize active event reference and reload conversation when user switches events
   useEffect(() => {
     activeEventIdRef.current = event.id;
     if (abortControllerRef.current) {
@@ -108,12 +154,36 @@ export function AiAssistantTab({
     if (event.id !== activeEventId) {
       setActiveEventId(event.id);
       setIsLoading(false);
-      setSessionMessages([]);
-      setConversationalAnswer(null);
-      setProposals([]);
       setErrorMessage(null);
+      loadSavedConversation(event);
     }
-  }, [event.id, activeEventId]);
+  }, [event.id, activeEventId, event, loadSavedConversation]);
+
+  // Cross-tab conversation synchronization
+  useEffect(() => {
+    if (typeof window === 'undefined' || !event.id) return;
+    const storageKey = getAiConversationStorageKey(event.id);
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === storageKey) {
+        loadSavedConversation(event);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [event.id, event, loadSavedConversation]);
+
+  // Clear conversation history action
+  const handleClearHistory = useCallback(() => {
+    aiConversationStorage.clearConversation(event.id);
+    setSessionMessages([]);
+    setConversationalAnswer(null);
+    setActiveModel(null);
+    setActiveProvider(null);
+    setProposals([]);
+    setErrorMessage(null);
+  }, [event.id]);
 
   // Cleanup pending controller on unmount
   useEffect(() => {
@@ -252,8 +322,20 @@ export function AiAssistantTab({
         sender: 'assistant',
         text: cached.answer,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        intent,
+        modelUsed: cached.modelUsed,
+        provider: cached.provider,
       };
-      setSessionMessages((prev) => [...prev, cachedAssistantMsg]);
+      const updatedMessages = [...sessionMessages, userMsg, cachedAssistantMsg];
+      setSessionMessages(updatedMessages);
+
+      aiConversationStorage.saveConversation(event.id, {
+        messages: updatedMessages,
+        lastAnswer: cached.answer,
+        lastModel: cached.modelUsed,
+        lastProvider: cached.provider,
+        proposals: validated,
+      });
       return;
     }
 
@@ -322,14 +404,27 @@ export function AiAssistantTab({
       setProposals(validated);
       setProposalFilter('all');
 
-      // Record assistant reply in session-only history
+      // Record assistant reply in history
       const asstMsg: SessionChatMessage = {
         id: `asst_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
         sender: 'assistant',
         text: data.answer,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        intent,
+        modelUsed: data.modelUsed,
+        provider: data.provider,
       };
-      setSessionMessages((prev) => [...prev, asstMsg]);
+      const updatedMessages = [...sessionMessages, userMsg, asstMsg];
+      setSessionMessages(updatedMessages);
+
+      // Persist completed conversation state to local storage
+      aiConversationStorage.saveConversation(event.id, {
+        messages: updatedMessages,
+        lastAnswer: data.answer,
+        lastModel: data.modelUsed,
+        lastProvider: data.provider,
+        proposals: validated,
+      });
 
       // Cache successful response for instant re-retrieval
       memoryResponseCache.set(cacheKey, {
@@ -364,9 +459,17 @@ export function AiAssistantTab({
     // Stale proposal protection: re-validate proposal against current event state
     const checked = detectProposalConflicts(event, [proposal]);
     if (checked[0].status === 'conflict') {
-      setProposals((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, status: 'conflict', conflictReason: checked[0].conflictReason } : p))
+      const conflictProposals = proposals.map((p) =>
+        p.id === id ? { ...p, status: 'conflict' as const, conflictReason: checked[0].conflictReason } : p
       );
+      setProposals(conflictProposals);
+      aiConversationStorage.saveConversation(event.id, {
+        messages: sessionMessages,
+        lastAnswer: conversationalAnswer,
+        lastModel: activeModel,
+        lastProvider: activeProvider,
+        proposals: conflictProposals,
+      });
       setErrorMessage(checked[0].conflictReason || 'Proposal is stale and conflicts with current celebration state.');
       return;
     }
@@ -374,7 +477,15 @@ export function AiAssistantTab({
     const result = applyProposalToEvent(event, proposal);
     if (result.success) {
       onUpdateEvent(result.event);
-      setProposals((prev) => markProposalAccepted(prev, id));
+      const nextProposals = markProposalAccepted(proposals, id);
+      setProposals(nextProposals);
+      aiConversationStorage.saveConversation(event.id, {
+        messages: sessionMessages,
+        lastAnswer: conversationalAnswer,
+        lastModel: activeModel,
+        lastProvider: activeProvider,
+        proposals: nextProposals,
+      });
     } else {
       setErrorMessage(result.error || 'Failed to apply proposal to event.');
     }
@@ -382,7 +493,15 @@ export function AiAssistantTab({
 
   // User dismisses a proposal
   const handleDismissProposal = (id: string) => {
-    setProposals((prev) => dismissProposal(prev, id));
+    const nextProposals = dismissProposal(proposals, id);
+    setProposals(nextProposals);
+    aiConversationStorage.saveConversation(event.id, {
+      messages: sessionMessages,
+      lastAnswer: conversationalAnswer,
+      lastModel: activeModel,
+      lastProvider: activeProvider,
+      proposals: nextProposals,
+    });
   };
 
   // Bulk actions
@@ -407,20 +526,34 @@ export function AiAssistantTab({
 
     if (acceptedIds.length > 0) {
       onUpdateEvent(currentEvent);
-      setProposals((prev) =>
-        prev.map((p) =>
-          acceptedIds.includes(p.id)
-            ? { ...p, status: 'accepted', appliedAt: new Date().toISOString() }
-            : p
-        )
+      const nextProposals = proposals.map((p) =>
+        acceptedIds.includes(p.id)
+          ? { ...p, status: 'accepted' as const, appliedAt: new Date().toISOString() }
+          : p
       );
+      setProposals(nextProposals);
+      aiConversationStorage.saveConversation(event.id, {
+        messages: sessionMessages,
+        lastAnswer: conversationalAnswer,
+        lastModel: activeModel,
+        lastProvider: activeProvider,
+        proposals: nextProposals,
+      });
     }
   };
 
   const handleDismissAllStaged = () => {
-    setProposals((prev) =>
-      prev.map((p) => (p.status === 'staged' ? { ...p, status: 'dismissed' } : p))
+    const nextProposals = proposals.map((p) =>
+      p.status === 'staged' ? { ...p, status: 'dismissed' as const } : p
     );
+    setProposals(nextProposals);
+    aiConversationStorage.saveConversation(event.id, {
+      messages: sessionMessages,
+      lastAnswer: conversationalAnswer,
+      lastModel: activeModel,
+      lastProvider: activeProvider,
+      proposals: nextProposals,
+    });
   };
 
   // Filtered proposal list for display
@@ -732,40 +865,56 @@ export function AiAssistantTab({
           </div>
         )}
 
-        {/* Session Conversation History Stream (Prior turns in this session) */}
-        {sessionMessages.length > 1 && (
-          <div className="pt-4 border-t border-[#E7DFD5] space-y-3">
-            <div className="flex items-center justify-between text-xs">
+        {/* Conversation History Stream */}
+        {sessionMessages.length > 0 && (
+          <div className="pt-4 border-t border-[#E7DFD5] space-y-3" data-testid="conversation-history-stream">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
               <span className="font-bold text-[#1C1917] uppercase tracking-wider flex items-center gap-1.5 font-mono text-[11px]">
                 <Compass className="w-3.5 h-3.5 text-[#D97706]" />
-                Previous Turns in this Session ({sessionMessages.length - 1})
+                Conversation History ({sessionMessages.length} {sessionMessages.length === 1 ? 'message' : 'messages'})
               </span>
-              <span className="text-[11px] text-[#A8A29E] font-mono">Session-only · Never Persisted</span>
-            </div>
-            <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
-              {sessionMessages.slice(0, -1).map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
+              <div className="flex items-center gap-3">
+                <span className="text-[11px] text-[#059669] font-mono font-medium flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#059669]" />
+                  <span>Stored Locally in Browser</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={handleClearHistory}
+                  className="inline-flex items-center gap-1 text-[11px] font-mono text-[#78716C] hover:text-[#DC2626] transition-colors px-2 py-0.5 rounded hover:bg-[#FEF2F2]"
+                  aria-label="Clear conversation history"
                 >
-                  <div
-                    className={`max-w-[88%] rounded-xl p-3 text-xs leading-relaxed ${
-                      msg.sender === 'user'
-                        ? 'bg-[#FFEDD5]/60 text-[#1C1917] border border-[#FED7AA]'
-                        : 'bg-[#FAF8F5] text-[#1C1917] border border-[#E7DFD5]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-3 text-[10px] text-[#78716C] mb-1 font-mono">
-                      <span className="font-bold text-[#1C1917]">
-                        {msg.sender === 'user' ? 'You' : 'Planning Assistant'}
-                      </span>
-                      <span>{msg.timestamp}</span>
-                    </div>
-                    <div className="whitespace-pre-line">{msg.text}</div>
-                  </div>
-                </div>
-              ))}
+                  <Trash2 className="w-3 h-3" />
+                  <span>Clear History</span>
+                </button>
+              </div>
             </div>
+            {sessionMessages.length > 1 && (
+              <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+                {sessionMessages.slice(0, -1).map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
+                  >
+                    <div
+                      className={`max-w-[88%] rounded-xl p-3 text-xs leading-relaxed ${
+                        msg.sender === 'user'
+                          ? 'bg-[#FFEDD5]/60 text-[#1C1917] border border-[#FED7AA]'
+                          : 'bg-[#FAF8F5] text-[#1C1917] border border-[#E7DFD5]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-3 text-[10px] text-[#78716C] mb-1 font-mono">
+                        <span className="font-bold text-[#1C1917]">
+                          {msg.sender === 'user' ? 'You' : 'Planning Assistant'}
+                        </span>
+                        <span>{msg.timestamp}</span>
+                      </div>
+                      <div className="whitespace-pre-line">{msg.text}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </section>

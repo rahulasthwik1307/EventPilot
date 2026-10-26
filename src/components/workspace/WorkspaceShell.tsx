@@ -41,9 +41,7 @@ export function WorkspaceShell({
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isReplanningOpen, setIsReplanningOpen] = useState(false);
   const [isShortcutsDialogOpen, setIsShortcutsDialogOpen] = useState(false);
-  const [lastSavedAt, setLastSavedAt] = useState<string>(
-    new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-  );
+  const [lastSavedAt, setLastSavedAt] = useState<string>('');
 
   useEffect(() => {
     if (initialTab) {
