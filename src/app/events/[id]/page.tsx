@@ -30,7 +30,23 @@ function EventWorkspaceView() {
     tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'overview';
 
   const [mounted, setMounted] = useState(false);
-  const [event, setEvent] = useState<Event | null>(null);
+  const [event, setEvent] = useState<Event | null>(() => {
+    if (typeof window === 'undefined' || !eventId) return null;
+    try {
+      if (eventId === 'sample' || eventId === 'sample-event-aarav-meera') {
+        const sampleRes = eventStorage.getSampleEvent();
+        if (sampleRes.success && sampleRes.data) return sampleRes.data;
+      } else {
+        const listRes = eventStorage.getPersonalEvents();
+        if (listRes.success && listRes.data) {
+          return listRes.data.find((e) => e.id === eventId) || null;
+        }
+      }
+    } catch {
+      // Fall through to useEffect
+    }
+    return null;
+  });
   const [notFound, setNotFound] = useState(false);
   const [storageError, setStorageError] = useState<string | null>(null);
 
@@ -103,7 +119,7 @@ function EventWorkspaceView() {
     [eventId, router]
   );
 
-  if (!mounted) {
+  if (!mounted && !event) {
     return (
       <div className="min-h-screen bg-neutral-bg flex items-center justify-center">
         <span className="text-neutral-muted text-sm font-medium animate-pulse">

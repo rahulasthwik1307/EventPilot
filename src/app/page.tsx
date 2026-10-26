@@ -30,7 +30,14 @@ export default function HomePage() {
     } catch {
       setStorageError('Failed to initialize local browser storage.');
     }
-  }, []);
+
+    // Warm up and prefetch sample workspace route so clicking navigation is instantaneous
+    try {
+      router.prefetch('/events/sample');
+    } catch {
+      // Ignored in non-browser/test environments
+    }
+  }, [router]);
 
   const handleOpenSample = () => {
     router.push('/events/sample');

@@ -13,6 +13,7 @@ import {
   Users,
   CheckCircle2,
   ChevronRight,
+  Loader2,
 } from 'lucide-react';
 
 export interface EditorialNocturneHeroProps {
@@ -28,6 +29,12 @@ export function EditorialNocturneHero({
 }: EditorialNocturneHeroProps) {
   const [activeTab, setActiveTab] = useState<EventType>('wedding');
   const [subtitleIndex, setSubtitleIndex] = useState(0);
+  const [isOpeningSample, setIsOpeningSample] = useState(false);
+
+  const handleSampleClick = () => {
+    setIsOpeningSample(true);
+    onOpenSample();
+  };
 
   const subtitleTags = [
     'Deterministic Paisa Arithmetic',
@@ -139,11 +146,21 @@ export function EditorialNocturneHero({
 
             <button
               type="button"
-              onClick={onOpenSample}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-neutral-surface hover:bg-neutral-subtle text-neutral-text font-semibold px-7 py-3.5 rounded-md transition-all active:translate-y-0.5 motion-enter"
+              onClick={handleSampleClick}
+              disabled={isOpeningSample}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-neutral-surface hover:bg-neutral-subtle text-neutral-text font-semibold px-7 py-3.5 rounded-md transition-all active:translate-y-0.5 motion-enter disabled:opacity-85"
             >
-              <Compass className="w-4 h-4 text-secondary" aria-hidden="true" />
-              <span>Explore Sample Event</span>
+              {isOpeningSample ? (
+                <>
+                  <Loader2 className="w-4 h-4 text-secondary animate-spin" aria-hidden="true" />
+                  <span>Opening Sandbox...</span>
+                </>
+              ) : (
+                <>
+                  <Compass className="w-4 h-4 text-secondary" aria-hidden="true" />
+                  <span>Explore Sample Event</span>
+                </>
+              )}
             </button>
           </div>
 
@@ -289,11 +306,21 @@ export function EditorialNocturneHero({
 
                 <button
                   type="button"
-                  onClick={onOpenSample}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-neutral-subtle hover:bg-neutral-bg text-neutral-text font-semibold text-sm px-5 py-3 rounded-md transition-colors"
+                  onClick={handleSampleClick}
+                  disabled={isOpeningSample}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-neutral-subtle hover:bg-neutral-bg text-neutral-text font-semibold text-sm px-5 py-3 rounded-md transition-colors disabled:opacity-85"
                 >
-                  <Compass className="w-4 h-4 text-secondary" />
-                  <span>Inspect in Sandbox</span>
+                  {isOpeningSample ? (
+                    <>
+                      <Loader2 className="w-4 h-4 text-secondary animate-spin" />
+                      <span>Opening Sandbox...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Compass className="w-4 h-4 text-secondary" />
+                      <span>Inspect in Sandbox</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -469,11 +496,21 @@ export function EditorialNocturneHero({
           </button>
           <button
             type="button"
-            onClick={onOpenSample}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-neutral-surface text-neutral-text hover:bg-neutral-subtle font-semibold px-7 py-3.5 rounded-md transition-all"
+            onClick={handleSampleClick}
+            disabled={isOpeningSample}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-neutral-surface text-neutral-text hover:bg-neutral-subtle font-semibold px-7 py-3.5 rounded-md transition-all disabled:opacity-85"
           >
-            <Compass className="w-4 h-4 text-secondary" />
-            <span>Explore Sample Sandbox</span>
+            {isOpeningSample ? (
+              <>
+                <Loader2 className="w-4 h-4 text-secondary animate-spin" />
+                <span>Opening Sandbox...</span>
+              </>
+            ) : (
+              <>
+                <Compass className="w-4 h-4 text-secondary" />
+                <span>Explore Sample Sandbox</span>
+              </>
+            )}
           </button>
         </div>
       </section>
