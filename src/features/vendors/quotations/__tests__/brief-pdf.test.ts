@@ -2,6 +2,21 @@ import { describe, it, expect, vi } from 'vitest';
 import { downloadVendorBriefPdf } from '../brief-pdf';
 import { VendorRequirementBrief } from '../../types';
 
+const saveSpy = vi.fn();
+
+vi.mock('jspdf', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('jspdf')>();
+  return {
+    ...actual,
+    jsPDF: class extends actual.jsPDF {
+      constructor(...args: any[]) {
+        super(...args);
+        this.save = saveSpy as any;
+      }
+    },
+  };
+});
+
 describe('downloadVendorBriefPdf', () => {
   const mockBrief: VendorRequirementBrief = {
     category: 'photography',
@@ -24,8 +39,11 @@ describe('downloadVendorBriefPdf', () => {
     formattedBriefText: 'Sample formatted brief',
   };
 
-  it('generates a PDF and invokes doc.save without error', () => {
-    // Should run through jsPDF vector generation cleanly
+  it('generates a PDF and invokes doc.save with expected filename without error', () => {
+    saveSpy.mockClear();
     expect(() => downloadVendorBriefPdf(mockBrief)).not.toThrow();
+    expect(saveSpy).toHaveBeenCalledWith(
+      'Requirement-Brief-photography-Aarav___Meera_Wedding_Celebration.pdf'
+    );
   });
 });

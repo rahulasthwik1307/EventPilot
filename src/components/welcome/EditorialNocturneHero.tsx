@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -228,7 +229,7 @@ export function EditorialNocturneHero({
         </div>
 
         {/* Dynamic Folio Content Panel */}
-        <div className="bg-neutral-surface rounded-xl p-6 sm:p-8 animate-tab-enter key={currentFolio.type}">
+        <div key={currentFolio.type} className="bg-neutral-surface rounded-xl p-6 sm:p-8 animate-tab-enter">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Folio Image Column */}
             <div className="lg:col-span-6 overflow-hidden rounded-xl bg-neutral-bg">

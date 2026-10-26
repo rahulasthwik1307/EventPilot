@@ -65,3 +65,13 @@ next-env.d.ts
 *.exe
 .agents/skills/impeccable/scripts/bin/
 
+# Temporary scratch and investigation artifacts
+/scratch/
+
+# Generated export PDFs (Client-side generated documents)
+*.pdf
+
+# Generated taste-skill inspection artifacts and screenshots
+.taste-skill/before/
+.taste-skill/after/
+.taste-skill/inspect/
