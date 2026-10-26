@@ -17,7 +17,7 @@ export function SavedEventsList({
   if (events.length === 0) return null;
 
   return (
-    <section className="py-12 bg-neutral-subtle rounded-2xl p-6 sm:p-8 mt-12">
+    <section className="py-8 sm:py-12 bg-neutral-subtle rounded-2xl p-4 sm:p-8 mt-8 sm:mt-12">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
           <h2 className="font-display text-2xl sm:text-3xl font-bold text-neutral-text">
@@ -41,9 +41,9 @@ export function SavedEventsList({
             return (
               <div
                 key={event.id}
-                className="bg-neutral-surface rounded-xl p-6 transition-transform duration-200 hover:translate-y-[-2px] flex flex-col justify-between"
+                className="bg-neutral-surface rounded-xl p-4 sm:p-6 transition-transform duration-200 hover:translate-y-[-2px] flex flex-col justify-between shadow-xs"
               >
-                <div className="space-y-3">
+                <div className="space-y-3.5">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-semibold bg-primary-subtle text-primary px-2.5 py-1 rounded-md capitalize">
                       {event.type}
@@ -57,18 +57,30 @@ export function SavedEventsList({
                     {event.title}
                   </h3>
 
-                  <div className="grid grid-cols-3 gap-3 text-sm text-neutral-text bg-neutral-subtle p-3 rounded-lg">
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="w-4 h-4 text-neutral-muted" />
-                      <span className="truncate">{formatDateDisplay(event.date)}</span>
+                  {/* Responsive Almanac Metadata Ledger Strip */}
+                  <div className="bg-neutral-subtle p-3 sm:p-3.5 rounded-lg text-sm text-neutral-text space-y-2.5 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-3 sm:items-center">
+                    {/* Row 1 on mobile: Auspicious Calendar Date (always unclipped) */}
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Calendar className="w-4 h-4 text-neutral-muted shrink-0" aria-hidden="true" />
+                      <span className="font-medium text-neutral-text whitespace-nowrap">
+                        {formatDateDisplay(event.date)}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <Users className="w-4 h-4 text-neutral-muted" />
-                      <span>{event.guestTarget} guests</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 justify-end font-semibold text-primary">
-                      <Wallet className="w-4 h-4" />
-                      <span>{formatCurrency(event.budgetCap, event.currency)}</span>
+
+                    {/* Row 2 on mobile: Guest Scale & Budget Cap (balanced side-by-side) */}
+                    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 sm:contents">
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-neutral-muted shrink-0" aria-hidden="true" />
+                        <span className="text-neutral-text whitespace-nowrap">
+                          {event.guestTarget} guests
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 sm:justify-end font-semibold text-secondary">
+                        <Wallet className="w-4 h-4 shrink-0 text-secondary" aria-hidden="true" />
+                        <span className="whitespace-nowrap font-bold">
+                          {formatCurrency(event.budgetCap, event.currency)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -77,7 +89,7 @@ export function SavedEventsList({
                   <button
                     type="button"
                     onClick={() => onSelectEvent(event.id)}
-                    className="flex-1 inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-neutral-text font-bold text-sm py-2.5 px-4 rounded-md transition-colors"
+                    className="flex-1 inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-neutral-text font-bold text-sm min-h-[44px] py-2.5 px-4 rounded-md transition-colors active:translate-y-0.5"
                   >
                     <span>Open Workspace</span>
                     <ArrowRight className="w-4 h-4" />
@@ -86,7 +98,7 @@ export function SavedEventsList({
                     type="button"
                     onClick={() => onDeleteEvent(event.id, event.title)}
                     aria-label={`Delete ${event.title}`}
-                    className="p-2.5 text-neutral-muted hover:text-status-danger hover:bg-neutral-subtle rounded-md transition-colors"
+                    className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-2.5 text-neutral-muted hover:text-status-danger hover:bg-neutral-subtle rounded-md transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
