@@ -1,6 +1,6 @@
 {
  "url": "http://localhost:3000/",
- "at": "2026-10-26T05:12:06.999Z",
+ "at": "2026-10-26T06:14:26.777Z",
  "allow": [],
  "viewports": [
   {
@@ -13,11 +13,11 @@
     0.7,
     0.61,
     0.7,
-    0.58
+    0.56
    ],
    "motion": {
-    "elements": 17,
-    "css": 16,
+    "elements": 18,
+    "css": 17,
     "transitions": 0,
     "scripted": 1,
     "videos": 0,
@@ -29,9 +29,9 @@
      "h": 900
     },
     "page": {
-     "height": 4348,
+     "height": 4281,
      "screens": 4.8,
-     "words": 450,
+     "words": 449,
      "img": 6,
      "video": 0,
      "canvas": 0,
@@ -227,17 +227,24 @@
      "families": [
       {
        "family": "Plus Jakarta Sans",
-       "share": 0.91,
+       "share": 0.9,
        "mono": false
       },
       {
        "family": "Eczar",
        "share": 0.09,
        "mono": false
+      },
+      {
+       "family": "JetBrains Mono",
+       "share": 0.01,
+       "mono": true
       }
      ],
-     "familyCount": 2,
+     "familyCount": 3,
      "sizes": [
+      11,
+      12,
       14,
       16,
       18,
@@ -247,7 +254,7 @@
       36,
       68
      ],
-     "sizeCount": 8,
+     "sizeCount": 10,
      "notLoaded": [],
      "body": {
       "font": "Plus Jakarta Sans",
@@ -264,16 +271,20 @@
       "font": "Eczar",
       "text": "Every Milestone Celebration, Art-Directe"
      },
-     "monoShare": 0,
-     "monoProseShare": 0,
-     "monoFamilies": [],
-     "monoSamples": [],
+     "monoShare": 0.01,
+     "monoProseShare": 0.01,
+     "monoFamilies": [
+      "JetBrains Mono"
+     ],
+     "monoSamples": [
+      "Panchang & Utsav Almanac"
+     ],
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
      "upperShare": 0,
      "centerShare": 0.34,
-     "smallText": 0
+     "smallText": 3
     },
     "eyebrows": [],
     "numbered": [],
@@ -370,8 +381,10 @@
      "scrims": 0,
      "gradientSamples": [],
      "gradientText": 0,
-     "hairlines": 0,
-     "hairlineSamples": [],
+     "hairlines": 1,
+     "hairlineSamples": [
+      "footer.mt-16.py-8 1440px"
+     ],
      "outlinedBoxes": 0,
      "dashed": 0,
      "blurred": 0,
@@ -413,7 +426,9 @@
      "plus jakarta sans",
      "plus jakarta sans fallback",
      "eczar",
-     "eczar fallback"
+     "eczar fallback",
+     "jetbrains mono",
+     "jetbrains mono fallback"
     ]
    },
    "layout": {
@@ -421,10 +436,10 @@
      "w": 1440,
      "h": 900
     },
-    "pageH": 4348,
+    "pageH": 4281,
     "margins": {
      "left": 176,
-     "right": 160
+     "right": 176
     },
     "sections": [
      {
@@ -603,18 +618,17 @@
    "width": 768,
    "height": 1024,
    "load": "load",
-   "screens": 6,
+   "screens": 5,
    "filled": [
     0.57,
     0.85,
     0.73,
     0.76,
-    0.68,
     0.68
    ],
    "motion": {
-    "elements": 18,
-    "css": 17,
+    "elements": 17,
+    "css": 16,
     "transitions": 0,
     "scripted": 1,
     "videos": 0,
@@ -626,9 +640,9 @@
      "h": 1024
     },
     "page": {
-     "height": 5123,
-     "screens": 5,
-     "words": 450,
+     "height": 5052,
+     "screens": 4.9,
+     "words": 449,
      "img": 6,
      "video": 0,
      "canvas": 0,
@@ -824,17 +838,24 @@
      "families": [
       {
        "family": "Plus Jakarta Sans",
-       "share": 0.91,
+       "share": 0.9,
        "mono": false
       },
       {
        "family": "Eczar",
        "share": 0.09,
        "mono": false
+      },
+      {
+       "family": "JetBrains Mono",
+       "share": 0.01,
+       "mono": true
       }
      ],
-     "familyCount": 2,
+     "familyCount": 3,
      "sizes": [
+      11,
+      12,
       14,
       16,
       18,
@@ -843,7 +864,7 @@
       30,
       36
      ],
-     "sizeCount": 7,
+     "sizeCount": 9,
      "notLoaded": [],
      "body": {
       "font": "Plus Jakarta Sans",
@@ -860,16 +881,20 @@
       "font": "Eczar",
       "text": "Every Milestone Celebration, Art-Directe"
      },
-     "monoShare": 0,
-     "monoProseShare": 0,
-     "monoFamilies": [],
-     "monoSamples": [],
+     "monoShare": 0.01,
+     "monoProseShare": 0.01,
+     "monoFamilies": [
+      "JetBrains Mono"
+     ],
+     "monoSamples": [
+      "Panchang & Utsav Almanac"
+     ],
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
      "upperShare": 0,
      "centerShare": 0.34,
-     "smallText": 0
+     "smallText": 3
     },
     "eyebrows": [],
     "numbered": [],
@@ -966,8 +991,10 @@
      "scrims": 0,
      "gradientSamples": [],
      "gradientText": 0,
-     "hairlines": 0,
-     "hairlineSamples": [],
+     "hairlines": 1,
+     "hairlineSamples": [
+      "footer.mt-16.py-8 768px"
+     ],
      "outlinedBoxes": 0,
      "dashed": 0,
      "blurred": 0,
@@ -1003,7 +1030,9 @@
      "plus jakarta sans",
      "plus jakarta sans fallback",
      "eczar",
-     "eczar fallback"
+     "eczar fallback",
+     "jetbrains mono",
+     "jetbrains mono fallback"
     ]
    },
    "layout": {
@@ -1011,29 +1040,25 @@
      "w": 768,
      "h": 1024
     },
-    "pageH": 5123,
+    "pageH": 5052,
     "margins": {
      "left": 32,
      "right": 32
     },
     "sections": [
      {
-      "sel": "div",
-      "tag": "div",
-      "top": 0,
-      "height": 4891,
-      "words": 468,
-      "media": 6,
+      "sel": "section.space-y-12",
+      "tag": "section",
+      "top": 144,
+      "height": 1054,
+      "words": 91,
+      "media": 1,
       "middle": 0,
-      "heading": {
-       "text": "Every Milestone Celebration,",
-       "size": 36,
-       "tag": "h1"
-      },
+      "heading": null,
       "left": 32,
       "right": 32,
-      "textLeft": 32,
-      "textRight": 43,
+      "textLeft": 44,
+      "textRight": 44,
       "fullBleed": false,
       "footer": false,
       "hero": true,
@@ -1041,18 +1066,91 @@
       "pinned": false
      },
      {
-      "sel": "footer.py-12.px-4",
-      "tag": "footer",
-      "top": 4987,
-      "height": 136,
-      "words": 24,
-      "media": 0,
-      "middle": 59,
-      "heading": null,
+      "sel": "section.space-y-8.bg-neutral-subtle",
+      "tag": "section",
+      "top": 1294,
+      "height": 1058,
+      "words": 73,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Interactive Celebration Folios",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 72,
+      "right": 104,
+      "textLeft": 72,
+      "textRight": 114,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.space-y-8",
+      "tag": "section",
+      "top": 2448,
+      "height": 988,
+      "words": 150,
+      "media": 3,
+      "middle": 3,
+      "heading": {
+       "text": "Vivaha & Weddings",
+       "size": 20,
+       "tag": "h3"
+      },
       "left": 32,
-      "right": 37,
+      "right": 32,
       "textLeft": 32,
-      "textRight": 37,
+      "textRight": 54,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.bg-neutral-surface.rounded-2xl",
+      "tag": "section",
+      "top": 3532,
+      "height": 870,
+      "words": 95,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Private Atelier Storage Sovereignty",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 72,
+      "right": 72,
+      "textLeft": 72,
+      "textRight": 74,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.bg-neutral-text.text-neutral-bg",
+      "tag": "section",
+      "top": 4499,
+      "height": 328,
+      "words": 37,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Begin Your Celebration Almanac",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 80,
+      "right": 81,
+      "textLeft": 80,
+      "textRight": 81,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -1113,15 +1211,15 @@
    "load": "load",
    "screens": 9,
    "filled": [
-    0.62,
-    0.85,
+    0.66,
+    0.79,
+    0.91,
+    0.66,
+    0.91,
+    0.73,
     0.91,
     0.8,
-    0.91,
-    0.86,
-    0.91,
-    0.67,
-    0.75
+    0.74
    ],
    "motion": {
     "elements": 18,
@@ -1137,8 +1235,8 @@
      "h": 844
     },
     "page": {
-     "height": 6881,
-     "screens": 8.2,
+     "height": 6766,
+     "screens": 8,
      "words": 443,
      "img": 6,
      "video": 0,
@@ -1183,7 +1281,7 @@
      "align": "center",
      "position": "center",
      "widthRatio": 0.92,
-     "top": 136,
+     "top": 92,
      "tag": "h1",
      "kind": "heading"
     },
@@ -1195,27 +1293,6 @@
      "font": "Eczar"
     },
     "headings": [
-     {
-      "text": "Event Pilot",
-      "words": 2,
-      "chars": 11,
-      "lines": 2,
-      "size": 24,
-      "vw": 6.2,
-      "font": "Eczar",
-      "weight": 700,
-      "tracking": 0,
-      "leading": 1.33,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "left",
-      "widthRatio": 0.29,
-      "top": 20,
-      "tag": "span",
-      "kind": "heading"
-     },
      {
       "text": "Every Milestone Celebration, Art-Directed & Audited",
       "words": 6,
@@ -1233,7 +1310,7 @@
       "align": "center",
       "position": "center",
       "widthRatio": 0.92,
-      "top": 136,
+      "top": 92,
       "tag": "h1",
       "kind": "heading"
      },
@@ -1254,7 +1331,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.79,
-      "top": 1396,
+      "top": 1352,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1275,7 +1352,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.67,
-      "top": 2084,
+      "top": 2040,
       "tag": "div",
       "kind": "heading"
      },
@@ -1296,7 +1373,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.92,
-      "top": 2792,
+      "top": 2748,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1317,7 +1394,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.79,
-      "top": 5108,
+      "top": 5064,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1338,13 +1415,13 @@
       "align": "center",
       "position": "center",
       "widthRatio": 0.75,
-      "top": 6127,
+      "top": 6083,
       "tag": "h2",
       "kind": "heading"
      }
     ],
     "headingSummary": {
-     "count": 7,
+     "count": 6,
      "maxLines": 2,
      "over2Lines": 0,
      "statements": 0,
@@ -1356,17 +1433,25 @@
      "families": [
       {
        "family": "Plus Jakarta Sans",
-       "share": 0.91,
+       "share": 0.9,
        "mono": false
       },
       {
        "family": "Eczar",
        "share": 0.09,
        "mono": false
+      },
+      {
+       "family": "JetBrains Mono",
+       "share": 0.01,
+       "mono": true
       }
      ],
-     "familyCount": 2,
+     "familyCount": 3,
      "sizes": [
+      11,
+      12,
+      13,
       14,
       16,
       18,
@@ -1375,7 +1460,7 @@
       26,
       30
      ],
-     "sizeCount": 7,
+     "sizeCount": 10,
      "notLoaded": [],
      "body": {
       "font": "Plus Jakarta Sans",
@@ -1392,16 +1477,20 @@
       "font": "Eczar",
       "text": "Interactive Celebration Folios"
      },
-     "monoShare": 0,
-     "monoProseShare": 0,
-     "monoFamilies": [],
-     "monoSamples": [],
+     "monoShare": 0.01,
+     "monoProseShare": 0.01,
+     "monoFamilies": [
+      "JetBrains Mono"
+     ],
+     "monoSamples": [
+      "Panchang & Utsav Almanac"
+     ],
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
      "upperShare": 0,
-     "centerShare": 0.38,
-     "smallText": 0
+     "centerShare": 0.34,
+     "smallText": 3
     },
     "eyebrows": [],
     "numbered": [],
@@ -1425,7 +1514,7 @@
       },
       {
        "color": "#ffffff",
-       "top": 776,
+       "top": 732,
        "hsl": {
         "h": 0,
         "s": 0,
@@ -1434,7 +1523,7 @@
       },
       {
        "color": "#f5efeb",
-       "top": 1372,
+       "top": 1328,
        "hsl": {
         "h": 24,
         "s": 0.33,
@@ -1443,7 +1532,7 @@
       },
       {
        "color": "#1c1917",
-       "top": 6095,
+       "top": 6051,
        "hsl": {
         "h": 24,
         "s": 0.1,
@@ -1458,7 +1547,7 @@
       },
       {
        "color": "#c2410c",
-       "share": 0.11
+       "share": 0.1
       },
       {
        "color": "#e7dfd5",
@@ -1466,7 +1555,7 @@
       },
       {
        "color": "#78716c",
-       "share": 0.02
+       "share": 0.03
       },
       {
        "color": "#fdfbf7",
@@ -1507,8 +1596,10 @@
      "scrims": 0,
      "gradientSamples": [],
      "gradientText": 0,
-     "hairlines": 0,
-     "hairlineSamples": [],
+     "hairlines": 1,
+     "hairlineSamples": [
+      "footer.mt-16.py-8 390px"
+     ],
      "outlinedBoxes": 0,
      "dashed": 0,
      "blurred": 0,
@@ -1520,11 +1611,16 @@
      "textShadow": 0,
      "cardRows": []
     },
-    "heroMedia": [],
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.12
+     }
+    ],
     "nav": {
      "links": 0,
      "fixed": false,
-     "height": 104,
+     "height": 60,
      "floatingPill": false,
      "blur": false
     },
@@ -1532,7 +1628,9 @@
      "plus jakarta sans",
      "plus jakarta sans fallback",
      "eczar",
-     "eczar fallback"
+     "eczar fallback",
+     "jetbrains mono",
+     "jetbrains mono fallback"
     ]
    },
    "layout": {
@@ -1540,7 +1638,7 @@
      "w": 390,
      "h": 844
     },
-    "pageH": 6881,
+    "pageH": 6766,
     "margins": {
      "left": 16,
      "right": 16
@@ -1550,7 +1648,7 @@
       "sel": "div",
       "tag": "div",
       "top": 0,
-      "height": 6585,
+      "height": 6541,
       "words": 462,
       "media": 6,
       "middle": 0,
@@ -1570,18 +1668,18 @@
       "pinned": false
      },
      {
-      "sel": "footer.py-12.px-4",
+      "sel": "footer.mt-16.py-8",
       "tag": "footer",
-      "top": 6681,
-      "height": 200,
+      "top": 6605,
+      "height": 161,
       "words": 24,
       "media": 0,
       "middle": 0,
       "heading": null,
-      "left": 17,
-      "right": 17,
-      "textLeft": 17,
-      "textRight": 17,
+      "left": 16,
+      "right": 41,
+      "textLeft": 16,
+      "textRight": 41,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -1594,7 +1692,7 @@
      {
       "text": "Every Milestone Celebration, Art-Directed & Audited",
       "size": 26,
-      "top": 136,
+      "top": 92,
       "firstScreen": true
      }
     ],
@@ -1627,6 +1725,28 @@
  ],
  "findings": [
   {
+   "level": "FAIL",
+   "id": "mono",
+   "width": 1440,
+   "message": "Monospace type outside code: JetBrains Mono — e.g. \"Panchang & Utsav Almanac\"",
+   "fix": "Set it in the text face. Monospace is for literal code inside <pre>/<code> only.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "hairline",
+   "width": 1440,
+   "message": "1 thin rule(s)/divider line(s): footer.mt-16.py-8 1440px",
+   "fix": "Delete. Separate with space, a tone change, or scale. Lines are only for real tables and form fields.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
    "level": "WARN",
    "id": "card-rows",
    "width": 1440,
@@ -1646,6 +1766,16 @@
   },
   {
    "level": "WARN",
+   "id": "size-count",
+   "width": 1440,
+   "message": "10 different font sizes (11, 12, 14, 16, 18, 20, 24, 30, 36, 68).",
+   "fix": "A page needs about five: display, heading, lead, body, small.",
+   "alsoAt": [
+    390
+   ]
+  },
+  {
+   "level": "WARN",
    "id": "no-footage",
    "width": 1440,
    "message": "No video anywhere on the page.",
@@ -1653,10 +1783,14 @@
   },
   {
    "level": "WARN",
-   "id": "off-centre",
+   "id": "small-text",
    "width": 1440,
-   "message": "The margins differ: 176px on the left, 160px on the right, at 1440px.",
-   "fix": "Put the navigation and the content on one pair of margins; check for padding on one side only, a scrollbar gutter, or a header on another inset than the page."
+   "message": "3 text block(s) under 13px.",
+   "fix": "Nothing meant to be read goes below 13px.",
+   "alsoAt": [
+    768,
+    390
+   ]
   },
   {
    "level": "WARN",
