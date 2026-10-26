@@ -63,7 +63,9 @@ next-env.d.ts
 
 # Large binaries and precompiled skill tooling
 *.exe
-.agents/skills/impeccable/scripts/bin/
+
+# Local coding-agent skills (retained locally in Antigravity, excluded from Git)
+.agents/skills/
 
 # Temporary scratch and investigation artifacts
 /scratch/
