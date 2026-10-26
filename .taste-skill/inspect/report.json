@@ -1,24 +1,25 @@
 {
  "url": "http://localhost:3000",
- "at": "2026-10-25T15:52:16.896Z",
+ "at": "2026-10-25T17:01:09.930Z",
  "allow": [],
  "viewports": [
   {
    "width": 1440,
    "height": 900,
    "load": "load",
-   "screens": 6,
+   "screens": 7,
    "filled": [
     0.43,
     0.7,
+    0.56,
     0.61,
-    0.61,
-    0.6,
+    0.65,
+    0.56,
     0.58
    ],
    "motion": {
-    "elements": 29,
-    "css": 28,
+    "elements": 18,
+    "css": 17,
     "transitions": 0,
     "scripted": 1,
     "videos": 0,
@@ -30,24 +31,25 @@
      "h": 900
     },
     "page": {
-     "height": 4936,
-     "screens": 5.5,
-     "words": 543,
-     "img": 6,
+     "height": 5458,
+     "screens": 6.1,
+     "words": 717,
+     "img": 20,
      "video": 0,
      "canvas": 0,
-     "svg": 20,
+     "svg": 32,
      "sections": 6,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 0,
      "uiAbuse": false,
-     "realPictures": 6,
+     "realPictures": 7,
      "videoCount": 0,
      "uiPictures": 0,
      "pictureSamples": [
       "hero_celebration.jpg",
       "wedding_vivaha.jpg",
+      "image?url=%2Fassets%2Fimages%2Fbanquet%2Froyal_b",
       "wedding_vivaha.jpg",
       "birthday_jubilee.jpg",
       "community_mela.jpg",
@@ -156,7 +158,7 @@
       "vw": 2.5,
       "font": "Eczar",
       "weight": 700,
-      "tracking": 0,
+      "tracking": -0.025,
       "leading": 1.11,
       "upper": false,
       "italic": false,
@@ -164,7 +166,7 @@
       "align": "center",
       "position": "center",
       "widthRatio": 0.53,
-      "top": 2196,
+      "top": 2234,
       "tag": "h2",
       "kind": "heading"
      },
@@ -185,7 +187,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.44,
-      "top": 2784,
+      "top": 3306,
       "tag": "h2",
       "kind": "heading"
      },
@@ -206,7 +208,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.34,
-      "top": 3700,
+      "top": 4222,
       "tag": "h2",
       "kind": "heading"
      },
@@ -227,7 +229,7 @@
       "align": "center",
       "position": "center",
       "widthRatio": 0.69,
-      "top": 4408,
+      "top": 4930,
       "tag": "h2",
       "kind": "heading"
      }
@@ -245,17 +247,29 @@
      "families": [
       {
        "family": "Plus Jakarta Sans",
-       "share": 0.91,
+       "share": 0.9,
        "mono": false
       },
       {
        "family": "Eczar",
-       "share": 0.09,
+       "share": 0.07,
+       "mono": false
+      },
+      {
+       "family": "JetBrains Mono",
+       "share": 0.02,
+       "mono": true
+      },
+      {
+       "family": "ui-serif",
+       "share": 0.01,
        "mono": false
       }
      ],
-     "familyCount": 2,
+     "familyCount": 4,
      "sizes": [
+      11,
+      12,
       14,
       16,
       18,
@@ -265,7 +279,7 @@
       36,
       68
      ],
-     "sizeCount": 8,
+     "sizeCount": 10,
      "notLoaded": [],
      "body": {
       "font": "Plus Jakarta Sans",
@@ -282,16 +296,25 @@
       "font": "Eczar",
       "text": "Every Milestone Celebration, Art-Directe"
      },
-     "monoShare": 0,
-     "monoProseShare": 0,
-     "monoFamilies": [],
-     "monoSamples": [],
+     "monoShare": 0.02,
+     "monoProseShare": 0.02,
+     "monoFamilies": [
+      "JetBrains Mono"
+     ],
+     "monoSamples": [
+      "5/8",
+      "4/8",
+      "6/8",
+      "VIP",
+      "VIP",
+      "VIP"
+     ],
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0,
-     "centerShare": 0.41,
-     "smallText": 0
+     "upperShare": 0.01,
+     "centerShare": 0.4,
+     "smallText": 37
     },
     "eyebrows": [],
     "numbered": [],
@@ -335,23 +358,23 @@
      "textColors": [
       {
        "color": "#1c1917",
-       "share": 0.82
+       "share": 0.58
+      },
+      {
+       "color": "#57534e",
+       "share": 0.14
       },
       {
        "color": "#c2410c",
-       "share": 0.09
+       "share": 0.07
       },
       {
-       "color": "#e7dfd5",
+       "color": "#ffffff",
        "share": 0.04
       },
       {
-       "color": "#78716c",
-       "share": 0.02
-      },
-      {
-       "color": "#065f46",
-       "share": 0.01
+       "color": "#e7dfd5",
+       "share": 0.03
       }
      ],
      "button": {
@@ -366,10 +389,10 @@
      "lowContrast": []
     },
     "buttons": {
-     "count": 17,
+     "count": 27,
      "inHero": 3,
-     "radius": 8,
-     "height": 44,
+     "radius": 12,
+     "height": 56,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
@@ -381,22 +404,32 @@
      ]
     },
     "surfaces": {
-     "shadowStatic": 0,
+     "shadowStatic": 5,
      "shadowOverlay": 0,
-     "shadowSamples": [],
+     "shadowSamples": [
+      "button.relative.w-12 → rgb(255, 255, 255) 0px 0px 0px 2px, rgb(180, 83, 9) 0px 0px 0px 4px, rgba(0, 0, ",
+      "button.relative.w-12 → rgb(255, 255, 255) 0px 0px 0px 2px, rgb(180, 83, 9) 0px 0px 0px 4px, rgba(0, 0, ",
+      "button.relative.w-12 → rgb(255, 255, 255) 0px 0px 0px 2px, rgb(180, 83, 9) 0px 0px 0px 4px, rgba(0, 0, ",
+      "button.relative.w-12 → rgb(255, 255, 255) 0px 0px 0px 2px, rgb(180, 83, 9) 0px 0px 0px 4px, rgba(0, 0, "
+     ],
      "gradients": 0,
      "scrims": 0,
      "gradientSamples": [],
      "gradientText": 0,
-     "hairlines": 0,
-     "hairlineSamples": [],
-     "outlinedBoxes": 0,
-     "dashed": 0,
+     "hairlines": 4,
+     "hairlineSamples": [
+      "div.p-4.sm:p-5 1086px",
+      "div.flex.items-center 495px",
+      "div.p-4.sm:p-5 1086px",
+      "div.flex.items-center 1046px"
+     ],
+     "outlinedBoxes": 7,
+     "dashed": 3,
      "blurred": 0,
-     "roundedBoxes": 15,
-     "boxRadius": 16,
+     "roundedBoxes": 22,
+     "boxRadius": 12,
      "squareMedia": 0,
-     "roundedMedia": 6,
+     "roundedMedia": 7,
      "mediaRadius": 12,
      "textShadow": 0,
      "cardRows": [
@@ -409,8 +442,20 @@
       {
        "count": 3,
        "iconTopped": false,
+       "rounded": false,
+       "top": 2391
+      },
+      {
+       "count": 3,
+       "iconTopped": false,
        "rounded": true,
-       "top": 2908
+       "top": 3049
+      },
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 3430
       }
      ]
     },
@@ -431,7 +476,9 @@
      "plus jakarta sans",
      "plus jakarta sans fallback",
      "eczar",
-     "eczar fallback"
+     "eczar fallback",
+     "jetbrains mono",
+     "jetbrains mono fallback"
     ]
    },
    "layout": {
@@ -439,7 +486,7 @@
      "w": 1440,
      "h": 900
     },
-    "pageH": 4936,
+    "pageH": 5458,
     "margins": {
      "left": 176,
      "right": 176
@@ -492,18 +539,22 @@
       "pinned": false
      },
      {
-      "sel": "section.space-y-8",
+      "sel": "section.space-y-6.sm:space-y-8",
       "tag": "section",
       "top": 2196,
-      "height": 492,
-      "words": 88,
-      "media": 0,
+      "height": 1014,
+      "words": 214,
+      "media": 1,
       "middle": 0,
-      "heading": null,
-      "left": 208,
-      "right": 237,
-      "textLeft": 224,
-      "textRight": 237,
+      "heading": {
+       "text": "Interactive Banquet Seating Matrix",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 197,
+      "right": 197,
+      "textLeft": 212,
+      "textRight": 197,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -513,7 +564,7 @@
      {
       "sel": "section.space-y-8",
       "tag": "section",
-      "top": 2784,
+      "top": 3306,
       "height": 780,
       "words": 150,
       "media": 3,
@@ -536,7 +587,7 @@
      {
       "sel": "section.bg-neutral-surface.rounded-2xl",
       "tag": "section",
-      "top": 3660,
+      "top": 4182,
       "height": 604,
       "words": 95,
       "media": 1,
@@ -559,7 +610,7 @@
      {
       "sel": "section.bg-neutral-text.text-neutral-bg",
       "tag": "section",
-      "top": 4360,
+      "top": 4882,
       "height": 300,
       "words": 37,
       "media": 0,
@@ -674,19 +725,30 @@
     },
     "tiles": 0,
     "panels": {
-     "count": 8,
+     "count": 15,
      "radii": [
       [
        12,
-       6
+       10
       ],
       [
        16,
        2
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       9999,
+       1
       ]
      ],
-     "heavyBorders": 0,
-     "borderSamples": [],
+     "heavyBorders": 2,
+     "borderSamples": [
+      "#d97805 on #ffffff (3.16:1)",
+      "#d97805 on #1c1a17 (5.49:1)"
+     ],
      "heavyShadows": 0,
      "softShadows": 0,
      "shadowSamples": [],
@@ -716,18 +778,20 @@
     "numbers": {
      "cells": 0,
      "leftAligned": 0,
-     "figures": 0,
-     "tabularShare": null,
-     "kpiMax": null
+     "figures": 1,
+     "tabularShare": 0,
+     "kpiMax": 14
     },
     "rows": null,
     "chartHues": 0,
     "placeholders": [],
     "type": {
-     "under13": 0,
+     "under13": 0.25,
      "tiny": 0,
      "tinySamples": [],
      "sizes": [
+      11,
+      12,
       14,
       16,
       18,
@@ -751,18 +815,19 @@
    "width": 768,
    "height": 1024,
    "load": "load",
-   "screens": 6,
+   "screens": 7,
    "filled": [
     0.57,
     0.85,
-    0.67,
-    0.77,
+    0.71,
+    0.83,
     0.73,
+    0.85,
     0.68
    ],
    "motion": {
-    "elements": 29,
-    "css": 28,
+    "elements": 18,
+    "css": 17,
     "transitions": 0,
     "scripted": 1,
     "videos": 0,
@@ -774,24 +839,25 @@
      "h": 1024
     },
     "page": {
-     "height": 5795,
-     "screens": 5.7,
-     "words": 543,
-     "img": 6,
+     "height": 6649,
+     "screens": 6.5,
+     "words": 717,
+     "img": 20,
      "video": 0,
      "canvas": 0,
-     "svg": 20,
+     "svg": 32,
      "sections": 6,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 0,
      "uiAbuse": false,
-     "realPictures": 6,
+     "realPictures": 7,
      "videoCount": 0,
      "uiPictures": 0,
      "pictureSamples": [
       "hero_celebration.jpg",
       "wedding_vivaha.jpg",
+      "image?url=%2Fassets%2Fimages%2Fbanquet%2Froyal_b",
       "wedding_vivaha.jpg",
       "birthday_jubilee.jpg",
       "community_mela.jpg",
@@ -900,7 +966,7 @@
       "vw": 4.7,
       "font": "Eczar",
       "weight": 700,
-      "tracking": 0,
+      "tracking": -0.025,
       "leading": 1.11,
       "upper": false,
       "italic": false,
@@ -908,7 +974,7 @@
       "align": "center",
       "position": "center",
       "widthRatio": 0.92,
-      "top": 2448,
+      "top": 2486,
       "tag": "h2",
       "kind": "heading"
      },
@@ -929,7 +995,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.64,
-      "top": 3120,
+      "top": 3974,
       "tag": "h2",
       "kind": "heading"
      },
@@ -950,7 +1016,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.81,
-      "top": 4244,
+      "top": 5098,
       "tag": "h2",
       "kind": "heading"
      },
@@ -971,7 +1037,7 @@
       "align": "center",
       "position": "center",
       "widthRatio": 0.79,
-      "top": 5219,
+      "top": 6073,
       "tag": "h2",
       "kind": "heading"
      }
@@ -989,17 +1055,29 @@
      "families": [
       {
        "family": "Plus Jakarta Sans",
-       "share": 0.91,
+       "share": 0.9,
        "mono": false
       },
       {
        "family": "Eczar",
-       "share": 0.09,
+       "share": 0.07,
+       "mono": false
+      },
+      {
+       "family": "JetBrains Mono",
+       "share": 0.02,
+       "mono": true
+      },
+      {
+       "family": "ui-serif",
+       "share": 0.01,
        "mono": false
       }
      ],
-     "familyCount": 2,
+     "familyCount": 4,
      "sizes": [
+      11,
+      12,
       14,
       16,
       18,
@@ -1008,7 +1086,7 @@
       30,
       36
      ],
-     "sizeCount": 7,
+     "sizeCount": 9,
      "notLoaded": [],
      "body": {
       "font": "Plus Jakarta Sans",
@@ -1025,16 +1103,25 @@
       "font": "Eczar",
       "text": "Every Milestone Celebration, Art-Directe"
      },
-     "monoShare": 0,
-     "monoProseShare": 0,
-     "monoFamilies": [],
-     "monoSamples": [],
+     "monoShare": 0.02,
+     "monoProseShare": 0.02,
+     "monoFamilies": [
+      "JetBrains Mono"
+     ],
+     "monoSamples": [
+      "5/8",
+      "4/8",
+      "6/8",
+      "VIP",
+      "VIP",
+      "VIP"
+     ],
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0,
-     "centerShare": 0.41,
-     "smallText": 0
+     "upperShare": 0.01,
+     "centerShare": 0.4,
+     "smallText": 37
     },
     "eyebrows": [],
     "numbered": [],
@@ -1078,23 +1165,23 @@
      "textColors": [
       {
        "color": "#1c1917",
-       "share": 0.82
+       "share": 0.58
+      },
+      {
+       "color": "#57534e",
+       "share": 0.14
       },
       {
        "color": "#c2410c",
-       "share": 0.09
+       "share": 0.07
       },
       {
-       "color": "#e7dfd5",
+       "color": "#ffffff",
        "share": 0.04
       },
       {
-       "color": "#78716c",
-       "share": 0.02
-      },
-      {
-       "color": "#065f46",
-       "share": 0.01
+       "color": "#e7dfd5",
+       "share": 0.03
       }
      ],
      "button": {
@@ -1109,10 +1196,10 @@
      "lowContrast": []
     },
     "buttons": {
-     "count": 17,
+     "count": 27,
      "inHero": 3,
-     "radius": 8,
-     "height": 36,
+     "radius": 12,
+     "height": 56,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
@@ -1124,22 +1211,32 @@
      ]
     },
     "surfaces": {
-     "shadowStatic": 0,
+     "shadowStatic": 5,
      "shadowOverlay": 0,
-     "shadowSamples": [],
+     "shadowSamples": [
+      "button.relative.w-12 → rgb(255, 255, 255) 0px 0px 0px 2px, rgb(180, 83, 9) 0px 0px 0px 4px, rgba(0, 0, ",
+      "button.relative.w-12 → rgb(255, 255, 255) 0px 0px 0px 2px, rgb(180, 83, 9) 0px 0px 0px 4px, rgba(0, 0, ",
+      "button.relative.w-12 → rgb(255, 255, 255) 0px 0px 0px 2px, rgb(180, 83, 9) 0px 0px 0px 4px, rgba(0, 0, ",
+      "button.relative.w-12 → rgb(255, 255, 255) 0px 0px 0px 2px, rgb(180, 83, 9) 0px 0px 0px 4px, rgba(0, 0, "
+     ],
      "gradients": 0,
      "scrims": 0,
      "gradientSamples": [],
      "gradientText": 0,
-     "hairlines": 0,
-     "hairlineSamples": [],
-     "outlinedBoxes": 0,
-     "dashed": 0,
+     "hairlines": 4,
+     "hairlineSamples": [
+      "div.p-4.sm:p-5 702px",
+      "div.flex.items-center 654px",
+      "div.p-4.sm:p-5 702px",
+      "div.flex.items-center 662px"
+     ],
+     "outlinedBoxes": 7,
+     "dashed": 3,
      "blurred": 0,
-     "roundedBoxes": 17,
+     "roundedBoxes": 23,
      "boxRadius": 12,
      "squareMedia": 0,
-     "roundedMedia": 6,
+     "roundedMedia": 7,
      "mediaRadius": 12,
      "textShadow": 0,
      "cardRows": [
@@ -1147,7 +1244,13 @@
        "count": 3,
        "iconTopped": false,
        "rounded": true,
-       "top": 3284
+       "top": 3658
+      },
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 4138
       }
      ]
     },
@@ -1168,7 +1271,9 @@
      "plus jakarta sans",
      "plus jakarta sans fallback",
      "eczar",
-     "eczar fallback"
+     "eczar fallback",
+     "jetbrains mono",
+     "jetbrains mono fallback"
     ]
    },
    "layout": {
@@ -1176,19 +1281,19 @@
      "w": 768,
      "h": 1024
     },
-    "pageH": 5795,
+    "pageH": 6649,
     "margins": {
      "left": 32,
-     "right": 37
+     "right": 43
     },
     "sections": [
      {
       "sel": "div",
       "tag": "div",
       "top": 0,
-      "height": 5563,
-      "words": 560,
-      "media": 6,
+      "height": 6417,
+      "words": 682,
+      "media": 7,
       "middle": 0,
       "heading": {
        "text": "Every Milestone Celebration,",
@@ -1208,7 +1313,7 @@
      {
       "sel": "footer.py-12.px-4",
       "tag": "footer",
-      "top": 5659,
+      "top": 6513,
       "height": 136,
       "words": 24,
       "media": 0,
@@ -1282,7 +1387,7 @@
     },
     "canvas": {
      "left": 32,
-     "right": 37
+     "right": 44
     },
     "hero": {
      "text": "Every Milestone Celebration, Art-Directed & Audited",
@@ -1310,19 +1415,30 @@
     },
     "tiles": 0,
     "panels": {
-     "count": 9,
+     "count": 16,
      "radii": [
       [
        12,
-       7
+       11
       ],
       [
        16,
        2
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       9999,
+       1
       ]
      ],
-     "heavyBorders": 0,
-     "borderSamples": [],
+     "heavyBorders": 2,
+     "borderSamples": [
+      "#d97805 on #ffffff (3.16:1)",
+      "#d97805 on #1c1a17 (5.49:1)"
+     ],
      "heavyShadows": 0,
      "softShadows": 0,
      "shadowSamples": [],
@@ -1336,18 +1452,20 @@
     "numbers": {
      "cells": 0,
      "leftAligned": 0,
-     "figures": 0,
-     "tabularShare": null,
-     "kpiMax": null
+     "figures": 1,
+     "tabularShare": 0,
+     "kpiMax": 14
     },
     "rows": null,
     "chartHues": 0,
     "placeholders": [],
     "type": {
-     "under13": 0,
+     "under13": 0.25,
      "tiny": 0,
      "tinySamples": [],
      "sizes": [
+      11,
+      12,
       14,
       16,
       18,
@@ -1370,22 +1488,23 @@
    "width": 390,
    "height": 844,
    "load": "load",
-   "screens": 10,
+   "screens": 11,
    "filled": [
     0.62,
     0.85,
     0.91,
+    0.72,
+    0.92,
+    0.71,
+    0.85,
+    0.85,
     0.79,
-    0.75,
-    0.91,
-    0.91,
-    0.85,
-    0.85,
+    0.79,
     0.75
    ],
    "motion": {
-    "elements": 30,
-    "css": 29,
+    "elements": 19,
+    "css": 18,
     "transitions": 0,
     "scripted": 1,
     "videos": 0,
@@ -1397,24 +1516,25 @@
      "h": 844
     },
     "page": {
-     "height": 8009,
-     "screens": 9.5,
-     "words": 536,
-     "img": 6,
+     "height": 8871,
+     "screens": 10.5,
+     "words": 701,
+     "img": 20,
      "video": 0,
      "canvas": 0,
-     "svg": 20,
+     "svg": 32,
      "sections": 6,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 0,
      "uiAbuse": false,
-     "realPictures": 6,
+     "realPictures": 7,
      "videoCount": 0,
      "uiPictures": 0,
      "pictureSamples": [
       "hero_celebration.jpg",
       "wedding_vivaha.jpg",
+      "image?url=%2Fassets%2Fimages%2Fbanquet%2Froyal_b",
       "wedding_vivaha.jpg",
       "birthday_jubilee.jpg",
       "community_mela.jpg",
@@ -1544,7 +1664,7 @@
       "vw": 7.7,
       "font": "Eczar",
       "weight": 700,
-      "tracking": 0,
+      "tracking": -0.025,
       "leading": 1.2,
       "upper": false,
       "italic": false,
@@ -1552,7 +1672,7 @@
       "align": "center",
       "position": "center",
       "widthRatio": 0.92,
-      "top": 2792,
+      "top": 2830,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1573,7 +1693,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.92,
-      "top": 3920,
+      "top": 4782,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1594,7 +1714,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.79,
-      "top": 6236,
+      "top": 7098,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1615,7 +1735,7 @@
       "align": "center",
       "position": "center",
       "widthRatio": 0.75,
-      "top": 7255,
+      "top": 8117,
       "tag": "h2",
       "kind": "heading"
      }
@@ -1633,17 +1753,29 @@
      "families": [
       {
        "family": "Plus Jakarta Sans",
-       "share": 0.91,
+       "share": 0.9,
        "mono": false
       },
       {
        "family": "Eczar",
-       "share": 0.09,
+       "share": 0.07,
+       "mono": false
+      },
+      {
+       "family": "JetBrains Mono",
+       "share": 0.02,
+       "mono": true
+      },
+      {
+       "family": "ui-serif",
+       "share": 0.01,
        "mono": false
       }
      ],
-     "familyCount": 2,
+     "familyCount": 4,
      "sizes": [
+      11,
+      12,
       14,
       16,
       18,
@@ -1652,7 +1784,7 @@
       26,
       30
      ],
-     "sizeCount": 7,
+     "sizeCount": 9,
      "notLoaded": [],
      "body": {
       "font": "Plus Jakarta Sans",
@@ -1669,16 +1801,25 @@
       "font": "Eczar",
       "text": "Interactive Celebration Folios"
      },
-     "monoShare": 0,
-     "monoProseShare": 0,
-     "monoFamilies": [],
-     "monoSamples": [],
+     "monoShare": 0.02,
+     "monoProseShare": 0.02,
+     "monoFamilies": [
+      "JetBrains Mono"
+     ],
+     "monoSamples": [
+      "5/8",
+      "4/8",
+      "6/8",
+      "VIP",
+      "VIP",
+      "VIP"
+     ],
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0,
+     "upperShare": 0.01,
      "centerShare": 0.44,
-     "smallText": 0
+     "smallText": 40
     },
     "eyebrows": [],
     "numbered": [],
@@ -1719,8 +1860,17 @@
        }
       },
       {
+       "color": "#faf8f5",
+       "top": 4283,
+       "hsl": {
+        "h": 36,
+        "s": 0.33,
+        "l": 0.97
+       }
+      },
+      {
        "color": "#1c1917",
-       "top": 7223,
+       "top": 8085,
        "hsl": {
         "h": 24,
         "s": 0.1,
@@ -1731,23 +1881,23 @@
      "textColors": [
       {
        "color": "#1c1917",
-       "share": 0.82
+       "share": 0.58
+      },
+      {
+       "color": "#57534e",
+       "share": 0.13
       },
       {
        "color": "#c2410c",
-       "share": 0.09
+       "share": 0.07
       },
       {
-       "color": "#e7dfd5",
+       "color": "#ffffff",
        "share": 0.04
       },
       {
-       "color": "#78716c",
-       "share": 0.02
-      },
-      {
-       "color": "#065f46",
-       "share": 0.01
+       "color": "#e7dfd5",
+       "share": 0.03
       }
      ],
      "button": {
@@ -1762,10 +1912,10 @@
      "lowContrast": []
     },
     "buttons": {
-     "count": 17,
+     "count": 25,
      "inHero": 3,
      "radius": 8,
-     "height": 44,
+     "height": 56,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
@@ -1777,25 +1927,42 @@
      ]
     },
     "surfaces": {
-     "shadowStatic": 0,
+     "shadowStatic": 5,
      "shadowOverlay": 0,
-     "shadowSamples": [],
+     "shadowSamples": [
+      "button.relative.w-12 → rgb(255, 255, 255) 0px 0px 0px 2px, rgb(180, 83, 9) 0px 0px 0px 4px, rgba(0, 0, ",
+      "button.relative.w-12 → rgb(255, 255, 255) 0px 0px 0px 2px, rgb(180, 83, 9) 0px 0px 0px 4px, rgba(0, 0, ",
+      "button.relative.w-12 → rgb(255, 255, 255) 0px 0px 0px 2px, rgb(180, 83, 9) 0px 0px 0px 4px, rgba(0, 0, ",
+      "button.relative.w-12 → rgb(255, 255, 255) 0px 0px 0px 2px, rgb(180, 83, 9) 0px 0px 0px 4px, rgba(0, 0, "
+     ],
      "gradients": 0,
      "scrims": 0,
      "gradientSamples": [],
      "gradientText": 0,
-     "hairlines": 0,
-     "hairlineSamples": [],
-     "outlinedBoxes": 0,
-     "dashed": 0,
+     "hairlines": 4,
+     "hairlineSamples": [
+      "div.p-4.sm:p-5 356px",
+      "div.flex.items-center 324px",
+      "div.p-4.sm:p-5 356px",
+      "div.flex.items-center 324px"
+     ],
+     "outlinedBoxes": 7,
+     "dashed": 3,
      "blurred": 0,
-     "roundedBoxes": 17,
+     "roundedBoxes": 23,
      "boxRadius": 12,
      "squareMedia": 0,
-     "roundedMedia": 6,
+     "roundedMedia": 7,
      "mediaRadius": 12,
      "textShadow": 0,
-     "cardRows": []
+     "cardRows": [
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 4300
+      }
+     ]
     },
     "heroMedia": [],
     "nav": {
@@ -1809,7 +1976,9 @@
      "plus jakarta sans",
      "plus jakarta sans fallback",
      "eczar",
-     "eczar fallback"
+     "eczar fallback",
+     "jetbrains mono",
+     "jetbrains mono fallback"
     ]
    },
    "layout": {
@@ -1817,7 +1986,7 @@
      "w": 390,
      "h": 844
     },
-    "pageH": 8009,
+    "pageH": 8871,
     "margins": {
      "left": 16,
      "right": 16
@@ -1827,9 +1996,9 @@
       "sel": "div",
       "tag": "div",
       "top": 0,
-      "height": 7713,
-      "words": 554,
-      "media": 6,
+      "height": 8575,
+      "words": 666,
+      "media": 7,
       "middle": 0,
       "heading": {
        "text": "Interactive Celebration Folios",
@@ -1849,7 +2018,7 @@
      {
       "sel": "footer.py-12.px-4",
       "tag": "footer",
-      "top": 7809,
+      "top": 8671,
       "height": 200,
       "words": 24,
       "media": 0,
@@ -1930,33 +2099,40 @@
     },
     "charts": 0,
     "layout": {
-     "panels": 14,
+     "panels": 6,
      "firstScreen": 0,
      "ragged": [],
      "voids": []
     },
     "tiles": 0,
     "panels": {
-     "count": 18,
+     "count": 17,
      "radii": [
       [
        12,
-       15
+       11
       ],
       [
        16,
        2
       ],
       [
+       0,
+       2
+      ],
+      [
+       9999,
+       1
+      ],
+      [
        8,
        1
       ]
      ],
-     "heavyBorders": 6,
+     "heavyBorders": 2,
      "borderSamples": [
-      "#d97706 on #fef3c7 (2.86:1)",
-      "#d97706 on #fef3c7 (2.86:1)",
-      "#d97706 on #fef3c7 (2.86:1)"
+      "#d97805 on #ffffff (3.16:1)",
+      "#d97805 on #1c1a17 (5.49:1)"
      ],
      "heavyShadows": 0,
      "softShadows": 0,
@@ -1987,18 +2163,20 @@
     "numbers": {
      "cells": 0,
      "leftAligned": 0,
-     "figures": 0,
-     "tabularShare": null,
-     "kpiMax": null
+     "figures": 1,
+     "tabularShare": 0,
+     "kpiMax": 14
     },
     "rows": null,
     "chartHues": 0,
     "placeholders": [],
     "type": {
-     "under13": 0,
+     "under13": 0.26,
      "tiny": 0,
      "tinySamples": [],
      "sizes": [
+      11,
+      12,
       14,
       16,
       18,
@@ -2025,6 +2203,17 @@
    "width": 1440,
    "message": "Yellow-cream background (page background #fdfbf7, section #fdfbf7, section #f5efeb).",
    "fix": "Use the drawn palette. If you want warmth, take a low-chroma stone or bone, not a yellow cream.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "font-count",
+   "width": 1440,
+   "message": "3 typefaces in use (Plus Jakarta Sans, Eczar, JetBrains Mono).",
+   "fix": "Two at most.",
    "alsoAt": [
     768,
     390
@@ -2066,13 +2255,6 @@
    "alsoAt": [
     390
    ]
-  },
-  {
-   "level": "WARN",
-   "id": "heavy-borders",
-   "width": 390,
-   "message": "6 panel borders are dark against their ground: #d97706 on #fef3c7 (2.86:1) | #d97706 on #fef3c7 (2.86:1) | #d97706 on #fef3c7 (2.86:1)",
-   "fix": "A panel border is a whisper: about 1.1–1.3:1 against its ground on a light screen (#e5e7eb–#ededed on white), and about 1.2–1.5:1 on a dark one (#1a1a1a on #000, #2e2e2e on #111). Darker lines turn the screen into a grid of boxes; keep the stronger line for controls."
   }
  ],
  "images": [
@@ -2091,7 +2273,8 @@
    "width": 768,
    "fold": "E:\\EventPilot\\.taste-skill\\inspect\\tablet-fold.jpg",
    "pages": [
-    "E:\\EventPilot\\.taste-skill\\inspect\\tablet-page-01.jpg"
+    "E:\\EventPilot\\.taste-skill\\inspect\\tablet-page-01.jpg",
+    "E:\\EventPilot\\.taste-skill\\inspect\\tablet-page-02.jpg"
    ],
    "film": []
   },

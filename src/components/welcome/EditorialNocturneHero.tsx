@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   ChevronRight,
 } from 'lucide-react';
+import { InteractiveBanquetSeatingMatrix } from './InteractiveBanquetSeatingMatrix';
 
 export interface EditorialNocturneHeroProps {
   onOpenSample: () => void;
@@ -27,8 +28,6 @@ export function EditorialNocturneHero({
 }: EditorialNocturneHeroProps) {
   const [activeTab, setActiveTab] = useState<EventType>('wedding');
   const [subtitleIndex, setSubtitleIndex] = useState(0);
-  const [simulatedSeats, setSimulatedSeats] = useState(6);
-  const [selectedTable, setSelectedTable] = useState<'mandap' | 'sangeet' | 'civic'>('sangeet');
 
   const subtitleTags = [
     'Deterministic Paisa Arithmetic',
@@ -43,10 +42,6 @@ export function EditorialNocturneHero({
     }, 3200);
     return () => clearInterval(timer);
   }, [subtitleTags.length]);
-
-  const handleSeatGuest = () => {
-    setSimulatedSeats((prev) => (prev >= 8 ? 4 : prev + 1));
-  };
 
   const archetypes = [
     {
@@ -306,112 +301,8 @@ export function EditorialNocturneHero({
         </div>
       </section>
 
-      {/* 3. One Live Thing: Interactive Banquet Seating Matrix */}
-      <section className="space-y-8">
-        <div className="text-center max-w-3xl mx-auto space-y-3">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold text-neutral-text">
-            Interactive Banquet Seating Matrix
-          </h2>
-          <p className="text-base text-neutral-text">
-            Test our live table engine right here. Click to seat guests and observe real-time occupancy
-            and per-guest cost recalculations in deterministic TypeScript logic.
-          </p>
-        </div>
-
-        <div className="bg-neutral-surface p-6 sm:p-8 rounded-2xl space-y-6">
-          {/* Table Selector */}
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setSelectedTable('mandap')}
-                className={`px-4 py-2 text-sm font-semibold rounded-md transition-all motion-enter ${
-                  selectedTable === 'mandap'
-                    ? 'bg-primary text-neutral-text'
-                    : 'bg-neutral-subtle text-neutral-text hover:bg-neutral-border'
-                }`}
-              >
-                Table 1: Mandap Royal Front (8 Seats)
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedTable('sangeet')}
-                className={`px-4 py-2 text-sm font-semibold rounded-md transition-all motion-enter ${
-                  selectedTable === 'sangeet'
-                    ? 'bg-primary text-neutral-text'
-                    : 'bg-neutral-subtle text-neutral-text hover:bg-neutral-border'
-                }`}
-              >
-                Table 2: Sangeet Courtyard Lounge
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedTable('civic')}
-                className={`px-4 py-2 text-sm font-semibold rounded-md transition-all motion-enter ${
-                  selectedTable === 'civic'
-                    ? 'bg-primary text-neutral-text'
-                    : 'bg-neutral-subtle text-neutral-text hover:bg-neutral-border'
-                }`}
-              >
-                Table 3: Elders Heritage Pavilion (8 Seats)
-              </button>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleSeatGuest}
-              className="inline-flex items-center gap-2 bg-secondary text-white hover:bg-neutral-text text-sm font-semibold px-4 py-2 rounded-md transition-colors motion-enter"
-            >
-              <Users className="w-4 h-4" />
-              <span>Seat Next Guest ({simulatedSeats}/8)</span>
-            </button>
-          </div>
-
-          {/* Seating Visualization Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3 pt-2">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((seatNum) => {
-              const isOccupied = seatNum <= simulatedSeats;
-              return (
-                <div
-                  key={seatNum}
-                  className={`p-4 rounded-xl text-center transition-all motion-enter ${
-                    isOccupied
-                      ? 'bg-primary-subtle text-neutral-text border-2 border-primary'
-                      : 'bg-neutral-subtle text-neutral-text border-2 border-neutral-border-strong'
-                  }`}
-                >
-                  <div className="text-sm font-bold">Seat {seatNum}</div>
-                  <div className="text-sm font-medium mt-1">
-                    {isOccupied ? 'Confirmed' : 'Available'}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Real-Time Deterministic Math Readout */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-neutral-subtle p-4 rounded-xl text-sm">
-            <div>
-              <span className="text-neutral-text">Current Table Occupancy:</span>{' '}
-              <strong className="text-neutral-text font-bold">
-                {simulatedSeats} of 8 seats ({Math.round((simulatedSeats / 8) * 100)}%)
-              </strong>
-            </div>
-            <div>
-              <span className="text-neutral-text">Allocated Catering:</span>{' '}
-              <strong className="text-secondary font-bold">
-                ₹{((simulatedSeats * 1850)).toLocaleString('en-IN')} (₹1,850/thali)
-              </strong>
-            </div>
-            <div>
-              <span className="text-neutral-text">Arithmetic Engine:</span>{' '}
-              <strong className="text-emerald-800 font-bold">
-                Deterministic TypeScript (Zero AI Drift)
-              </strong>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* 3. One Live Thing: Interactive Banquet Seating Matrix Centerpiece */}
+      <InteractiveBanquetSeatingMatrix />
 
       {/* 4. Three Grounded Planning Templates (Archetype Gallery) */}
       <section className="space-y-8">
