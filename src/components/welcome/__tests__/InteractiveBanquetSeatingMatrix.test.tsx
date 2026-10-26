@@ -92,7 +92,7 @@ describe('InteractiveBanquetSeatingMatrix Component', () => {
 
     // Initial Mandap Royal (thali rate ₹2,400) with 5 seats: 5 * 2400 = ₹12,000
     expect(screen.getByText('₹12,000')).toBeInTheDocument();
-    expect(screen.getByText(/₹2,400\/thali/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/₹2,400\/thali/i).length).toBeGreaterThanOrEqual(1);
 
     // Switch to Sangeet Courtyard Lounge (thali rate ₹1,850, 4 seats initial: 4 * 1850 = ₹7,400)
     const sangeetBtn = screen.getByRole('button', { name: /Sangeet Courtyard Lounge/i });
@@ -100,7 +100,7 @@ describe('InteractiveBanquetSeatingMatrix Component', () => {
 
     expect(screen.getAllByText('Sangeet Courtyard Lounge').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('₹7,400')).toBeInTheDocument();
-    expect(screen.getByText(/₹1,850\/thali/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/₹1,850\/thali/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/4 of 8 seats/i)).toBeInTheDocument();
 
     // Switch to Elders Heritage Pavilion (thali rate ₹1,650, 6 seats initial: 6 * 1650 = ₹9,900)
@@ -109,7 +109,7 @@ describe('InteractiveBanquetSeatingMatrix Component', () => {
 
     expect(screen.getAllByText('Elders Heritage Pavilion').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('₹9,900')).toBeInTheDocument();
-    expect(screen.getByText(/₹1,650\/thali/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/₹1,650\/thali/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/6 of 8 seats/i)).toBeInTheDocument();
   });
 

@@ -217,7 +217,7 @@ export function EditorialNocturneHero({
                   onClick={() => setActiveTab(item.type)}
                   className={`px-4 py-2 text-sm font-semibold rounded-md transition-all motion-enter ${
                     isSelected
-                      ? 'bg-primary text-neutral-text shadow-xs'
+                      ? 'bg-primary text-neutral-text'
                       : 'text-neutral-text hover:bg-neutral-subtle'
                   }`}
                 >
