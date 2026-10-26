@@ -171,12 +171,12 @@ Event Pilot enforces distinct, verified privacy guarantees across its two server
 
 ```mermaid
 flowchart TD
-    subgraph Client["Browser (Local-First Client Workspace)"]
+    subgraph Client["Browser - Local-First Client Workspace"]
         UI["Event Pilot UI (Next.js 15 / React 19)"]
         LS[("Browser localStorage<br/>event_pilot_personal_events_v1")]
-        Sync["Cross-Tab Concurrency Sync<br/>(expectedVersion & StorageEvent)"]
-        Engines["Deterministic TypeScript Domain Engines<br/>(Budget Math, Timeline Offsets, Seating)"]
-        Projector["Client-Side Context Projector<br/>(Strips all Guest PII, Contacts, & Notes)"]
+        Sync["Cross-Tab Concurrency Sync<br/>expectedVersion & StorageEvent"]
+        Engines["Deterministic TypeScript Domain Engines<br/>Budget Math, Timeline Offsets, Seating"]
+        Projector["Client-Side Context Projector<br/>Strips all Guest PII, Contacts, & Notes"]
         UI <--> LS
         UI <--> Sync
         UI <--> Engines
@@ -184,10 +184,10 @@ flowchart TD
     end
 
     subgraph API["Next.js Server API Layer"]
-        RateLimitAssistant["Streaming Validator & Rate Limiter<br/>(/api/assistant: Max 64 KB & Early 413 Abort)"]
-        RateLimitQuotation["Streaming Validator & Rate Limiter<br/>(/api/quotations: Max 128 KB & Early 413 Abort)"]
-        ZodAssistant["Zod Validation (AiAssistantRequestSchema)"]
-        ZodQuotation["Zod Validation (QuotationsApiRequestSchema)"]
+        RateLimitAssistant["Streaming Validator & Rate Limiter<br/>/api/assistant - Max 64 KB & Early 413 Abort"]
+        RateLimitQuotation["Streaming Validator & Rate Limiter<br/>/api/quotations - Max 128 KB & Early 413 Abort"]
+        ZodAssistant["Zod Validation - AiAssistantRequestSchema"]
+        ZodQuotation["Zod Validation - QuotationsApiRequestSchema"]
         Orchestrator["Multi-Model AI Orchestrator"]
         QuoteExtractor["Quotation Extractor & Analysis Engine"]
 
@@ -200,29 +200,29 @@ flowchart TD
         CF2["Failover 1: Cloudflare Workers AI<br/>@cf/meta/llama-3.3-70b-instruct-fp8-fast"]
         CF3["Failover 2: Cloudflare Workers AI<br/>@cf/meta/llama-3.1-8b-instruct-fp8"]
         Gemini["Final Fallback: Google Gemini API<br/>gemini-3.8-flash"]
-        RegexFallback["Deterministic Regex Fallback<br/>(Pure Local Rule-Based Extraction)"]
+        RegexFallback["Deterministic Regex Fallback<br/>Pure Local Rule-Based Extraction"]
 
         Orchestrator --> CF1
-        CF1 -.->|Timeout / Error| CF2
+        CF1 -.->|Timeout or Error| CF2
         CF2 -.->|Capacity Spike| CF3
-        CF3 -.->|Unauthorized / Down| Gemini
+        CF3 -.->|Unauthorized or Down| Gemini
 
         QuoteExtractor --> CF2
         CF2 -.->|Fallback| Gemini
-        Gemini -.->|Offline / Failure| RegexFallback
+        Gemini -.->|Offline or Failure| RegexFallback
     end
 
     subgraph UserReview["Proposal Decision Boundary"]
-        Proposals["Staged Proposals with Visual Diffs<br/>(Budget, Task, Milestone Diffs)"]
-        Decision{"User Inspects, Edits, & Decides"}
+        Proposals["Staged Proposals with Visual Diffs<br/>Budget, Task, Milestone Diffs"]
+        Decision{"User Inspects, Edits, or Decides"}
         Orchestrator --> Proposals --> Decision
         QuoteExtractor -->|Structured Quotation Record| Decision
-        Decision -->|User Accepts & Applies| Engines
+        Decision -->|User Accepts and Applies| Engines
         Decision -->|User Dismisses| UI
     end
 
-    Projector -->|Allowlisted Constraints (64 KB)| RateLimitAssistant
-    UI -->|User-Pasted Quote Text (128 KB)| RateLimitQuotation
+    Projector -->|Allowlisted Constraints - 64 KB| RateLimitAssistant
+    UI -->|User-Pasted Quote Text - 128 KB| RateLimitQuotation
 ```
 
 ---
