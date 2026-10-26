@@ -199,10 +199,10 @@ export interface SaveEventOptions {
 export interface EventStorage {
   getPersonalEvents(): StorageResult<Event[]>;
   getPersonalEvent(id: string): StorageResult<Event | null>;
-  savePersonalEvent(event: Event, options?: SaveEventOptions): StorageResult<void>;
+  savePersonalEvent(event: Event, options?: SaveEventOptions): StorageResult<Event>;
   deletePersonalEvent(id: string): StorageResult<void>;
   getSampleEvent(): StorageResult<Event>;
-  saveSampleEvent(event: Event, options?: SaveEventOptions): StorageResult<void>;
+  saveSampleEvent(event: Event, options?: SaveEventOptions): StorageResult<Event>;
   resetSampleEvent(): StorageResult<Event>;
   getActiveEventId(): StorageResult<string | null>;
   setActiveEventId(id: string | null): StorageResult<void>;

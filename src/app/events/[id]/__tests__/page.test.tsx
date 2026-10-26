@@ -1,8 +1,8 @@
-import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within, act } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import EventWorkspacePage from "../page";
 import { mockPush } from "../../../../test/setup";
-import { eventStorage } from "../../../../features/events/storage";
+import { eventStorage, STORAGE_KEYS } from "../../../../features/events/storage";
 import { Event } from "../../../../features/events/types";
 
 describe("EventWorkspacePage - Dedicated Workspace Routes and Tabs", () => {
@@ -263,6 +263,262 @@ describe("EventWorkspacePage - Dedicated Workspace Routes and Tabs", () => {
 
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith("/");
+    });
+  });
+
+  describe("Optimistic Concurrency & Cross-Tab Collision Protection", () => {
+    const createPersonalTestEvent = (id = "concurrency-test-evt"): Event => ({
+      id,
+      title: "Priya & Rohan's Vivaha",
+      type: "wedding",
+      date: "2026-12-15",
+      guestTarget: 250,
+      budgetCap: 1200000,
+      currency: "INR",
+      isSample: false,
+      version: 1,
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+      categories: [],
+      expenses: [],
+      milestones: [
+        {
+          id: "m-1",
+          title: "Muhurtham Preparation",
+          offsetDays: -30,
+        },
+      ],
+      tasks: [
+        {
+          id: "task-concurrency-1",
+          title: "Book Mandap Hall",
+          milestoneId: "m-1",
+          priority: "urgent",
+          status: "pending",
+          dueDate: "2026-11-15",
+          createdAt: "2026-01-01T00:00:00.000Z",
+          updatedAt: "2026-01-01T00:00:00.000Z",
+        },
+      ],
+      vendors: [],
+      households: [],
+      guests: [],
+      tables: [],
+      assignments: [],
+      quotations: [],
+    });
+
+    it("passes expectedVersion and expectedUpdatedAt on normal workspace update and advances version", async () => {
+      const initial = createPersonalTestEvent("evt-normal-save");
+      eventStorage.savePersonalEvent(initial);
+      const storedBeforeRender = eventStorage.getPersonalEvent("evt-normal-save").data!;
+
+      const saveSpy = vi.spyOn(eventStorage, "savePersonalEvent");
+
+      window.history.pushState({}, "", "/events/evt-normal-save?tab=timeline");
+      render(<EventWorkspacePage />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Book Mandap Hall")).toBeInTheDocument();
+      });
+
+      // Toggle task status
+      const toggleBtn = screen.getByLabelText("Mark Book Mandap Hall as completed");
+      fireEvent.click(toggleBtn);
+
+      await waitFor(() => {
+        expect(saveSpy).toHaveBeenCalledWith(
+          expect.objectContaining({ id: "evt-normal-save" }),
+          expect.objectContaining({
+            expectedVersion: 1,
+            expectedUpdatedAt: storedBeforeRender.updatedAt,
+          })
+        );
+      });
+
+      // Check stored version advanced to 2
+      const stored = eventStorage.getPersonalEvent("evt-normal-save").data!;
+      expect(stored.version).toBe(2);
+      expect(stored.tasks[0].status).toBe("completed");
+
+      // Verify no conflict alert is rendered
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      saveSpy.mockRestore();
+    });
+
+    it("surfaces recoverable conflict alert when storage rejects stale save and does not show false success", async () => {
+      // 1. Initial event saved at Version 1
+      const initial = createPersonalTestEvent("evt-stale-conflict");
+      eventStorage.savePersonalEvent(initial);
+
+      window.history.pushState({}, "", "/events/evt-stale-conflict?tab=timeline");
+      render(<EventWorkspacePage />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Book Mandap Hall")).toBeInTheDocument();
+      });
+
+      // 2. Simulate Tab A concurrently saving a payment in the background
+      const v1Stored = eventStorage.getPersonalEvent("evt-stale-conflict").data!;
+      const paymentExpense = {
+        id: "exp-tab-a-1",
+        categoryId: "cat-1",
+        title: "Tab A Mandap Advance",
+        estimatedAmount: 75000,
+        actualAmount: 75000,
+        paymentStatus: "settled" as const,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      const tabAUpdated: Event = {
+        ...v1Stored,
+        expenses: [paymentExpense],
+      };
+      // Tab A successfully saves and advances stored version to 2
+      const tabASaveRes = eventStorage.savePersonalEvent(tabAUpdated, {
+        expectedVersion: v1Stored.version,
+        expectedUpdatedAt: v1Stored.updatedAt,
+      });
+      expect(tabASaveRes.success).toBe(true);
+      expect(eventStorage.getPersonalEvent("evt-stale-conflict").data?.version).toBe(2);
+
+      // 3. Tab B (the rendered workspace, still on V1) attempts an edit (toggling task)
+      const toggleBtn = screen.getByLabelText("Mark Book Mandap Hall as completed");
+      fireEvent.click(toggleBtn);
+
+      // 4. Concurrency conflict banner is surfaced
+      await waitFor(() => {
+        const alert = screen.getByRole("alert");
+        expect(alert).toBeInTheDocument();
+        expect(alert).toHaveTextContent(/Save Conflict:/i);
+        expect(alert).toHaveTextContent(/updated in another session/i);
+        expect(screen.getByRole("button", { name: /Reload Latest Celebration/i })).toBeInTheDocument();
+      });
+
+      // 5. Verify Tab A's persisted data in storage was NOT overwritten
+      const preserved = eventStorage.getPersonalEvent("evt-stale-conflict").data!;
+      expect(preserved.version).toBe(2);
+      expect(preserved.expenses).toHaveLength(1);
+      expect(preserved.expenses[0].title).toBe("Tab A Mandap Advance");
+      // The task in storage was NOT toggled by Tab B's rejected save
+      expect(preserved.tasks[0].status).toBe("pending");
+    });
+
+    it("reloads latest persisted state when clicking Reload Latest Celebration button", async () => {
+      const initial = createPersonalTestEvent("evt-reload-test");
+      eventStorage.savePersonalEvent(initial);
+
+      window.history.pushState({}, "", "/events/evt-reload-test?tab=timeline");
+      render(<EventWorkspacePage />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Book Mandap Hall")).toBeInTheDocument();
+      });
+
+      // Concurrent update in storage
+      const stored = eventStorage.getPersonalEvent("evt-reload-test").data!;
+      eventStorage.savePersonalEvent(
+        { ...stored, title: "Priya & Rohan's Vivaha — Updated by Tab A" },
+        { expectedVersion: stored.version, expectedUpdatedAt: stored.updatedAt }
+      );
+
+      // Trigger conflict by attempting update with stale version
+      const toggleBtn = screen.getByLabelText("Mark Book Mandap Hall as completed");
+      fireEvent.click(toggleBtn);
+
+      await waitFor(() => {
+        expect(screen.getByRole("alert")).toBeInTheDocument();
+      });
+
+      // Click "Reload Latest Celebration"
+      const reloadBtn = screen.getByRole("button", { name: /Reload Latest Celebration/i });
+      fireEvent.click(reloadBtn);
+
+      await waitFor(() => {
+        expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+        expect(
+          screen.getByRole("heading", { level: 1, name: "Priya & Rohan's Vivaha — Updated by Tab A" })
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("detects cross-tab storage changes and warns user that workspace snapshot is stale", async () => {
+      const initial = createPersonalTestEvent("evt-cross-tab-stale");
+      eventStorage.savePersonalEvent(initial);
+
+      window.history.pushState({}, "", "/events/evt-cross-tab-stale");
+      render(<EventWorkspacePage />);
+
+      await waitFor(() => {
+        expect(screen.getByRole("heading", { level: 1, name: "Priya & Rohan's Vivaha" })).toBeInTheDocument();
+      });
+
+      // Another tab saves changes into localStorage
+      const stored = eventStorage.getPersonalEvent("evt-cross-tab-stale").data!;
+      eventStorage.savePersonalEvent(
+        { ...stored, title: "Priya & Rohan — Edited in Tab B" },
+        { expectedVersion: stored.version, expectedUpdatedAt: stored.updatedAt }
+      );
+
+      // Dispatch cross-tab storage event
+      act(() => {
+        window.dispatchEvent(
+          new StorageEvent("storage", {
+            key: STORAGE_KEYS.PERSONAL_EVENTS,
+            newValue: window.localStorage.getItem(STORAGE_KEYS.PERSONAL_EVENTS),
+          })
+        );
+      });
+
+      // Status banner appears warning the user
+      await waitFor(() => {
+        const statusBanner = screen.getByRole("status");
+        expect(statusBanner).toBeInTheDocument();
+        expect(statusBanner).toHaveTextContent(/Celebration Updated Elsewhere/i);
+        expect(statusBanner).toHaveTextContent(/Another tab made changes/i);
+      });
+
+      // Click reload in status banner
+      const reloadBtn = within(screen.getByRole("status")).getByRole("button", {
+        name: /Reload Latest Celebration/i,
+      });
+      fireEvent.click(reloadBtn);
+
+      await waitFor(() => {
+        expect(screen.queryByRole("status")).not.toBeInTheDocument();
+        expect(
+          screen.getByRole("heading", { level: 1, name: "Priya & Rohan — Edited in Tab B" })
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("handles cross-tab event deletion safely by showing Celebration Not Found", async () => {
+      const initial = createPersonalTestEvent("evt-cross-tab-delete");
+      eventStorage.savePersonalEvent(initial);
+
+      window.history.pushState({}, "", "/events/evt-cross-tab-delete");
+      render(<EventWorkspacePage />);
+
+      await waitFor(() => {
+        expect(screen.getByRole("heading", { level: 1, name: "Priya & Rohan's Vivaha" })).toBeInTheDocument();
+      });
+
+      // Another tab deletes the event from storage
+      eventStorage.deletePersonalEvent("evt-cross-tab-delete");
+
+      // Dispatch storage event
+      act(() => {
+        window.dispatchEvent(
+          new StorageEvent("storage", {
+            key: STORAGE_KEYS.PERSONAL_EVENTS,
+            newValue: window.localStorage.getItem(STORAGE_KEYS.PERSONAL_EVENTS),
+          })
+        );
+      });
+
+      await waitFor(() => {
+        expect(screen.getByRole("heading", { level: 1, name: "Celebration Not Found" })).toBeInTheDocument();
+      });
     });
   });
 });

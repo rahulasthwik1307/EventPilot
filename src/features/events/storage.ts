@@ -205,7 +205,7 @@ export class LocalStorageEventStorage implements EventStorage {
     return { success: true, data: found };
   }
 
-  savePersonalEvent(event: Event, options?: SaveEventOptions): StorageResult<void> {
+  savePersonalEvent(event: Event, options?: SaveEventOptions): StorageResult<Event> {
     if (!this.isAvailable()) {
       return { success: false, error: this.unavailableError() };
     }
@@ -299,7 +299,7 @@ export class LocalStorageEventStorage implements EventStorage {
 
     try {
       window.localStorage.setItem(STORAGE_KEYS.PERSONAL_EVENTS, JSON.stringify(container));
-      return { success: true };
+      return { success: true, data: sanitized };
     } catch (err) {
       return {
         success: false,
@@ -386,7 +386,7 @@ export class LocalStorageEventStorage implements EventStorage {
     }
   }
 
-  saveSampleEvent(event: Event, options?: SaveEventOptions): StorageResult<void> {
+  saveSampleEvent(event: Event, options?: SaveEventOptions): StorageResult<Event> {
     if (!this.isAvailable()) {
       return { success: false, error: this.unavailableError() };
     }
@@ -464,7 +464,7 @@ export class LocalStorageEventStorage implements EventStorage {
 
     try {
       window.localStorage.setItem(STORAGE_KEYS.SAMPLE_EVENT, JSON.stringify(container));
-      return { success: true };
+      return { success: true, data: sampleEvent };
     } catch (err) {
       return {
         success: false,

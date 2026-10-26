@@ -9,15 +9,18 @@ node_modules
 # Next.js
 /.next/
 /out/
+.turbo/
 
 # Production
 build
 
 # Misc
 .DS_Store
+._*
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+$RECYCLE.BIN/
 *.pem
 *.key
 *.cert
@@ -35,6 +38,7 @@ pnpm-debug.log*
 # Editor and IDE settings
 .vscode/
 .idea/
+.codex/
 *.swp
 *.swo
 *~
@@ -77,3 +81,19 @@ next-env.d.ts
 .taste-skill/before/
 .taste-skill/after/
 .taste-skill/inspect/
+
+# Impeccable live session runtime state and ephemeral journals
+.impeccable/live/server.json
+.impeccable/live/roots.json
+.impeccable/live/app-root.json
+.impeccable/live/inject-journal.json
+.impeccable/live/sessions/
+.impeccable/live/annotations/
+.impeccable/live/previews/
+.impeccable/live/artifacts/
+.impeccable/live/cache/
+.impeccable/live/locks/
+.impeccable/hook.cache.json
+.impeccable/hook.pending.json
+.impeccable/config.local.json
+.impeccable/questions/

@@ -22,6 +22,8 @@ export interface OrchestratorOptions {
   clientOverride?: any;
   timeoutMs?: number;
   fetchFn?: typeof fetch;
+  allowGeminiFallback?: boolean;
+  maxTotalAttempts?: number;
 }
 
 /**
@@ -71,15 +73,26 @@ export async function orchestrateAssistantResponse(
   const invokeGemini =
     options.geminiInvocationFn || generateGeminiAssistantResponse;
 
+  const maxTotalAttempts =
+    options.maxTotalAttempts ?? (Number(process.env.MAX_AI_PROVIDER_ATTEMPTS) || 4);
+  const allowGeminiFallback =
+    options.allowGeminiFallback ?? (process.env.ENABLE_GEMINI_FALLBACK !== 'false');
+
+  let totalAttempts = 0;
+
   const failureLog: Array<{ provider: string; model: string; code: string; message: string }> = [];
 
   // Phase 1: Cloudflare Workers AI Multi-Model Chain
   for (let i = 0; i < models.length; i++) {
+    if (totalAttempts >= maxTotalAttempts) {
+      break;
+    }
     const model = models[i];
     let attempt = 0;
 
-    while (attempt <= maxRetries) {
+    while (attempt <= maxRetries && totalAttempts < maxTotalAttempts) {
       attempt++;
+      totalAttempts++;
 
       const result = await invokeCloudflare(request, model, {
         timeoutMs: options.timeoutMs,
@@ -144,7 +157,11 @@ export async function orchestrateAssistantResponse(
     }
   }
 
-  // Phase 2: Final Fallback to existing Gemini implementation
+  // Phase 2: Final Fallback to existing Gemini implementation (when permitted and within attempt budget)
+  const shouldAttemptGemini = allowGeminiFallback && totalAttempts < maxTotalAttempts;
+
+  if (shouldAttemptGemini) {
+    totalAttempts++;
   try {
     const geminiResult = await invokeGemini(request, options.clientOverride);
 
@@ -179,6 +196,8 @@ export async function orchestrateAssistantResponse(
     });
   }
 
+  }
+
   // Phase 3: All providers exhausted — return safe, actionable user error
   const lastFailure = failureLog[failureLog.length - 1];
   const isHighDemand = failureLog.some(
@@ -187,7 +206,7 @@ export async function orchestrateAssistantResponse(
       f.code === 'SERVER_ERROR' ||
       f.code === 'CAPACITY_EXCEEDED'
   );
-  const isQuota = failureLog.every((f) => f.code === 'QUOTA_EXCEEDED');
+  const isQuota = failureLog.length > 0 && failureLog.every((f) => f.code === 'QUOTA_EXCEEDED');
 
   if (isQuota) {
     return {

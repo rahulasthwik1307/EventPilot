@@ -42,7 +42,7 @@ import { DynamicReplanningModal } from '../replanning/DynamicReplanningModal';
 
 export interface BudgetLedgerTabProps {
   event: Event;
-  onUpdateEvent: (updated: Event) => void;
+  onUpdateEvent: (updated: Event, options?: { alreadySaved?: boolean }) => void;
 }
 
 function getCategoryIcon(name: string) {
@@ -902,14 +902,14 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
         isOpen={isScenarioSimulationOpen}
         onClose={() => setIsScenarioSimulationOpen(false)}
         event={event}
-        onApplyScenario={(updated) => onUpdateEvent(updated)}
+        onApplyScenario={(updated) => onUpdateEvent(updated, { alreadySaved: true })}
       />
 
       <DynamicReplanningModal
         isOpen={isDynamicReplanningOpen}
         onClose={() => setIsDynamicReplanningOpen(false)}
         event={event}
-        onApplyPlan={(updated) => onUpdateEvent(updated)}
+        onApplyPlan={(updated) => onUpdateEvent(updated, { alreadySaved: true })}
       />
     </div>
   );

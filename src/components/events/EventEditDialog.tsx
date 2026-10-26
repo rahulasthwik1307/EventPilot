@@ -228,7 +228,7 @@ export function EventEditDialog({
     }
 
     setIsSaving(false);
-    onSuccess(updated);
+    onSuccess(saveRes.data || updated);
     onClose();
   };
 

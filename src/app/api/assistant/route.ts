@@ -1,23 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AiAssistantRequestSchema } from '../../../features/ai/schemas';
 import { orchestrateAssistantResponse } from '../../../features/ai/ai-orchestrator';
+import {
+  getClientIdentifier,
+  checkRateLimit,
+  parseJsonWithLimit,
+  createRateLimitExceededResponse,
+  attachRateLimitHeaders,
+} from '../../../features/ai/rate-limiter';
+
+// Maximum payload size for assistant requests: 64 KB
+const MAX_ASSISTANT_BODY_BYTES = 64 * 1024;
 
 export async function POST(req: NextRequest) {
   try {
-    let body: unknown;
-    try {
-      body = await req.json();
-    } catch {
-      return NextResponse.json(
-        {
-          error: 'Invalid JSON request payload.',
-          code: 'MALFORMED_REQUEST',
-        },
-        { status: 400 }
-      );
+    // 1. Rate limiting check by client identity
+    const clientId = getClientIdentifier(req);
+    const rateLimit = checkRateLimit(clientId);
+
+    if (!rateLimit.allowed) {
+      return createRateLimitExceededResponse(rateLimit);
     }
 
-    const validated = AiAssistantRequestSchema.safeParse(body);
+    // 2. Bounded body size and JSON parsing
+    const bodyResult = await parseJsonWithLimit(req, MAX_ASSISTANT_BODY_BYTES);
+    if (!bodyResult.success) {
+      return bodyResult.response;
+    }
+
+    // 3. Schema validation
+    const validated = AiAssistantRequestSchema.safeParse(bodyResult.data);
     if (!validated.success) {
       const issues = validated.error.issues || (validated.error as any).errors || [];
       return NextResponse.json(
@@ -33,6 +45,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // 4. AI Orchestration
     const result = await orchestrateAssistantResponse(validated.data);
 
     if (!result.success || !result.data) {
@@ -51,10 +64,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       ...result.data,
     });
+
+    return attachRateLimitHeaders(response, rateLimit);
   } catch (err: any) {
     // Top-level catch to guarantee secrets and stack traces are never leaked
     return NextResponse.json(

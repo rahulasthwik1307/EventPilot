@@ -1,9 +1,15 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
 import * as orchestrator from '../../../../features/ai/ai-orchestrator';
+import { resetRateLimits } from '../../../../features/ai/rate-limiter';
 
 describe('POST /api/assistant (App Router API Route)', () => {
+  beforeEach(() => {
+    resetRateLimits();
+    vi.restoreAllMocks();
+  });
+
   const validPayload = {
     eventId: 'sample-event-aarav-meera',
     intent: 'budget',
@@ -70,6 +76,8 @@ describe('POST /api/assistant (App Router API Route)', () => {
     expect(body.answer).toContain('healthy reserve');
     expect(body.modelUsed).toBe('@cf/meta/llama-3.3-70b-instruct-fp8-fast');
     expect(body.provider).toBe('cloudflare');
+    expect(res.headers.get('X-RateLimit-Limit')).toBeDefined();
+    expect(res.headers.get('X-RateLimit-Remaining')).toBeDefined();
   });
 
   it('maps provider 503 error to HTTP 503 without leaking credentials', async () => {
@@ -143,5 +151,67 @@ describe('POST /api/assistant (App Router API Route)', () => {
     const body = await res.json();
     expect(body.success).toBe(true);
     expect(body.proposals[0].actionType).toBe('update_preference');
+  });
+
+  it('enforces rate limits and returns 429 when threshold exceeded', async () => {
+    const orchestratorSpy = vi.spyOn(orchestrator, 'orchestrateAssistantResponse').mockResolvedValue({
+      success: true,
+      data: {
+        answer: 'Response',
+        summary: 'Summary',
+        recommendations: [],
+        proposals: [],
+        modelUsed: '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+        provider: 'cloudflare',
+        timestamp: '2026-10-21T17:00:00.000Z',
+      },
+    });
+
+    const createRequest = () =>
+      new NextRequest('http://localhost:3000/api/assistant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'cf-connecting-ip': '203.0.113.88',
+        },
+        body: JSON.stringify(validPayload),
+      });
+
+    // Default rate limit is 10 requests per minute
+    for (let i = 0; i < 10; i++) {
+      const res = await POST(createRequest());
+      expect(res.status).toBe(200);
+    }
+
+    // 11th request must be rate-limited
+    const rateLimitedRes = await POST(createRequest());
+    expect(rateLimitedRes.status).toBe(429);
+    const body = await rateLimitedRes.json();
+    expect(body.code).toBe('RATE_LIMIT_EXCEEDED');
+    expect(rateLimitedRes.headers.get('Retry-After')).toBeDefined();
+
+    // Orchestrator must NOT have been called for the 11th request
+    expect(orchestratorSpy).toHaveBeenCalledTimes(10);
+  });
+
+  it('rejects oversized payloads with HTTP 413 before parsing or AI orchestration', async () => {
+    const orchestratorSpy = vi.spyOn(orchestrator, 'orchestrateAssistantResponse');
+
+    // 70 KB payload exceeds 64 KB limit
+    const oversizedString = 'x'.repeat(70 * 1024);
+    const req = new NextRequest('http://localhost:3000/api/assistant', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'cf-connecting-ip': '203.0.113.89',
+      },
+      body: JSON.stringify({ ...validPayload, userPrompt: oversizedString }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(413);
+    const body = await res.json();
+    expect(body.code).toBe('PAYLOAD_TOO_LARGE');
+    expect(orchestratorSpy).not.toHaveBeenCalled();
   });
 });

@@ -420,4 +420,80 @@ describe('ai-orchestrator (Multi-Model Failover & Gemini Fallback)', () => {
     expect(str).not.toContain(process.env.CLOUDFLARE_API_TOKEN || 'dummy');
     expect(str).not.toContain(process.env.GEMINI_API_KEY || 'dummy');
   });
+
+  // Scenario 15: Total attempts across providers are strictly bounded
+  it('Scenario 15: Bounds total provider attempts across models and halts failover', async () => {
+    const mockCf = vi.fn().mockResolvedValue({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Temporary failure', status: 500 },
+    });
+    const mockGemini = vi.fn().mockResolvedValue({
+      success: true,
+      data: sampleSuccessPayload,
+    });
+
+    const res = await orchestrateAssistantResponse(mockRequest, {
+      cloudflareModels: [
+        '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+        '@cf/meta/llama-3.1-8b-instruct-fp8',
+        '@cf/meta/llama-3.2-3b-instruct',
+      ],
+      cfInvocationFn: mockCf,
+      geminiInvocationFn: mockGemini,
+      maxRetriesPerModel: 1,
+      maxTotalAttempts: 2, // Hard bound to 2 attempts max
+      retryDelayMs: 0,
+    });
+
+    // Should stop after 2 attempts without calling subsequent models or Gemini
+    expect(mockCf).toHaveBeenCalledTimes(2);
+    expect(mockGemini).not.toHaveBeenCalled();
+    expect(res.success).toBe(false);
+  });
+
+  // Scenario 16: Gemini fallback can be explicitly disabled
+  it('Scenario 16: Prevents Gemini invocation when allowGeminiFallback is false', async () => {
+    const mockCf = vi.fn().mockResolvedValue({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Cloudflare failure', status: 500 },
+    });
+    const mockGemini = vi.fn();
+
+    const res = await orchestrateAssistantResponse(mockRequest, {
+      cloudflareModels: ['@cf/meta/llama-3.3-70b-instruct-fp8-fast'],
+      cfInvocationFn: mockCf,
+      geminiInvocationFn: mockGemini,
+      allowGeminiFallback: false,
+      maxRetriesPerModel: 0,
+      retryDelayMs: 0,
+    });
+
+    expect(res.success).toBe(false);
+    expect(mockCf).toHaveBeenCalledTimes(1);
+    expect(mockGemini).not.toHaveBeenCalled();
+    expect(res.error?.status).toBe(503);
+  });
+
+  // Scenario 17: Returns 429 QUOTA_EXCEEDED when primary quota exhausted and fallback disabled
+  it('Scenario 17: Returns 429 QUOTA_EXCEEDED when primary is exhausted and fallback disabled', async () => {
+    const mockCf = vi.fn().mockResolvedValue({
+      success: false,
+      error: { code: 'QUOTA_EXCEEDED', message: 'Daily neurons exhausted', status: 429 },
+    });
+    const mockGemini = vi.fn();
+
+    const res = await orchestrateAssistantResponse(mockRequest, {
+      cloudflareModels: ['@cf/meta/llama-3.3-70b-instruct-fp8-fast'],
+      cfInvocationFn: mockCf,
+      geminiInvocationFn: mockGemini,
+      allowGeminiFallback: false,
+      maxRetriesPerModel: 0,
+      retryDelayMs: 0,
+    });
+
+    expect(res.success).toBe(false);
+    expect(mockGemini).not.toHaveBeenCalled();
+    expect(res.error?.code).toBe('QUOTA_EXCEEDED');
+    expect(res.error?.status).toBe(429);
+  });
 });

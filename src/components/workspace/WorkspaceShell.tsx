@@ -16,9 +16,13 @@ import { EventEditDialog } from '../events/EventEditDialog';
 import { DynamicReplanningModal } from '../replanning/DynamicReplanningModal';
 import { Dialog } from '../ui/Dialog';
 
+export interface UpdateEventOptions {
+  alreadySaved?: boolean;
+}
+
 export interface WorkspaceShellProps {
   event: Event;
-  onUpdateEvent: (updated: Event) => void;
+  onUpdateEvent: (updated: Event, options?: UpdateEventOptions) => void;
   onBackToWelcome: () => void;
   onResetSample: () => void;
   onDeleteEvent?: () => void;
@@ -97,8 +101,8 @@ export function WorkspaceShell({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleTabChange]);
 
-  const handleEventUpdated = (updated: Event) => {
-    onUpdateEvent(updated);
+  const handleEventUpdated = (updated: Event, options?: UpdateEventOptions) => {
+    onUpdateEvent(updated, options);
     setLastSavedAt(
       new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     );
@@ -224,7 +228,7 @@ export function WorkspaceShell({
         isOpen={isEditDialogOpen}
         onClose={() => setIsEditDialogOpen(false)}
         event={event}
-        onSuccess={handleEventUpdated}
+        onSuccess={(updated) => handleEventUpdated(updated, { alreadySaved: true })}
       />
 
       {/* Dynamic Celebration Replanner Studio */}
@@ -232,7 +236,7 @@ export function WorkspaceShell({
         isOpen={isReplanningOpen}
         onClose={() => setIsReplanningOpen(false)}
         event={event}
-        onApplyPlan={handleEventUpdated}
+        onApplyPlan={(updated) => handleEventUpdated(updated, { alreadySaved: true })}
       />
 
       {/* Keyboard Shortcuts Cheatsheet Modal */}

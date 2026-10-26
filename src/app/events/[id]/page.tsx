@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState, useCallback, Suspense } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { Event } from '../../../features/events/types';
-import { eventStorage } from '../../../features/events/storage';
-import { WorkspaceShell } from '../../../components/workspace/WorkspaceShell';
+import { Event, SaveEventOptions } from '../../../features/events/types';
+import { eventStorage, STORAGE_KEYS } from '../../../features/events/storage';
+import { WorkspaceShell, UpdateEventOptions } from '../../../components/workspace/WorkspaceShell';
 import { WorkspaceTab } from '../../../components/workspace/WorkspaceNavigation';
-import { AlertCircle, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { AlertCircle, AlertTriangle, ArrowLeft, RefreshCw } from 'lucide-react';
 
 const VALID_TABS: WorkspaceTab[] = [
   'overview',
@@ -49,6 +49,45 @@ function EventWorkspaceView() {
   });
   const [notFound, setNotFound] = useState(false);
   const [storageError, setStorageError] = useState<string | null>(null);
+  const [concurrencyConflict, setConcurrencyConflict] = useState<{
+    message: string;
+  } | null>(null);
+  const [staleWarning, setStaleWarning] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const handleReloadLatest = useCallback(() => {
+    if (!eventId) return;
+    try {
+      if (eventId === 'sample' || eventId === 'sample-event-aarav-meera') {
+        const sampleRes = eventStorage.getSampleEvent();
+        if (sampleRes.success && sampleRes.data) {
+          setEvent(sampleRes.data);
+          setConcurrencyConflict(null);
+          setStaleWarning(false);
+          setSaveError(null);
+        } else {
+          setStorageError(sampleRes.error?.message || 'Failed to reload sample event sandbox.');
+        }
+      } else {
+        const listRes = eventStorage.getPersonalEvents();
+        if (listRes.success && listRes.data) {
+          const found = listRes.data.find((e) => e.id === eventId);
+          if (found) {
+            setEvent(found);
+            setConcurrencyConflict(null);
+            setStaleWarning(false);
+            setSaveError(null);
+          } else {
+            setNotFound(true);
+          }
+        } else {
+          setStorageError(listRes.error?.message || 'Failed to reload celebrations from storage.');
+        }
+      }
+    } catch {
+      setStorageError('Failed to access local browser storage.');
+    }
+  }, [eventId]);
 
   useEffect(() => {
     setMounted(true);
@@ -80,14 +119,146 @@ function EventWorkspaceView() {
     }
   }, [eventId]);
 
-  const handleUpdateEvent = useCallback((updated: Event) => {
-    setEvent(updated);
-    if (updated.isSample) {
-      eventStorage.saveSampleEvent(updated);
-    } else {
-      eventStorage.savePersonalEvent(updated);
-    }
-  }, []);
+  // Safe cross-tab storage change detection
+  useEffect(() => {
+    if (typeof window === 'undefined' || !eventId) return;
+
+    const handleStorageChange = (e: StorageEvent) => {
+      const isPersonalKey = e.key === STORAGE_KEYS.PERSONAL_EVENTS;
+      const isSampleKey = e.key === STORAGE_KEYS.SAMPLE_EVENT;
+
+      if (!isPersonalKey && !isSampleKey) return;
+
+      const isSampleRoute = eventId === 'sample' || eventId === 'sample-event-aarav-meera';
+
+      if (isSampleRoute && isSampleKey) {
+        if (!e.newValue) {
+          return;
+        }
+        try {
+          const sampleRes = eventStorage.getSampleEvent();
+          if (sampleRes.success && sampleRes.data) {
+            const latest = sampleRes.data;
+            if (
+              event &&
+              ((typeof latest.version === 'number' &&
+                typeof event.version === 'number' &&
+                latest.version > event.version) ||
+                (latest.updatedAt && event.updatedAt && latest.updatedAt !== event.updatedAt))
+            ) {
+              setStaleWarning(true);
+            }
+          }
+        } catch {
+          // Safe error catch
+        }
+      } else if (!isSampleRoute && isPersonalKey) {
+        if (!e.newValue) {
+          setNotFound(true);
+          return;
+        }
+        try {
+          const listRes = eventStorage.getPersonalEvents();
+          if (listRes.success && listRes.data) {
+            const found = listRes.data.find((item) => item.id === eventId);
+            if (!found) {
+              // Current event was deleted in another tab
+              setNotFound(true);
+              return;
+            }
+            if (
+              event &&
+              ((typeof found.version === 'number' &&
+                typeof event.version === 'number' &&
+                found.version > event.version) ||
+                (found.updatedAt && event.updatedAt && found.updatedAt !== event.updatedAt))
+            ) {
+              setStaleWarning(true);
+            }
+          }
+        } catch {
+          // Safe error catch
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [eventId, event]);
+
+  const handleUpdateEvent = useCallback(
+    (updated: Event, options?: UpdateEventOptions) => {
+      if (!event) return;
+
+      if (options?.alreadySaved) {
+        // Already persisted to storage with optimistic concurrency checks in modal
+        const latestStored = updated.isSample
+          ? eventStorage.getSampleEvent().data
+          : eventStorage.getPersonalEvent(updated.id).data;
+        setEvent(latestStored || updated);
+        setConcurrencyConflict(null);
+        setStaleWarning(false);
+        setSaveError(null);
+        return;
+      }
+
+      // Concurrency check options MUST be derived strictly from the active snapshot `event`
+      // from which `updated` was derived, NOT from stale or future values.
+      const saveOptions: SaveEventOptions = {
+        expectedVersion: event.version ?? 1,
+        expectedUpdatedAt: event.updatedAt,
+      };
+
+      if (updated.isSample) {
+        const saveRes = eventStorage.saveSampleEvent(updated, saveOptions);
+        if (saveRes.success) {
+          const savedEvent =
+            saveRes.data ||
+            eventStorage.getSampleEvent().data || {
+              ...updated,
+              version: (event.version ?? 1) + 1,
+            };
+          setEvent(savedEvent);
+          setConcurrencyConflict(null);
+          setStaleWarning(false);
+          setSaveError(null);
+        } else if (saveRes.error?.code === 'CONCURRENCY_CONFLICT') {
+          // Do NOT update React state. Surface recoverable conflict.
+          setConcurrencyConflict({
+            message:
+              saveRes.error.message ||
+              'The sample celebration workspace has been updated in another session. Please reload to review the latest changes.',
+          });
+        } else {
+          setSaveError(saveRes.error?.message || 'Failed to save sample event sandbox state.');
+        }
+      } else {
+        const saveRes = eventStorage.savePersonalEvent(updated, saveOptions);
+        if (saveRes.success) {
+          const savedEvent =
+            saveRes.data ||
+            eventStorage.getPersonalEvent(updated.id).data || {
+              ...updated,
+              version: (event.version ?? 1) + 1,
+            };
+          setEvent(savedEvent);
+          setConcurrencyConflict(null);
+          setStaleWarning(false);
+          setSaveError(null);
+        } else if (saveRes.error?.code === 'CONCURRENCY_CONFLICT') {
+          // Do NOT update React state. Surface recoverable conflict.
+          setConcurrencyConflict({
+            message:
+              saveRes.error.message ||
+              'The celebration workspace has been updated in another session. Please reload to review the latest changes.',
+          });
+        } else {
+          setSaveError(saveRes.error?.message || 'Failed to save personal event to storage.');
+        }
+      }
+    },
+    [event]
+  );
 
   const handleResetSample = useCallback(() => {
     const resetRes = eventStorage.resetSampleEvent();
@@ -216,15 +387,111 @@ function EventWorkspaceView() {
   }
 
   return (
-    <WorkspaceShell
-      event={event}
-      initialTab={activeTab}
-      onTabChange={handleTabChange}
-      onUpdateEvent={handleUpdateEvent}
-      onBackToWelcome={handleBackToWelcome}
-      onResetSample={handleResetSample}
-      onDeleteEvent={!event.isSample ? handleDeleteEvent : undefined}
-    />
+    <>
+      {concurrencyConflict && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="bg-status-danger-subtle border-b border-status-danger/40 px-4 sm:px-6 lg:px-8 py-3 text-xs text-status-danger font-medium sticky top-0 z-50 shadow-sm"
+        >
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <span>
+                <strong>Save Conflict:</strong> {concurrencyConflict.message}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleReloadLatest}
+                className="inline-flex items-center gap-1.5 bg-status-danger text-white font-semibold px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Reload Latest Celebration</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setConcurrencyConflict(null)}
+                className="text-neutral-muted hover:text-neutral-text px-2 py-1 text-xs"
+                aria-label="Dismiss conflict notice"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {staleWarning && !concurrencyConflict && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="bg-status-warning-subtle border-b border-status-warning/40 px-4 sm:px-6 lg:px-8 py-2.5 text-xs text-status-warning font-medium sticky top-0 z-50 shadow-sm"
+        >
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+              <span>
+                <strong>Celebration Updated Elsewhere:</strong> Another tab made changes to this celebration. Reload to synchronize your view.
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleReloadLatest}
+                className="inline-flex items-center gap-1.5 bg-status-warning text-white font-semibold px-3 py-1 rounded-md hover:opacity-90 transition-opacity"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Reload Latest Celebration</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setStaleWarning(false)}
+                className="text-neutral-muted hover:text-neutral-text px-2 py-1 text-xs"
+                aria-label="Dismiss update notice"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {saveError && !concurrencyConflict && (
+        <div
+          role="alert"
+          className="bg-status-danger-subtle border-b border-status-danger/40 px-4 sm:px-6 lg:px-8 py-3 text-xs text-status-danger font-medium sticky top-0 z-50 shadow-sm"
+        >
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <span>
+                <strong>Save Failed:</strong> {saveError}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSaveError(null)}
+              className="text-neutral-muted hover:text-neutral-text px-2 py-1 text-xs"
+              aria-label="Dismiss error notice"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
+      <WorkspaceShell
+        event={event}
+        initialTab={activeTab}
+        onTabChange={handleTabChange}
+        onUpdateEvent={handleUpdateEvent}
+        onBackToWelcome={handleBackToWelcome}
+        onResetSample={handleResetSample}
+        onDeleteEvent={!event.isSample ? handleDeleteEvent : undefined}
+      />
+    </>
   );
 }
 

@@ -148,7 +148,7 @@ export function ScenarioSimulationModal({
       return;
     }
 
-    onApplyScenario(updated);
+    onApplyScenario(saveRes.data || updated);
     onClose();
   };
 

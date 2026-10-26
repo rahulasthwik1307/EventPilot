@@ -430,5 +430,68 @@ describe('LocalStorageEventStorage Adapter', () => {
       expect(updatedSnapshot.title).toBe('Migrated from Legacy');
       expect(updatedSnapshot.version).toBe(2);
     });
+
+    it('two tabs load same event; Tab A saves a payment; Tab B attempts stale save; Tab A payment preserved', () => {
+      // 1. Tab A and Tab B both load the celebration at Version 1
+      const baseEvent = createTestEvent({ id: 'evt-two-tabs-race' });
+      const initialSave = storage.savePersonalEvent(baseEvent);
+      expect(initialSave.success).toBe(true);
+
+      const tabASnapshot = storage.getPersonalEvent(baseEvent.id).data!;
+      const tabBSnapshot = storage.getPersonalEvent(baseEvent.id).data!;
+      expect(tabASnapshot.version).toBe(1);
+      expect(tabBSnapshot.version).toBe(1);
+
+      // 2. Tab A records a payment / settled expense and saves with expectedVersion: 1
+      const paymentExpense = {
+        id: 'exp-payment-1',
+        categoryId: 'cat-test-1',
+        title: 'Catering Advance Deposit',
+        estimatedAmount: 50000,
+        actualAmount: 50000,
+        paymentStatus: 'settled' as const,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      const tabAUpdated: Event = {
+        ...tabASnapshot,
+        expenses: [...(tabASnapshot.expenses || []), paymentExpense],
+      };
+
+      const tabASaveRes = storage.savePersonalEvent(tabAUpdated, {
+        expectedVersion: tabASnapshot.version,
+        expectedUpdatedAt: tabASnapshot.updatedAt,
+      });
+      expect(tabASaveRes.success).toBe(true);
+
+      // Persisted event is now Version 2 with Tab A's payment
+      const storedAfterTabA = storage.getPersonalEvent(baseEvent.id).data!;
+      expect(storedAfterTabA.version).toBe(2);
+      expect(storedAfterTabA.expenses).toHaveLength(1);
+      expect(storedAfterTabA.expenses[0].title).toBe('Catering Advance Deposit');
+
+      // 3. Tab B attempts a stale unrelated edit (e.g. guest target change) using its stale snapshot (version: 1)
+      const tabBUpdated: Event = {
+        ...tabBSnapshot,
+        guestTarget: 999, // Unrelated edit
+      };
+
+      const tabBSaveRes = storage.savePersonalEvent(tabBUpdated, {
+        expectedVersion: tabBSnapshot.version, // stale version: 1
+        expectedUpdatedAt: tabBSnapshot.updatedAt,
+      });
+
+      // Storage rejects Tab B's stale save
+      expect(tabBSaveRes.success).toBe(false);
+      expect(tabBSaveRes.error?.code).toBe('CONCURRENCY_CONFLICT');
+
+      // 4. Tab A's payment remains completely intact and undisturbed in storage
+      const finalStored = storage.getPersonalEvent(baseEvent.id).data!;
+      expect(finalStored.version).toBe(2);
+      expect(finalStored.guestTarget).toBe(baseEvent.guestTarget); // NOT 999!
+      expect(finalStored.expenses).toHaveLength(1);
+      expect(finalStored.expenses[0].title).toBe('Catering Advance Deposit');
+      expect(finalStored.expenses[0].actualAmount).toBe(50000);
+    });
   });
 });

@@ -3,6 +3,7 @@ import {
   ExtractedQuotationOutputSchema,
   QuotationComparisonInsight,
   QuotationComparisonInsightSchema,
+  ComparisonQuotationItem,
   VENDOR_CATEGORIES,
   CURRENCY_CODES,
 } from './quotation-schemas';
@@ -262,8 +263,9 @@ ${sourceText.slice(0, 8000)}
     }
   }
 
-  // Try Gemini if configured
-  if (geminiApiKey) {
+  // Try Gemini if configured and permitted
+  const allowGemini = process.env.ENABLE_GEMINI_FALLBACK !== 'false';
+  if (geminiApiKey && allowGemini) {
     try {
       const { GoogleGenAI } = await import('@google/genai');
       const ai = new GoogleGenAI({ apiKey: geminiApiKey });
@@ -296,7 +298,7 @@ ${sourceText.slice(0, 8000)}
  * Generates qualitative comparative insights for 2 or more quotations using AI or deterministic rules.
  */
 export async function generateComparisonInsightsWithAi(
-  quotations: VendorQuotation[],
+  quotations: Array<VendorQuotation | ComparisonQuotationItem>,
   eventContext: {
     title: string;
     eventType: string;
@@ -315,25 +317,38 @@ export async function generateComparisonInsightsWithAi(
     const q1 = quotations[i];
     const q2 = quotations[i + 1];
 
+    if (!q1 || !q2) continue;
+
     if (q1.serviceCategory === q2.serviceCategory) {
-      const hasDrone1 = q1.includedServices.some((s) => /drone/i.test(s.description));
-      const hasDrone2 = q2.includedServices.some((s) => /drone/i.test(s.description));
+      const services1 = Array.isArray(q1.includedServices) ? q1.includedServices : [];
+      const services2 = Array.isArray(q2.includedServices) ? q2.includedServices : [];
+
+      const hasDrone1 = services1.some(
+        (s) => s && typeof s.description === 'string' && /drone/i.test(s.description)
+      );
+      const hasDrone2 = services2.some(
+        (s) => s && typeof s.description === 'string' && /drone/i.test(s.description)
+      );
+
+      const v1Name = q1.vendorName || 'Vendor 1';
+      const v2Name = q2.vendorName || 'Vendor 2';
+      const q1Title = q1.title || 'Quotation 1';
 
       if (hasDrone1 && !hasDrone2) {
         findings.push({
           dimension: 'scope',
-          summary: `Aerial Footage Coverage: ${q1.vendorName} vs ${q2.vendorName}`,
-          detail: `${q1.vendorName} bundles aerial drone capture into the package, whereas ${q2.vendorName} requires an additional equipment add-on or omits drone coverage.`,
+          summary: `Aerial Footage Coverage: ${v1Name} vs ${v2Name}`,
+          detail: `${v1Name} bundles aerial drone capture into the package, whereas ${v2Name} requires an additional equipment add-on or omits drone coverage.`,
           severity: 'info',
-          sourceEvidence: `Inclusions in ${q1.title}`,
+          sourceEvidence: `Inclusions in ${q1Title}`,
         });
       }
 
       if (q1.cancellationPolicy && !q2.cancellationPolicy) {
         findings.push({
           dimension: 'cancellation',
-          summary: `Contractual Risk: Missing Cancellation Terms for ${q2.vendorName}`,
-          detail: `${q1.vendorName} specifies clear cancellation provisions ("${q1.cancellationPolicy}"), while ${q2.vendorName} does not define refund terms, posing financial exposure if dates shift.`,
+          summary: `Contractual Risk: Missing Cancellation Terms for ${v2Name}`,
+          detail: `${v1Name} specifies clear cancellation provisions ("${q1.cancellationPolicy}"), while ${v2Name} does not define refund terms, posing financial exposure if dates shift.`,
           severity: 'warning',
           sourceEvidence: `Cancellation terms comparison`,
         });

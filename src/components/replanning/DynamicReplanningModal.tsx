@@ -199,7 +199,7 @@ export function DynamicReplanningModal({
     }
 
     setIsSaving(false);
-    onApplyPlan(applyResult.event);
+    onApplyPlan(saveRes.data || applyResult.event);
     onClose();
   };
 
