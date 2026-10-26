@@ -37,6 +37,7 @@ import {
 import { formatCurrency } from '../../features/events/validation';
 import { CouponBadge } from '../ui/Badge';
 import { UndoToast } from '../ui/UndoToast';
+import { useUndoAction } from '../../hooks/useUndoAction';
 import { CategoryDialog } from './CategoryDialog';
 import { CategoryDeleteDialog } from './CategoryDeleteDialog';
 import { ExpenseDialog } from './ExpenseDialog';
@@ -81,7 +82,7 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
   const [defaultExpenseCatId, setDefaultExpenseCatId] = useState<string | undefined>(undefined);
   const [isScenarioSimulationOpen, setIsScenarioSimulationOpen] = useState(false);
   const [isDynamicReplanningOpen, setIsDynamicReplanningOpen] = useState(false);
-  const [pendingUndoExpense, setPendingUndoExpense] = useState<Expense | null>(null);
+  const expenseUndo = useUndoAction<Expense>();
 
   // Filters
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
@@ -213,7 +214,7 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
     if (!deletedExp) return;
 
     const updatedExpenses = expenses.filter((e) => e.id !== expenseId);
-    setPendingUndoExpense(deletedExp);
+    expenseUndo.stage(deletedExp, `Expense "${deletedExp.title}" deleted.`);
 
     onUpdateEvent({
       ...event,
@@ -223,9 +224,8 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
   };
 
   const handleUndoDeleteExpense = () => {
-    if (!pendingUndoExpense) return;
-    const restoredExpense = pendingUndoExpense;
-    setPendingUndoExpense(null);
+    const restoredExpense = expenseUndo.consume();
+    if (!restoredExpense) return;
 
     // Re-insert expense with original ID, category, amounts, and attributes
     const updatedExpenses = [...expenses, restoredExpense];
@@ -953,10 +953,10 @@ export function BudgetLedgerTab({ event, onUpdateEvent }: BudgetLedgerTabProps) 
       />
 
       <UndoToast
-        isOpen={Boolean(pendingUndoExpense)}
-        message={`Expense "${pendingUndoExpense?.title}" deleted.`}
+        isOpen={expenseUndo.isOpen}
+        message={expenseUndo.message}
         onUndo={handleUndoDeleteExpense}
-        onDismiss={() => setPendingUndoExpense(null)}
+        onDismiss={expenseUndo.dismiss}
         durationMs={5000}
       />
     </div>

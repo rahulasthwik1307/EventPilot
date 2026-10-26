@@ -12,22 +12,24 @@ describe("HomePage - Landing Page and Navigation", () => {
   });
 
   it("renders the studio baseline title and design system references", () => {
-    render(<HomePage />);
+    const { unmount } = render(<HomePage />);
     expect(screen.getByText("Event Pilot")).toBeInTheDocument();
     expect(screen.getByText(/Almanac Studio/i)).toBeInTheDocument();
     expect(screen.getAllByText("Panchang & Utsav Almanac").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByRole("heading", { level: 1, name: /Every Milestone Celebration/i })).toBeInTheDocument();
+    unmount();
   });
 
   it("displays the three planning archetypes with quick actions", () => {
-    render(<HomePage />);
+    const { unmount } = render(<HomePage />);
     expect(screen.getByRole("heading", { level: 3, name: "Vivaha & Weddings" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Milestone Birthdays" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Community Festivals" })).toBeInTheDocument();
+    unmount();
   });
 
   it("renders the clean product footer and omits internal development text", () => {
-    render(<HomePage />);
+    const { unmount } = render(<HomePage />);
     expect(screen.getByText("Event Pilot · Your celebration, thoughtfully planned.")).toBeInTheDocument();
     expect(screen.getByText("Thoughtful planning · Clear budgets · Your data stays in your browser.")).toBeInTheDocument();
     expect(screen.getAllByText("Panchang & Utsav Almanac").length).toBeGreaterThanOrEqual(1);
@@ -36,6 +38,7 @@ describe("HomePage - Landing Page and Navigation", () => {
     expect(screen.queryByText(/Challenge 5/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Milestone 1/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Deterministic Math Engine · Browser-Local Persistence/i)).not.toBeInTheDocument();
+    unmount();
   });
 
   it("opens shared creation dialog with corresponding archetype when clicking archetype cards", async () => {
@@ -84,17 +87,18 @@ describe("HomePage - Landing Page and Navigation", () => {
   });
 
   it("navigates to /events/sample when clicking 'Explore Sample Event'", async () => {
-    render(<HomePage />);
+    const { unmount } = render(<HomePage />);
     const exploreBtn = screen.getByRole("button", { name: /Explore Sample Event/i });
     fireEvent.click(exploreBtn);
 
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith("/events/sample");
     });
+    unmount();
   });
 
   it("allows creating a personal celebration and navigates to its dedicated route", async () => {
-    render(<HomePage />);
+    const { unmount } = render(<HomePage />);
 
     const createBtn = screen.getByRole("button", { name: /Create New Celebration/i });
     fireEvent.click(createBtn);
@@ -119,6 +123,7 @@ describe("HomePage - Landing Page and Navigation", () => {
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith(expect.stringMatching(/^\/events\//));
     });
+    unmount();
   });
 
   it("renders saved events list and navigates to event workspace on selection", async () => {
@@ -147,7 +152,7 @@ describe("HomePage - Landing Page and Navigation", () => {
     };
     eventStorage.savePersonalEvent(mockEvent);
 
-    render(<HomePage />);
+    const { unmount } = render(<HomePage />);
 
     await waitFor(() => {
       expect(screen.getByText("Ananya's First Birthday")).toBeInTheDocument();
@@ -159,6 +164,7 @@ describe("HomePage - Landing Page and Navigation", () => {
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith("/events/personal-evt-123");
     });
+    unmount();
   });
 
   it("allows deleting a personal celebration from the saved list", async () => {
@@ -187,7 +193,7 @@ describe("HomePage - Landing Page and Navigation", () => {
     };
     eventStorage.savePersonalEvent(mockEvent);
 
-    render(<HomePage />);
+    const { unmount } = render(<HomePage />);
 
     await waitFor(() => {
       expect(screen.getByText("Temporary Celebration")).toBeInTheDocument();
@@ -202,5 +208,6 @@ describe("HomePage - Landing Page and Navigation", () => {
     await waitFor(() => {
       expect(screen.queryByText("Temporary Celebration")).not.toBeInTheDocument();
     });
+    unmount();
   });
 });

@@ -18,6 +18,7 @@ import {
 import { CouponBadge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { UndoToast } from '../ui/UndoToast';
+import { useUndoAction } from '../../hooks/useUndoAction';
 import { SeatingAssignment } from '../../features/seating/types';
 import { GuestDialog } from './GuestDialog';
 import { HouseholdDialog } from './HouseholdDialog';
@@ -61,10 +62,10 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
   const [isHouseholdDialogOpen, setIsHouseholdDialogOpen] = useState(false);
   const [editingHousehold, setEditingHousehold] = useState<GuestHousehold | null>(null);
   const [deletingHousehold, setDeletingHousehold] = useState<GuestHousehold | null>(null);
-  const [pendingUndoGuest, setPendingUndoGuest] = useState<{
+  const guestUndo = useUndoAction<{
     guest: Guest;
     assignments: SeatingAssignment[];
-  } | null>(null);
+  }>();
 
   const guests = useMemo(() => event.guests || [], [event.guests]);
   const households = useMemo(() => event.households || [], [event.households]);
@@ -176,10 +177,14 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
     const removedAssignments = (event.assignments || []).filter((a) => a.guestId === guestId);
     const remainingAssignments = (event.assignments || []).filter((a) => a.guestId !== guestId);
 
-    setPendingUndoGuest({
-      guest: deletedGuest,
-      assignments: removedAssignments,
-    });
+    const fullName = `${deletedGuest.firstName} ${deletedGuest.lastName || ''}`.trim();
+    guestUndo.stage(
+      {
+        guest: deletedGuest,
+        assignments: removedAssignments,
+      },
+      `Guest "${fullName}" removed.`
+    );
 
     onUpdateEvent({
       ...event,
@@ -190,9 +195,9 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
   };
 
   const handleUndoDeleteGuest = () => {
-    if (!pendingUndoGuest) return;
-    const { guest: restoredGuest, assignments: restoredAssignments } = pendingUndoGuest;
-    setPendingUndoGuest(null);
+    const item = guestUndo.consume();
+    if (!item) return;
+    const { guest: restoredGuest, assignments: restoredAssignments } = item;
 
     const now = new Date().toISOString();
     const updatedGuests = [...guests, restoredGuest];
@@ -884,10 +889,10 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
       />
 
       <UndoToast
-        isOpen={Boolean(pendingUndoGuest)}
-        message={`Guest "${pendingUndoGuest ? `${pendingUndoGuest.guest.firstName} ${pendingUndoGuest.guest.lastName || ''}`.trim() : ''}" removed.`}
+        isOpen={guestUndo.isOpen}
+        message={guestUndo.message}
         onUndo={handleUndoDeleteGuest}
-        onDismiss={() => setPendingUndoGuest(null)}
+        onDismiss={guestUndo.dismiss}
         durationMs={5000}
       />
     </div>

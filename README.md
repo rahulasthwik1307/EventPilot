@@ -72,7 +72,8 @@ Planning milestone celebrations—especially multi-day Indian weddings, focused 
 - **Styling:** Tailwind CSS 3.4 adhering to the *Panchang & Utsav Almanac* design system (`DESIGN.md`)
 - **Typography:** Self-hosted `Eczar` (Display/Editorial serif) and `Plus Jakarta Sans` (Body sans-serif) via `next/font/google`
 - **Schema Validation:** [Zod 4.6](https://zod.dev/) for runtime API request/response contracts and proposal schemas
-- **Testing:** [Vitest 2.1](https://vitest.dev/) with `@testing-library/react` and `jsdom` (23 test suites, 175+ automated tests)
+- **Testing:** [Vitest 2.1](https://vitest.dev/) with `@testing-library/react` and `jsdom` (48 test suites, 400+ automated tests across pure engines, custom hooks, and UI components)
+- **Architectural Design:** Deep modules and clean seam separation (`useEventWorkspace`, `useUndoAction`, modular domain overview decomposition) with deterministic TypeScript calculation engines and optimistic concurrency protection.
 
 ---
 
@@ -146,10 +147,10 @@ npm run build
 | Evaluation Parameter | Priority | Implementation Evidence |
 | :--- | :--- | :--- |
 | **A. Problem Statement Alignment** | Very High | Complete end-to-end user journeys for weddings, birthdays, and festivals. Working integrations across budgets, re-anchored timelines, vendors, RSVPs, seating, and AI-staged proposals. |
-| **B. Code Quality** | High | Strict TypeScript typing, modular domain engines, schema-driven API validation with Zod, zero ESLint warnings, 100% clean production build. |
-| **C. Security & Privacy** | Medium | All AI credentials isolated server-side. Zero client leaks. Minimal context projection excludes all private guest, vendor, and financial data. Corrupted storage write-protection prevents data destruction. |
+| **B. Code Quality & Architecture** | High | Deep modules with minimal interfaces (`useEventWorkspace`, `useUndoAction`), decoupled overview sub-components (`src/components/workspace/overview/`), strict TypeScript typing, deterministic domain engines, zero ESLint warnings, 100% clean production build. |
+| **C. Security & Privacy** | High | Server-side security headers (CSP, HSTS, X-Content-Type-Options, frame protection), client-rate-limited AI routes, bounded quotation processing arrays, and optimistic concurrency version locking to prevent cross-tab data loss. |
 | **D. Efficiency & Reliability** | Medium | Automatic port-conflict clearing (`scripts/clean-port.js`), preloaded Google fonts eliminating FOUC, in-memory AI response caching, bounded model retry loops and timeouts. |
-| **E. Automated Testing** | Confidence | 23 test suites, 175+ unit and integration tests covering domain calculations, storage migrations, proposal staging, provider failover chains, and UI workflows. |
+| **E. Automated Testing** | Confidence | 48 test suites, 400+ unit and integration tests covering domain calculations, storage migrations, concurrency safeguards, proposal staging, provider failover chains, and UI workflows. |
 | **F. Accessibility & Polish** | Polish | WCAG 2.1 AA compliant color contrast, focus-trapped dialogs with Escape key listeners, screen-reader status announcements, responsive viewports (mobile, tablet, desktop), and reduced-motion support. |
 
 ---

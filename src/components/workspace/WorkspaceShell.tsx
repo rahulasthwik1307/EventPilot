@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Event } from '../../features/events/types';
+import { Event, UpdateEventOptions } from '../../features/events/types';
 import { WorkspaceHeader } from './WorkspaceHeader';
 import { SampleBanner } from './SampleBanner';
 import { WorkspaceNavigation, WorkspaceTab } from './WorkspaceNavigation';
@@ -16,9 +16,7 @@ import { EventEditDialog } from '../events/EventEditDialog';
 import { DynamicReplanningModal } from '../replanning/DynamicReplanningModal';
 import { Dialog } from '../ui/Dialog';
 
-export interface UpdateEventOptions {
-  alreadySaved?: boolean;
-}
+export type { UpdateEventOptions };
 
 export interface WorkspaceShellProps {
   event: Event;

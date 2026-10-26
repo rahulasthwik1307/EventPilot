@@ -53,14 +53,18 @@ export function validateTableInput(input: Partial<TableInput>): {
 
 /**
  * Calculates authoritative occupancy metrics for an individual table.
+ * Supports optional pre-indexed guestMap and pre-filtered tableAssignments for high-throughput batching.
  */
 export function calculateTableOccupancy(
   table: SeatingTable,
   assignments: SeatingAssignment[],
-  guests: Guest[]
+  guests: Guest[] | Map<string, Guest>,
+  prefilteredAssignments?: SeatingAssignment[]
 ): TableOccupancyStatus {
-  const guestMap = new Map<string, Guest>(guests.map((g) => [g.id, g]));
-  const tableAssignments = assignments.filter((a) => a.tableId === table.id);
+  const guestMap =
+    guests instanceof Map ? guests : new Map<string, Guest>(guests.map((g) => [g.id, g]));
+  const tableAssignments =
+    prefilteredAssignments ?? assignments.filter((a) => a.tableId === table.id);
 
   let expectedOccupancy = 0;
   let provisionalOccupancy = 0;
@@ -110,6 +114,41 @@ export function calculateTableOccupancy(
 }
 
 /**
+ * Efficiently calculates occupancy status for all tables in a single pass.
+ * Indexes guests (O(G)) and groups assignments by tableId (O(A)) once,
+ * achieving O(G + A + T) asymptotic complexity instead of O(T * (G + A)).
+ */
+export function calculateAllTablesOccupancy(
+  tables: SeatingTable[],
+  assignments: SeatingAssignment[],
+  guests: Guest[] | Map<string, Guest>
+): Map<string, TableOccupancyStatus> {
+  const guestMap =
+    guests instanceof Map ? guests : new Map<string, Guest>(guests.map((g) => [g.id, g]));
+
+  const assignmentsByTable = new Map<string, SeatingAssignment[]>();
+  for (const asg of assignments) {
+    let list = assignmentsByTable.get(asg.tableId);
+    if (!list) {
+      list = [];
+      assignmentsByTable.set(asg.tableId, list);
+    }
+    list.push(asg);
+  }
+
+  const result = new Map<string, TableOccupancyStatus>();
+  for (const table of tables) {
+    const tableAssignments = assignmentsByTable.get(table.id) || [];
+    result.set(
+      table.id,
+      calculateTableOccupancy(table, assignments, guestMap, tableAssignments)
+    );
+  }
+
+  return result;
+}
+
+/**
  * Calculates global seating metrics across all tables and expected attendees.
  */
 export function calculateSeatingSummary(
@@ -121,10 +160,13 @@ export function calculateSeatingSummary(
   let totalSeats = 0;
   let overCapacityCount = 0;
 
+  const guestMap = new Map<string, Guest>(guests.map((g) => [g.id, g]));
+  const occupancyMap = calculateAllTablesOccupancy(tables, assignments, guestMap);
+
   for (const tbl of tables) {
     totalSeats += tbl.capacity;
-    const occ = calculateTableOccupancy(tbl, assignments, guests);
-    if (occ.isOverCapacity) {
+    const occ = occupancyMap.get(tbl.id);
+    if (occ?.isOverCapacity) {
       overCapacityCount++;
     }
   }
@@ -133,7 +175,6 @@ export function calculateSeatingSummary(
   const expectedAttendance = attendance.expectedAttendance;
 
   // Count confirmed attendees assigned to any table
-  const guestMap = new Map<string, Guest>(guests.map((g) => [g.id, g]));
   let expectedAssigned = 0;
 
   for (const asg of assignments) {

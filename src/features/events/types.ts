@@ -91,16 +91,16 @@ export interface ChecklistTask {
   updatedAt: string;
 }
 
-// --- Re-export M3 Domain Types & Preferences ---
-export * from '../vendors/types';
-export * from '../guests/types';
-export * from '../seating/types';
-export * from '../preferences/types';
+// --- Re-export Subdomain Types & Preferences ---
+export type * from '../vendors/types';
+export type * from '../guests/types';
+export type * from '../seating/types';
+export type * from '../preferences/types';
 
-import { Vendor, VendorQuotation } from '../vendors/types';
-import { Guest, GuestHousehold } from '../guests/types';
-import { SeatingAssignment, SeatingTable } from '../seating/types';
-import { EventPreferences } from '../preferences/types';
+import type { Vendor, VendorQuotation } from '../vendors/types';
+import type { Guest, GuestHousehold } from '../guests/types';
+import type { SeatingAssignment, SeatingTable } from '../seating/types';
+import type { EventPreferences } from '../preferences/types';
 
 // --- Core Event Entity ---
 
@@ -194,6 +194,10 @@ export interface StorageResult<T> {
 export interface SaveEventOptions {
   expectedUpdatedAt?: string;
   expectedVersion?: number;
+}
+
+export interface UpdateEventOptions {
+  alreadySaved?: boolean;
 }
 
 export interface EventStorage {

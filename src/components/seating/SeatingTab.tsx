@@ -10,6 +10,7 @@ import {
 import { Event } from '../../features/events/types';
 import {
   assignAttendee,
+  calculateAllTablesOccupancy,
   calculateSeatingSummary,
   calculateTableOccupancy,
   deleteTableSafely,
@@ -105,6 +106,12 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
   const guestMap = useMemo(() => new Map(guests.map((g) => [g.id, g])), [guests]);
   const householdMap = useMemo(() => new Map(households.map((h) => [h.id, h.name])), [households]);
 
+  // Pre-indexed table occupancy map for high-throughput single-pass calculations
+  const tableOccupancyMap = useMemo(
+    () => calculateAllTablesOccupancy(tables, assignments, guests),
+    [tables, assignments, guests]
+  );
+
   const handleSaveTable = (tableData: TableInput) => {
     let updatedTables: SeatingTable[];
     if (editingTable) {
@@ -166,15 +173,16 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
   // Find tables with capacity violations
   const overCapacityTables = useMemo(() => {
     return tables.filter((t) => {
-      const occ = calculateTableOccupancy(t, assignments, guests);
-      return occ.isOverCapacity;
+      const occ = tableOccupancyMap.get(t.id);
+      return occ?.isOverCapacity;
     });
-  }, [tables, assignments, guests]);
+  }, [tables, tableOccupancyMap]);
 
   // Filtered tables based on search and dropdown selections
   const filteredTables = useMemo(() => {
     return tables.filter((t) => {
-      const occ = calculateTableOccupancy(t, assignments, guests);
+      const occ = tableOccupancyMap.get(t.id);
+      if (!occ) return false;
 
       // Search match: table name, notes, or assigned guest names
       if (searchQuery.trim()) {
@@ -208,7 +216,7 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
 
       return true;
     });
-  }, [tables, assignments, guests, searchQuery, tableTypeFilter, occupancyFilter, guestMap]);
+  }, [tables, tableOccupancyMap, searchQuery, tableTypeFilter, occupancyFilter, guestMap]);
 
   return (
     <div className="space-y-8">
@@ -485,7 +493,9 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredTables.map((table) => {
-                const occ = calculateTableOccupancy(table, assignments, guests);
+                const occ =
+                  tableOccupancyMap.get(table.id) ||
+                  calculateTableOccupancy(table, assignments, guests);
                 const tableTypeLabel =
                   TABLE_TYPES.find((t) => t.id === table.tableType)?.label || 'Banquet';
 
@@ -887,7 +897,9 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
                         >
                           <option value="">Seat at table...</option>
                           {tables.map((tbl) => {
-                            const occ = calculateTableOccupancy(tbl, assignments, guests);
+                            const occ =
+                              tableOccupancyMap.get(tbl.id) ||
+                              calculateTableOccupancy(tbl, assignments, guests);
                             return (
                               <option key={tbl.id} value={tbl.id}>
                                 {tbl.name} ({occ.currentOccupancy}/{tbl.capacity} seated)

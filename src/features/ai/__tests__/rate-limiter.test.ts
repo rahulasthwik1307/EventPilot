@@ -176,6 +176,102 @@ describe('rate-limiter', () => {
         expect(data.code).toBe('MALFORMED_REQUEST');
       }
     });
+
+    it('streams chunked request body and parses valid JSON under limit', async () => {
+      const encoder = new TextEncoder();
+      const chunk1 = encoder.encode('{"message":');
+      const chunk2 = encoder.encode('"chunked hello"}');
+
+      const stream = new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(chunk1);
+          controller.enqueue(chunk2);
+          controller.close();
+        },
+      });
+
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'POST',
+        body: stream,
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const result = await parseJsonWithLimit(req, 1024);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toEqual({ message: 'chunked hello' });
+      }
+    });
+
+    it('aborts chunked stream immediately when cumulative bytes exceed limit', async () => {
+      const encoder = new TextEncoder();
+      let chunksSupplied = 0;
+      let streamCancelled = false;
+
+      const stream = new ReadableStream<Uint8Array>({
+        pull(controller) {
+          chunksSupplied++;
+          controller.enqueue(encoder.encode('x'.repeat(400)));
+        },
+        cancel() {
+          streamCancelled = true;
+        },
+      });
+
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'POST',
+        body: stream,
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      // Limit is 500 bytes. Chunk 1 is 400 bytes, Chunk 2 reaches 800 bytes (> 500) -> early abort
+      const result = await parseJsonWithLimit(req, 500);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.response.status).toBe(413);
+        const body = await result.response.json();
+        expect(body.code).toBe('PAYLOAD_TOO_LARGE');
+      }
+      expect(streamCancelled).toBe(true);
+      expect(chunksSupplied).toBeLessThanOrEqual(2);
+    });
+
+    it('rejects chunked stream with invalid UTF-8 bytes with 400 MALFORMED_REQUEST', async () => {
+      const invalidUtf8 = new Uint8Array([0xff, 0xfe, 0xfd]);
+
+      const stream = new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(invalidUtf8);
+          controller.close();
+        },
+      });
+
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'POST',
+        body: stream,
+      });
+
+      const result = await parseJsonWithLimit(req, 1024);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.response.status).toBe(400);
+        const body = await result.response.json();
+        expect(body.code).toBe('MALFORMED_REQUEST');
+      }
+    });
+
+    it('falls back gracefully to req.json() for mock requests lacking body and text', async () => {
+      const mockReq = {
+        headers: new Headers(),
+        json: async () => ({ mock: 'data' }),
+      } as unknown as NextRequest;
+
+      const result = await parseJsonWithLimit(mockReq, 1024);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toEqual({ mock: 'data' });
+      }
+    });
   });
 
   describe('responses and headers', () => {

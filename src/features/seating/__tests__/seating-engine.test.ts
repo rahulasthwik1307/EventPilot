@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   calculateTableOccupancy,
+  calculateAllTablesOccupancy,
   calculateSeatingSummary,
   getUnassignedAttendees,
   assignAttendee,
@@ -159,5 +160,59 @@ describe('Seating Engine - Capacity, Occupancy & Assignment Rules', () => {
     expect(summary.expectedAssigned).toBe(1);
     expect(summary.unassignedExpected).toBe(2);
     expect(summary.seatingProgressPct).toBe(33); // 1 of 3 confirmed seated
+  });
+
+  describe('calculateAllTablesOccupancy & calculateTableOccupancy optimization', () => {
+    it('computes occupancy for all tables in a single batch pass matching individual calculations', () => {
+      const tables: SeatingTable[] = [
+        mockTable({ id: 'tbl_1', capacity: 2 }),
+        mockTable({ id: 'tbl_2', capacity: 5 }),
+        mockTable({ id: 'tbl_3', capacity: 4 }),
+      ];
+      const guests: Guest[] = [
+        mockGuest({ id: 'g1', rsvpStatus: 'confirmed' }),
+        mockGuest({ id: 'g2', rsvpStatus: 'confirmed' }),
+        mockGuest({ id: 'g3', rsvpStatus: 'pending' }),
+        mockGuest({ id: 'g4', rsvpStatus: 'declined' }),
+      ];
+      const assignments: SeatingAssignment[] = [
+        // tbl_1 has 3 assignments -> over capacity (capacity 2)
+        { id: 'a1', tableId: 'tbl_1', guestId: 'g1', isPlusOne: false, assignedAt: '' },
+        { id: 'a2', tableId: 'tbl_1', guestId: 'g2', isPlusOne: false, assignedAt: '' },
+        { id: 'a3', tableId: 'tbl_1', guestId: 'g3', isPlusOne: false, assignedAt: '' },
+        // tbl_2 has 1 assignment
+        { id: 'a4', tableId: 'tbl_2', guestId: 'g4', isPlusOne: false, assignedAt: '' },
+        // tbl_3 has 0 assignments
+      ];
+
+      const batchMap = calculateAllTablesOccupancy(tables, assignments, guests);
+      expect(batchMap.size).toBe(3);
+
+      for (const table of tables) {
+        const individual = calculateTableOccupancy(table, assignments, guests);
+        const batched = batchMap.get(table.id);
+        expect(batched).toBeDefined();
+        expect(batched).toEqual(individual);
+      }
+
+      expect(batchMap.get('tbl_1')?.isOverCapacity).toBe(true);
+      expect(batchMap.get('tbl_2')?.declinedOccupancy).toBe(1);
+      expect(batchMap.get('tbl_3')?.currentOccupancy).toBe(0);
+      expect(batchMap.get('tbl_3')?.availableSeats).toBe(4);
+    });
+
+    it('accepts pre-indexed guestMap and pre-filtered assignments in calculateTableOccupancy', () => {
+      const table = mockTable({ id: 'tbl_1', capacity: 4 });
+      const guest = mockGuest({ id: 'g1', rsvpStatus: 'confirmed' });
+      const guestMap = new Map<string, Guest>([[guest.id, guest]]);
+      const tableAssignments: SeatingAssignment[] = [
+        { id: 'a1', tableId: 'tbl_1', guestId: 'g1', isPlusOne: false, assignedAt: '' },
+      ];
+
+      const occ = calculateTableOccupancy(table, [], guestMap, tableAssignments);
+      expect(occ.currentOccupancy).toBe(1);
+      expect(occ.expectedOccupancy).toBe(1);
+      expect(occ.availableSeats).toBe(3);
+    });
   });
 });

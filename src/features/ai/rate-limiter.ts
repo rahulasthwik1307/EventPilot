@@ -192,7 +192,110 @@ export async function parseJsonWithLimit<T = unknown>(
     }
   }
 
-  // 2. Read raw body stream as text to inspect actual byte length
+  // 2. Stream-read body with early byte-size cutoff if a readable stream is available
+  if (req?.body && typeof (req.body as ReadableStream<Uint8Array>).getReader === 'function') {
+    let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+    try {
+      reader = (req.body as ReadableStream<Uint8Array>).getReader();
+    } catch {
+      reader = null;
+    }
+
+    if (reader) {
+      const chunks: Uint8Array[] = [];
+      let totalBytes = 0;
+      let streamExceeded = false;
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          if (value) {
+            totalBytes += value.byteLength;
+            if (totalBytes > maxBytes) {
+              streamExceeded = true;
+              try {
+                await reader.cancel('Payload too large');
+              } catch {
+                // Ignore cancellation error
+              }
+              break;
+            }
+            chunks.push(value);
+          }
+        }
+      } catch {
+        return {
+          success: false,
+          response: NextResponse.json(
+            {
+              error: 'Failed to read request body stream.',
+              code: 'STREAM_READ_ERROR',
+            },
+            { status: 400 }
+          ),
+        };
+      }
+
+      if (streamExceeded) {
+        return {
+          success: false,
+          response: NextResponse.json(
+            {
+              error: `Request payload exceeds size limit of ${Math.round(maxBytes / 1024)}KB.`,
+              code: 'PAYLOAD_TOO_LARGE',
+            },
+            {
+              status: 413,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          ),
+        };
+      }
+
+      // Combine chunks into single buffer
+      const combined = new Uint8Array(totalBytes);
+      let offset = 0;
+      for (const chunk of chunks) {
+        combined.set(chunk, offset);
+        offset += chunk.byteLength;
+      }
+
+      let rawText: string;
+      try {
+        rawText = new TextDecoder('utf-8', { fatal: true }).decode(combined);
+      } catch {
+        return {
+          success: false,
+          response: NextResponse.json(
+            {
+              error: 'Invalid JSON request payload.',
+              code: 'MALFORMED_REQUEST',
+            },
+            { status: 400 }
+          ),
+        };
+      }
+
+      try {
+        const parsed = JSON.parse(rawText) as T;
+        return { success: true, data: parsed };
+      } catch {
+        return {
+          success: false,
+          response: NextResponse.json(
+            {
+              error: 'Invalid JSON request payload.',
+              code: 'MALFORMED_REQUEST',
+            },
+            { status: 400 }
+          ),
+        };
+      }
+    }
+  }
+
+  // 3. Fallback: Read raw body stream as text to inspect actual byte length
   if (typeof req?.text === 'function') {
     let rawText: string;
     try {
@@ -244,7 +347,7 @@ export async function parseJsonWithLimit<T = unknown>(
     }
   }
 
-  // 3. Fallback for test environments where mock request only supplies req.json()
+  // 4. Fallback for test environments where mock request only supplies req.json()
   if (typeof req?.json === 'function') {
     try {
       const data = (await req.json()) as T;
