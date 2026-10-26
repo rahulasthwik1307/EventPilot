@@ -27,7 +27,7 @@ Planning milestone celebrations—especially multi-day Indian weddings, landmark
 ```
 
 - **Deterministic Domain Authority:** All financial totals, category variances, per-guest scaling, and calendar date re-anchorings are computed in 100% pure TypeScript logic. Generative language models are strictly prohibited from calculating authoritative numbers or dates.
-- **Privacy-Safe Context Projection:** The AI assistant receives only allowlisted, anonymized event constraints. Guest identities, contact information, dietary restrictions, and private storage are never transmitted to external AI providers.
+- **Privacy-Safe Context Projection:** Before leaving the browser, the planning assistant extracts only allowlisted celebration constraints (title, city, budget cap, headcount, category names). Guest identities, contact information, dietary restrictions, and private storage are never transmitted to external AI providers.
 - **Local-First Privacy:** All personal celebration data lives inside the browser's `localStorage` (`event_pilot_personal_events_v1`). No mandatory accounts, cloud databases, or third-party tracking are required.
 - **Resilient Multi-Model AI Chain:** Primary orchestration runs on Cloudflare Workers AI free-tier models with automatic multi-model failover, backed by Google Gemini Flash as an isolated final fallback.
 
@@ -35,17 +35,18 @@ Planning milestone celebrations—especially multi-day Indian weddings, landmark
 
 ## Table of Contents
 
-1. [The Product Story](#2-the-product-story)
-2. [Celebration Archetypes](#3-celebration-archetypes)
-3. [Comprehensive Feature Showcase](#4-comprehensive-feature-showcase)
-4. [AI Architecture & Privacy-Conscious Data Flow](#5-ai-architecture--privacy-conscious-data-flow)
-5. [Software Architecture & Engineering Highlights](#6-software-architecture--engineering-highlights)
-6. [Challenge 5 Evaluator Mapping & Guided Tour](#7-challenge-5-evaluator-mapping--guided-tour)
-7. [Technology Stack](#8-technology-stack)
-8. [Installation & Local Setup](#9-installation--local-setup)
-9. [Testing & Quality Verification](#10-testing--quality-verification)
-10. [Known Limitations & Operational Notes](#11-known-limitations--operational-notes)
-11. [Open Source License](#12-open-source-license)
+1. [Overview & First Screen](#1-overview--first-screen)
+2. [The Product Story](#2-the-product-story)
+3. [Celebration Archetypes](#3-celebration-archetypes)
+4. [Comprehensive Feature Showcase](#4-comprehensive-feature-showcase)
+5. [AI Architecture & Privacy-Conscious Data Flow](#5-ai-architecture--privacy-conscious-data-flow)
+6. [Software Architecture & Engineering Highlights](#6-software-architecture--engineering-highlights)
+7. [Challenge 5 Evaluator Mapping & Guided Tour](#7-challenge-5-evaluator-mapping--guided-tour)
+8. [Technology Stack](#8-technology-stack)
+9. [Installation & Local Setup](#9-installation--local-setup)
+10. [Testing & Quality Verification](#10-testing--quality-verification)
+11. [Known Limitations & Operational Notes](#11-known-limitations--operational-notes)
+12. [Open Source License](#12-open-source-license)
 
 ---
 
@@ -148,12 +149,23 @@ Event Pilot employs a multi-model fallback chain designed for maximum resilience
 - **Strict Isolation:** If Cloudflare Workers AI succeeds, Google Gemini is never invoked. Gemini is engaged only if all Cloudflare candidates fail, time out (30s bound), or lack credentials.
 - **Graceful Degradation:** If all external providers fail or credentials are omitted, the application returns a structured, actionable 503 response. The entire manual planning suite remains fully functional offline.
 
-### Privacy-Safe Context Projector
+### Privacy Architecture & Request Boundary Audit
 
-Before any payload leaves the server, the **Privacy-Safe Context Projector** (`src/features/ai/context-projector.ts`) extracts only an allowlisted summary of planning constraints:
+Event Pilot enforces distinct, verified privacy guarantees across its two server AI pathways:
 
-- **Included:** Event title, celebration type, city/location, budget cap, target headcount, and high-level category allocation names.
-- **Strictly Excluded:** Guest names, email addresses, phone numbers, individual dietary restrictions, private vendor notes, and raw `localStorage` payloads.
+#### 1. Planning Assistant Pathway (`/api/assistant`)
+- **Client-Side Context Projection:** Before any network dispatch leaves the browser, `projectPrivacySafeContext()` ([`src/features/ai/context-projector.ts`](src/features/ai/context-projector.ts)) extracts strictly allowlisted celebration metadata: event archetype, celebration title, location/city, budget cap, target headcount, and category allocation names.
+- **Strictly Excluded PII:** Zero guest records (names, email addresses, phone numbers, dietary requirements, attendance statuses, table assignments), zero private vendor notes, and zero raw `localStorage` payloads ever leave the browser.
+- **Bounded Request Size:** The streaming rate limiter enforces `MAX_ASSISTANT_BODY_BYTES = 64 * 1024` (64 KB) with early HTTP 413 abort before complete payload buffering.
+
+#### 2. Quotation Extraction Pathway (`/api/quotations`)
+- **User-Initiated Scope:** Operates solely on raw text that the user explicitly pastes into the quotation import modal.
+- **Payload Isolation:** The server transmits up to 8,000 characters of this user-pasted quotation text solely to extract pricing, deliverables, taxes, and payment milestones. Stored celebration records, guest rosters, and budget ledgers are never attached.
+- **Bounded Request Size:** The streaming rate limiter enforces `MAX_QUOTATION_BODY_BYTES = 128 * 1024` (128 KB) with early HTTP 413 abort.
+- **Deterministic Offline Fallback:** If AI credentials are not provided or remote providers fail, quotation extraction falls back to a deterministic, local regex and pattern-matching parser (`extractQuotationDeterministically`) that executes entirely on the server without any external API calls.
+
+#### 3. Storage Boundary
+- **Local-First Client Authority:** All personal celebrations are stored in the browser's `localStorage` (`event_pilot_personal_events_v1`). No cloud database, user account creation, or external telemetry is required.
 
 ### Data Flow Architecture
 
@@ -164,39 +176,53 @@ flowchart TD
         LS[("Browser localStorage<br/>event_pilot_personal_events_v1")]
         Sync["Cross-Tab Concurrency Sync<br/>(expectedVersion & StorageEvent)"]
         Engines["Deterministic TypeScript Domain Engines<br/>(Budget Math, Timeline Offsets, Seating)"]
+        Projector["Client-Side Context Projector<br/>(Strips all Guest PII, Contacts, & Notes)"]
         UI <--> LS
         UI <--> Sync
         UI <--> Engines
+        UI -->|Planning Prompt Context| Projector
     end
 
     subgraph API["Next.js Server API Layer"]
-        RateLimit["Rate Limiter & Stream Validator<br/>(Max 32KB/64KB/128KB & Early 413 Abort)"]
-        Zod["Zod Runtime Schema Validation"]
-        Projector["Privacy-Safe Context Projector<br/>(Strips all PII, Guest Names, & Diets)"]
+        RateLimitAssistant["Streaming Validator & Rate Limiter<br/>(/api/assistant: Max 64 KB & Early 413 Abort)"]
+        RateLimitQuotation["Streaming Validator & Rate Limiter<br/>(/api/quotations: Max 128 KB & Early 413 Abort)"]
+        ZodAssistant["Zod Validation (AiAssistantRequestSchema)"]
+        ZodQuotation["Zod Validation (QuotationsApiRequestSchema)"]
         Orchestrator["Multi-Model AI Orchestrator"]
-        RateLimit --> Zod --> Projector --> Orchestrator
+        QuoteExtractor["Quotation Extractor & Analysis Engine"]
+
+        RateLimitAssistant --> ZodAssistant --> Orchestrator
+        RateLimitQuotation --> ZodQuotation --> QuoteExtractor
     end
 
     subgraph Providers["Multi-Model AI Provider Chain"]
         CF1["Primary: Cloudflare Workers AI<br/>@cf/meta/llama-3.2-3b-instruct"]
         CF2["Failover 1: Cloudflare Workers AI<br/>@cf/meta/llama-3.3-70b-instruct-fp8-fast"]
         CF3["Failover 2: Cloudflare Workers AI<br/>@cf/meta/llama-3.1-8b-instruct-fp8"]
-        Gemini["Final Fallback: Google Gemini<br/>gemini-3.8-flash"]
+        Gemini["Final Fallback: Google Gemini API<br/>gemini-3.8-flash"]
+        RegexFallback["Deterministic Regex Fallback<br/>(Pure Local Rule-Based Extraction)"]
+
         Orchestrator --> CF1
         CF1 -.->|Timeout / Error| CF2
         CF2 -.->|Capacity Spike| CF3
         CF3 -.->|Unauthorized / Down| Gemini
+
+        QuoteExtractor --> CF2
+        CF2 -.->|Fallback| Gemini
+        Gemini -.->|Offline / Failure| RegexFallback
     end
 
     subgraph UserReview["Proposal Decision Boundary"]
-        Proposals["Staged Proposals with Diffs<br/>(Budget, Task, Vendor, Seating Diffs)"]
+        Proposals["Staged Proposals with Visual Diffs<br/>(Budget, Task, Milestone Diffs)"]
         Decision{"User Inspects, Edits, & Decides"}
         Orchestrator --> Proposals --> Decision
-        Decision -->|User Accepts| UI
+        QuoteExtractor -->|Structured Quotation Record| Decision
+        Decision -->|User Accepts & Applies| Engines
         Decision -->|User Dismisses| UI
     end
 
-    UI -->|Prompt Request| RateLimit
+    Projector -->|Allowlisted Constraints (64 KB)| RateLimitAssistant
+    UI -->|User-Pasted Quote Text (128 KB)| RateLimitQuotation
 ```
 
 ---
@@ -209,9 +235,9 @@ Event Pilot is engineered with deep modules, strict boundary contracts, and resi
 - **Optimistic Concurrency Protection:** Personal celebrations track `version` and `updatedAt`. Saving operations pass `expectedVersion` to prevent silent overwrites when multiple browser tabs are open, surfacing a non-destructive conflict banner when background changes are detected.
 - **Early-Abort Streaming Request Limits:** The API enforces strict size boundaries (64 KB for assistant, 128 KB for quotations) chunk-by-chunk using a `ReadableStreamDefaultReader`. If a stream exceeds the limit, it cancels the stream immediately and returns HTTP 413 without buffering excess bytes into server memory.
 - **Zero Circular Dependencies:** AST-based dependency graph traversal across all 96 source TypeScript files confirms **0 circular dependency cycles**.
-- **WCAG 2.2 AA Contrast & Accessibility:**
-  - Amber button contrast ratio elevated from 3.20:1 to **4.69:1** (`text-neutral-text` on `#D97706`).
-  - Active navigation rail state communicated via `aria-current="page"`.
+- **Verified Accessibility Improvements (4.69:1 Contrast & ARIA):**
+  - Primary amber button contrast elevated to **4.69:1** (`text-neutral-text` on `#D97706`), meeting the WCAG AA 4.5:1 minimum threshold for standard text.
+  - Active workspace navigation rail state communicated via `aria-current="page"`.
   - In-page view switchers implemented with standard `role="tablist"`, `role="tab"`, and `role="tabpanel"`.
   - Form validation errors programmatically linked to inputs via `aria-invalid` and `aria-describedby`.
   - Cost-model switchers structured as accessible `role="radiogroup"` controls with roving tabindex and Arrow-key navigation.
@@ -225,7 +251,7 @@ Event Pilot is engineered with deep modules, strict boundary contracts, and resi
 
 | Challenge Need | Event Pilot Capability | Implementation Evidence |
 |---|---|---|
-| **Multi-Ceremony & Event Planning** | Three tailored archetypes (Weddings, Birthdays, Festivals) with distinct ceremonial milestones and budgets. | [`src/features/events/archetypes.ts`](src/features/events/archetypes.ts), [`src/components/events/EventCreateDialog.tsx`](src/components/events/EventCreateDialog.tsx) |
+| **Multi-Ceremony & Event Planning** | Three tailored archetypes (Weddings, Birthdays, Festivals) with distinct ceremonial milestones and budgets. | [`src/features/events/types.ts`](src/features/events/types.ts), [`src/components/events/EventCreateDialog.tsx`](src/components/events/EventCreateDialog.tsx) |
 | **Budget Control & Actuals** | Deterministic ledger with category allocations, fixed vs per-guest unit economics, and strict actual spending rules. | [`src/features/events/budget-engine.ts`](src/features/events/budget-engine.ts), [`src/components/budget/BudgetLedgerTab.tsx`](src/components/budget/BudgetLedgerTab.tsx) |
 | **Rescheduling & Logistics** | Relative milestone offsets (`T-X`), rescheduling safety engine, and offline RFC 5545 `.ics` calendar export. | [`src/features/events/timeline-engine.ts`](src/features/events/timeline-engine.ts), [`src/features/timeline/ics-export.ts`](src/features/timeline/ics-export.ts) |
 | **Vendor Quotes & Coordination** | Structured vendor registry, comparative quotation analysis, AI quote extraction, and PDF brief generation. | [`src/features/vendors/quotations/`](src/features/vendors/quotations/), [`src/components/vendors/`](src/components/vendors/) |
@@ -237,12 +263,12 @@ Event Pilot is engineered with deep modules, strict boundary contracts, and resi
 
 Follow these verified steps in the running application (`http://localhost:3000`):
 
-1. **Explore the Sample Sandbox:** On the landing hero, click **"Explore Sample Event"**. Inspect *Aarav & Meera's Vivaha Celebration* across the 7 navigation tabs without creating an account.
-2. **Review the Budget Ledger:** Switch to the **Budget** tab (hotkey `2`). Notice the distinction between allocated limits, estimated commitments, and recorded actuals. Record an expense or toggle an item to test per-guest headcount scaling.
+1. **Explore the Sample Sandbox:** On the landing hero, click **"Explore Sample Event"**. Inspect *Aarav & Meera's Vivaha Celebration* across the 7 workspace navigation tabs without creating an account.
+2. **Review the Budget Ledger:** Switch to the **Budget Ledger** tab (hotkey `2`). Notice the distinction between allocated limits, estimated commitments, and recorded actuals. Record an expense or toggle an item to test per-guest headcount scaling.
 3. **Run What-If Replanning:** Click **"Dynamic Replan"** in the budget header. Slide target attendance from 250 to 350. Review the multi-domain impact analysis (budget variance, task compression, seating shortages) and inspect the selective proposal diffs.
 4. **Inspect Dietary & Seating Logistics:** Switch to **Guests & RSVP** (hotkey `5`) to review dietary preferences (Vegetarian, Sattvic, Jain). Then open **Seating Planner** (hotkey `6`) to inspect table occupancy meters, assign attendees, or test overcapacity warnings.
-5. **Compare Vendor Quotations:** In the **Vendors** tab (hotkey `4`), click **"Quotation Comparison"**. Review side-by-side pricing, included deliverables, and payment terms, or click **"Requirements Brief"** to generate an offline PDF summary.
-6. **Export Offline Calendar:** In the **Timeline** tab (hotkey `3`), click **"Export Calendar (.ics)"** to download an RFC 5545 `.ics` file containing all re-anchored celebration milestones.
+5. **Compare Vendor Quotations:** In the **Vendors** tab (hotkey `4`), click **"Compare Quotes"**. Review side-by-side pricing, included deliverables, and payment terms, or click **"Requirement Brief"** to generate an offline PDF summary.
+6. **Export Offline Calendar:** In the **Timeline & Tasks** tab (hotkey `3`), click **"Export Calendar (.ics)"** to download an RFC 5545 `.ics` file containing all re-anchored celebration milestones.
 
 ---
 
@@ -342,10 +368,9 @@ npm run build
 │ Check                                 │ Verified Result                       │
 ├───────────────────────────────────────┼───────────────────────────────────────┤
 │ Vitest Automated Test Suite           │ 49 passed / 49 files (426/426 tests)  │
-│ Test Suite Execution Time             │ 29.50s (clean exit, code 0)           │
 │ TypeScript Typecheck (tsc --noEmit)   │ 0 errors (clean exit, code 0)         │
-│ ESLint Validation (next lint)         │ 0 warnings, 0 errors (code 0)         │
-│ Production Build (next build)         │ Compiled successfully in 18.0s        │
+│ ESLint Validation (next lint)         │ 0 warnings, 0 errors (clean exit)     │
+│ Production Build (next build)         │ Compiled successfully (all routes)    │
 │ Circular Dependencies                 │ 0 cycles detected across 96 files     │
 └───────────────────────────────────────┴───────────────────────────────────────┘
 ```
@@ -358,7 +383,7 @@ npm run build
 
 - **In-Memory Rate Limiting Scope:** The built-in sliding-window rate limiter runs in-memory per Node process. In multi-instance or serverless containerized environments (e.g. Vercel serverless / AWS Lambda / multi-replica Kubernetes), state is not shared across nodes and resets upon container recycling. Production deployments spanning multiple edge instances should be backed by a centralized store (e.g. Redis, Upstash, or Cloudflare Rate Limiting).
 - **Local-First Single-Device Scope:** In accordance with the initial privacy-first release, personal celebration data is stored in the user's browser `localStorage`. Data does not automatically synchronize across different physical devices or separate browsers.
-- **Accessibility Verification Scope:** High-contrast design tokens (WCAG 2.2 AA compliant 4.69:1 contrast), WAI-ARIA tablists, radiogroups, and programmatic form error associations have been verified via automated DOM testing. Full end-to-end screen reader verification (NVDA, VoiceOver, JAWS) across every operating system and assistive device permutation has not been independently certified.
+- **Accessibility Verification Scope:** Targeted accessibility remediations—including elevated amber button contrast (measured 4.69:1), WAI-ARIA tablists, radiogroups, and programmatic form error associations—have been verified via automated DOM testing. Application-wide WCAG 2.2 AA certification across every screen and full end-to-end screen reader testing (NVDA, VoiceOver, JAWS) across all operating systems have not been independently certified.
 
 ---
 
