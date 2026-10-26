@@ -1,10 +1,14 @@
-import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import HomePage from "../page";
+import { mockPush } from "../../test/setup";
+import { eventStorage } from "../../features/events/storage";
+import { Event } from "../../features/events/types";
 
-describe("HomePage - Milestone 1, 2, and 3 End-to-End Workflows", () => {
+describe("HomePage - Landing Page and Navigation", () => {
   beforeEach(() => {
     window.localStorage.clear();
+    mockPush.mockClear();
   });
 
   it("renders the studio baseline title and design system references", () => {
@@ -79,36 +83,17 @@ describe("HomePage - Milestone 1, 2, and 3 End-to-End Workflows", () => {
     unmount();
   });
 
-  it("opens the sample celebration sandbox workspace when clicking 'Explore Sample Event'", async () => {
+  it("navigates to /events/sample when clicking 'Explore Sample Event'", async () => {
     render(<HomePage />);
     const exploreBtn = screen.getByRole("button", { name: /Explore Sample Event/i });
     fireEvent.click(exploreBtn);
 
     await waitFor(() => {
-      expect(screen.getByText(/SAMPLE SANDBOX/i)).toBeInTheDocument();
-      expect(screen.getByRole("heading", { level: 1, name: "Aarav & Meera's Vivaha Celebration" })).toBeInTheDocument();
-      expect(screen.getByText(/Sample Celebration Sandbox/i)).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Reset Sample/i })).toBeInTheDocument();
+      expect(mockPush).toHaveBeenCalledWith("/events/sample");
     });
   });
 
-  it("allows navigating back to the celebration studio from workspace", async () => {
-    render(<HomePage />);
-    fireEvent.click(screen.getByRole("button", { name: /Explore Sample Event/i }));
-
-    await waitFor(() => {
-      expect(screen.getByRole("heading", { level: 1, name: "Aarav & Meera's Vivaha Celebration" })).toBeInTheDocument();
-    });
-
-    const backBtn = screen.getByRole("button", { name: /Celebration Studio/i });
-    fireEvent.click(backBtn);
-
-    await waitFor(() => {
-      expect(screen.getByRole("heading", { level: 1, name: /Every Milestone Celebration/i })).toBeInTheDocument();
-    });
-  });
-
-  it("allows creating a personal celebration and transitions to its workspace", async () => {
+  it("allows creating a personal celebration and navigates to its dedicated route", async () => {
     render(<HomePage />);
 
     const createBtn = screen.getByRole("button", { name: /Create New Celebration/i });
@@ -132,146 +117,90 @@ describe("HomePage - Milestone 1, 2, and 3 End-to-End Workflows", () => {
     fireEvent.click(screen.getByRole("button", { name: /Create Celebration Plan/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { level: 1, name: "Rohan's Milestone 40th Birthday" })).toBeInTheDocument();
-      expect(screen.getByText(/PERSONAL EVENT · LOCAL/i)).toBeInTheDocument();
-      expect(screen.getAllByText("₹2,50,000").length).toBeGreaterThan(0);
+      expect(mockPush).toHaveBeenCalledWith(expect.stringMatching(/^\/events\//));
     });
   });
 
-  it("navigates to Budget Ledger tab and renders category ledger in sample event", async () => {
+  it("renders saved events list and navigates to event workspace on selection", async () => {
+    const mockEvent: Event = {
+      id: "personal-evt-123",
+      title: "Ananya's First Birthday",
+      type: "birthday",
+      date: "2026-12-10",
+      guestTarget: 50,
+      budgetCap: 100000,
+      currency: "INR",
+      isSample: false,
+      version: 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      categories: [],
+      expenses: [],
+      milestones: [],
+      tasks: [],
+      vendors: [],
+      households: [],
+      guests: [],
+      tables: [],
+      assignments: [],
+      quotations: [],
+    };
+    eventStorage.savePersonalEvent(mockEvent);
+
     render(<HomePage />);
-    fireEvent.click(screen.getByRole("button", { name: /Explore Sample Event/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { level: 1, name: "Aarav & Meera's Vivaha Celebration" })).toBeInTheDocument();
+      expect(screen.getByText("Ananya's First Birthday")).toBeInTheDocument();
     });
 
-    const nav = screen.getByRole("navigation", { name: /Workspace navigation/i });
-    const budgetTabBtn = within(nav).getByRole("button", { name: /^Budget Ledger$/i });
-    fireEvent.click(budgetTabBtn);
+    const openBtn = screen.getByRole("button", { name: /Open Workspace/i });
+    fireEvent.click(openBtn);
 
     await waitFor(() => {
-      expect(screen.getByText("Budget & Expense Ledger")).toBeInTheDocument();
-      expect(screen.getAllByText(/Venue & Traditional Catering/i).length).toBeGreaterThanOrEqual(1);
-      expect(screen.getByText(/The Tamarind Tree Main Mandap Hall Booking/i)).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Record Expense/i })).toBeInTheDocument();
+      expect(mockPush).toHaveBeenCalledWith("/events/personal-evt-123");
     });
   });
 
-  it("navigates to Timeline & Tasks tab and renders matrix in sample event", async () => {
+  it("allows deleting a personal celebration from the saved list", async () => {
+    const mockEvent: Event = {
+      id: "personal-evt-delete-me",
+      title: "Temporary Celebration",
+      type: "community",
+      date: "2026-12-10",
+      guestTarget: 50,
+      budgetCap: 50000,
+      currency: "INR",
+      isSample: false,
+      version: 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      categories: [],
+      expenses: [],
+      milestones: [],
+      tasks: [],
+      vendors: [],
+      households: [],
+      guests: [],
+      tables: [],
+      assignments: [],
+      quotations: [],
+    };
+    eventStorage.savePersonalEvent(mockEvent);
+
     render(<HomePage />);
-    fireEvent.click(screen.getByRole("button", { name: /Explore Sample Event/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { level: 1, name: "Aarav & Meera's Vivaha Celebration" })).toBeInTheDocument();
+      expect(screen.getByText("Temporary Celebration")).toBeInTheDocument();
     });
 
-    const nav = screen.getByRole("navigation", { name: /Workspace navigation/i });
-    const timelineTabBtn = within(nav).getByRole("button", { name: /^Timeline & Tasks$/i });
-    fireEvent.click(timelineTabBtn);
+    // Mock confirm dialog
+    vi.spyOn(window, "confirm").mockReturnValueOnce(true);
+
+    const deleteBtn = screen.getByRole("button", { name: /Delete Temporary Celebration/i });
+    fireEvent.click(deleteBtn);
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { level: 2, name: /^Timeline & Tasks$/i })).toBeInTheDocument();
-      expect(screen.getByText(/Consult Panchang for auspicious Muhurtham window/i)).toBeInTheDocument();
-      expect(screen.getAllByRole("button", { name: /Add Task/i }).length).toBeGreaterThanOrEqual(1);
-    });
-  });
-
-  it("navigates to Vendors tab and renders vendor book in sample event", async () => {
-    render(<HomePage />);
-    fireEvent.click(screen.getByRole("button", { name: /Explore Sample Event/i }));
-
-    await waitFor(() => {
-      expect(screen.getByRole("heading", { level: 1, name: "Aarav & Meera's Vivaha Celebration" })).toBeInTheDocument();
-    });
-
-    const nav = screen.getByRole("navigation", { name: /Workspace navigation/i });
-    const vendorsTabBtn = within(nav).getByRole("button", { name: /^Vendors$/i });
-    fireEvent.click(vendorsTabBtn);
-
-    await waitFor(() => {
-      expect(screen.getByText("Vendor Directory & Contracts")).toBeInTheDocument();
-      expect(screen.getByText("The Tamarind Tree Estate")).toBeInTheDocument();
-      expect(screen.getByText("Annapurna Heritage Caterers")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Record Vendor/i })).toBeInTheDocument();
-    });
-  });
-
-  it("navigates to Guests & RSVP tab and renders guest register in sample event", async () => {
-    render(<HomePage />);
-    fireEvent.click(screen.getByRole("button", { name: /Explore Sample Event/i }));
-
-    await waitFor(() => {
-      expect(screen.getByRole("heading", { level: 1, name: "Aarav & Meera's Vivaha Celebration" })).toBeInTheDocument();
-    });
-
-    const nav = screen.getByRole("navigation", { name: /Workspace navigation/i });
-    const guestsTabBtn = within(nav).getByRole("button", { name: /^Guests & RSVP$/i });
-    fireEvent.click(guestsTabBtn);
-
-    await waitFor(() => {
-      expect(screen.getByText("Guest & RSVP Management")).toBeInTheDocument();
-      expect(screen.getAllByText("The Sharma Family").length).toBeGreaterThanOrEqual(1);
-      expect(screen.getByText("Priya Sharma")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Add Guest/i })).toBeInTheDocument();
-    });
-  });
-
-  it("navigates to Seating Planner tab and renders table planner in sample event", async () => {
-    render(<HomePage />);
-    fireEvent.click(screen.getByRole("button", { name: /Explore Sample Event/i }));
-
-    await waitFor(() => {
-      expect(screen.getByRole("heading", { level: 1, name: "Aarav & Meera's Vivaha Celebration" })).toBeInTheDocument();
-    });
-
-    const nav = screen.getByRole("navigation", { name: /Workspace navigation/i });
-    const seatingTabBtn = within(nav).getByRole("button", { name: /^Seating Planner$/i });
-    fireEvent.click(seatingTabBtn);
-
-    await waitFor(() => {
-      expect(screen.getByText("Banquet Seating Planner")).toBeInTheDocument();
-      expect(screen.getByText("Table 1 - Mandap Royal Front")).toBeInTheDocument();
-      expect(screen.getByText("Unassigned Queue")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Add Table/i })).toBeInTheDocument();
-    });
-  });
-
-  it("navigates to AI Assistant tab from navigation bar and renders live console", async () => {
-    render(<HomePage />);
-    fireEvent.click(screen.getByRole("button", { name: /Explore Sample Event/i }));
-
-    await waitFor(() => {
-      expect(screen.getByRole("heading", { level: 1, name: "Aarav & Meera's Vivaha Celebration" })).toBeInTheDocument();
-    });
-
-    const nav = screen.getByRole("navigation", { name: /Workspace navigation/i });
-    const aiTabBtn = within(nav).getByRole("button", { name: /^AI Assistant$/i });
-    fireEvent.click(aiTabBtn);
-
-    await waitFor(() => {
-      expect(screen.getByText("AI Planning Assistant")).toBeInTheDocument();
-      expect(screen.getByText("Cloudflare AI + Fallback")).toBeInTheDocument();
-      expect(screen.getByText(/Privacy Guard Active/i)).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Ask Assistant/i })).toBeInTheDocument();
-    });
-  });
-
-  it("navigates to AI Assistant from OverviewTab spotlight banner", async () => {
-    render(<HomePage />);
-    fireEvent.click(screen.getByRole("button", { name: /Explore Sample Event/i }));
-
-    await waitFor(() => {
-      expect(screen.getByRole("heading", { level: 1, name: "Aarav & Meera's Vivaha Celebration" })).toBeInTheDocument();
-    });
-
-    // In Overview tab, click the spotlight banner "Consult AI Assistant" button
-    const spotlightBtn = screen.getByRole("button", { name: /Consult AI Assistant/i });
-    fireEvent.click(spotlightBtn);
-
-    await waitFor(() => {
-      expect(screen.getByText("AI Planning Assistant")).toBeInTheDocument();
-      expect(screen.getByText(/Zero PII Transmitted/i)).toBeInTheDocument();
+      expect(screen.queryByText("Temporary Celebration")).not.toBeInTheDocument();
     });
   });
 });

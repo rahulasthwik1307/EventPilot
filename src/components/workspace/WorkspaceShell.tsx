@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Event } from '../../features/events/types';
 import { WorkspaceHeader } from './WorkspaceHeader';
 import { SampleBanner } from './SampleBanner';
@@ -22,6 +22,8 @@ export interface WorkspaceShellProps {
   onBackToWelcome: () => void;
   onResetSample: () => void;
   onDeleteEvent?: () => void;
+  initialTab?: WorkspaceTab;
+  onTabChange?: (tab: WorkspaceTab) => void;
 }
 
 export function WorkspaceShell({
@@ -30,13 +32,29 @@ export function WorkspaceShell({
   onBackToWelcome,
   onResetSample,
   onDeleteEvent,
+  initialTab = 'overview',
+  onTabChange,
 }: WorkspaceShellProps) {
-  const [activeTab, setActiveTab] = useState<WorkspaceTab>('overview');
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>(initialTab);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isReplanningOpen, setIsReplanningOpen] = useState(false);
   const [isShortcutsDialogOpen, setIsShortcutsDialogOpen] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<string>(
     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  );
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
+
+  const handleTabChange = useCallback(
+    (tab: WorkspaceTab) => {
+      setActiveTab(tab);
+      onTabChange?.(tab);
+    },
+    [onTabChange]
   );
 
   // Global Keyboard Shortcuts (Tabs 1-7, '?' for cheatsheet, Esc for dialogs)
@@ -71,13 +89,13 @@ export function WorkspaceShell({
 
       if (tabMap[e.key]) {
         e.preventDefault();
-        setActiveTab(tabMap[e.key]);
+        handleTabChange(tabMap[e.key]);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [handleTabChange]);
 
   const handleEventUpdated = (updated: Event) => {
     onUpdateEvent(updated);
@@ -108,7 +126,7 @@ export function WorkspaceShell({
             <aside className="lg:w-60 lg:flex-shrink-0 mb-6 lg:mb-0 lg:sticky lg:top-6">
               <WorkspaceNavigation
                 activeTab={activeTab}
-                onTabChange={setActiveTab}
+                onTabChange={handleTabChange}
               />
             </aside>
 
@@ -120,7 +138,7 @@ export function WorkspaceShell({
                     event={event}
                     onEdit={() => setIsEditDialogOpen(true)}
                     onReplan={() => setIsReplanningOpen(true)}
-                    onNavigateTab={setActiveTab}
+                    onNavigateTab={handleTabChange}
                     lastSavedAt={lastSavedAt}
                   />
                 )}

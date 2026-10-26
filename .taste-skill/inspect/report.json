@@ -1,19 +1,20 @@
 {
  "url": "http://localhost:3000",
- "at": "2026-10-26T02:58:57.284Z",
+ "at": "2026-10-26T04:17:05.118Z",
  "allow": [],
  "viewports": [
   {
    "width": 1440,
    "height": 900,
    "load": "load",
-   "screens": 6,
+   "screens": 7,
    "filled": [
     0.43,
     0.7,
-    0.61,
-    0.61,
-    0.7,
+    0.55,
+    0.64,
+    0.65,
+    0.56,
     0.58
    ],
    "motion": {
@@ -30,13 +31,13 @@
      "h": 900
     },
     "page": {
-     "height": 5196,
-     "screens": 5.8,
-     "words": 670,
-     "img": 21,
+     "height": 5479,
+     "screens": 6.1,
+     "words": 681,
+     "img": 18,
      "video": 0,
      "canvas": 0,
-     "svg": 33,
+     "svg": 43,
      "sections": 6,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
@@ -48,7 +49,7 @@
      "pictureSamples": [
       "hero_celebration.jpg",
       "wedding_vivaha.jpg",
-      "image?url=%2Fassets%2Fimages%2Fbanquet%2Fisometr",
+      "image?url=%2Fassets%2Fimages%2Fbanquet%2Fmandap_",
       "wedding_vivaha.jpg",
       "birthday_jubilee.jpg",
       "community_mela.jpg",
@@ -69,13 +70,17 @@
      "vw": 4.7,
      "font": "Eczar",
      "weight": 700,
-     "tracking": -0.02,
+     "tracking": -0.025,
      "leading": 1.18,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "center",
+     "position": "center",
+     "widthRatio": 0.76,
      "top": 144,
      "tag": "h1",
-     "kind": "heading",
-     "align": "left",
-     "position": "left"
+     "kind": "heading"
     },
     "h1": {
      "text": "Every Milestone Celebration, Art-Directed & Audited",
@@ -153,19 +158,19 @@
       "words": 4,
       "chars": 34,
       "lines": 1,
-      "size": 30,
-      "vw": 2.1,
+      "size": 36,
+      "vw": 2.5,
       "font": "Eczar",
       "weight": 700,
       "tracking": -0.025,
-      "leading": 1.2,
+      "leading": 1.11,
       "upper": false,
       "italic": false,
       "mono": false,
       "align": "center",
       "position": "center",
       "widthRatio": 0.53,
-      "top": 2230,
+      "top": 2232,
       "tag": "h2",
       "kind": "heading"
      },
@@ -186,7 +191,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.44,
-      "top": 3044,
+      "top": 3327,
       "tag": "h2",
       "kind": "heading"
      },
@@ -207,7 +212,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.34,
-      "top": 3960,
+      "top": 4243,
       "tag": "h2",
       "kind": "heading"
      },
@@ -228,7 +233,7 @@
       "align": "center",
       "position": "center",
       "widthRatio": 0.69,
-      "top": 4668,
+      "top": 4951,
       "tag": "h2",
       "kind": "heading"
      }
@@ -246,23 +251,18 @@
      "families": [
       {
        "family": "Plus Jakarta Sans",
-       "share": 0.92,
+       "share": 0.87,
        "mono": false
       },
       {
        "family": "Eczar",
-       "share": 0.07,
-       "mono": false
-      },
-      {
-       "family": "ui-serif",
-       "share": 0.01,
+       "share": 0.13,
        "mono": false
       }
      ],
-     "familyCount": 3,
+     "familyCount": 2,
      "sizes": [
-      12,
+      13,
       14,
       16,
       18,
@@ -296,9 +296,9 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0.01,
-     "centerShare": 0.35,
-     "smallText": 29
+     "upperShare": 0,
+     "centerShare": 0.32,
+     "smallText": 0
     },
     "eyebrows": [],
     "numbered": [],
@@ -340,7 +340,7 @@
       },
       {
        "color": "#faf8f5",
-       "top": 2358,
+       "top": 2376,
        "hsl": {
         "h": 36,
         "s": 0.33,
@@ -351,22 +351,22 @@
      "textColors": [
       {
        "color": "#1c1917",
-       "share": 0.62
+       "share": 0.61
       },
       {
        "color": "#57534e",
-       "share": 0.13
+       "share": 0.12
       },
       {
        "color": "#c2410c",
        "share": 0.07
       },
       {
-       "color": "#e7dfd5",
-       "share": 0.03
+       "color": "#78716c",
+       "share": 0.04
       },
       {
-       "color": "#065f46",
+       "color": "#e7dfd5",
        "share": 0.03
       }
      ],
@@ -382,10 +382,10 @@
      "lowContrast": []
     },
     "buttons": {
-     "count": 28,
+     "count": 29,
      "inHero": 3,
      "radius": 12,
-     "height": 52,
+     "height": 44,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
@@ -404,21 +404,16 @@
      "scrims": 0,
      "gradientSamples": [],
      "gradientText": 0,
-     "hairlines": 4,
-     "hairlineSamples": [
-      "div.p-3.sm:p-3.5 1084px",
-      "div.flex.items-center 518px",
-      "div.p-3.sm:p-3.5 1084px",
-      "div.flex.items-center 1056px"
-     ],
-     "outlinedBoxes": 4,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 1,
      "dashed": 0,
      "blurred": 0,
-     "roundedBoxes": 19,
+     "roundedBoxes": 20,
      "boxRadius": 12,
      "squareMedia": 0,
      "roundedMedia": 7,
-     "mediaRadius": 12,
+     "mediaRadius": 16,
      "textShadow": 0,
      "cardRows": [
       {
@@ -431,7 +426,13 @@
        "count": 3,
        "iconTopped": false,
        "rounded": true,
-       "top": 3168
+       "top": 3055
+      },
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 3451
       }
      ]
     },
@@ -460,7 +461,7 @@
      "w": 1440,
      "h": 900
     },
-    "pageH": 5196,
+    "pageH": 5479,
     "margins": {
      "left": 176,
      "right": 176
@@ -513,22 +514,22 @@
       "pinned": false
      },
      {
-      "sel": "section.space-y-4.sm:space-y-6",
+      "sel": "section.space-y-6.select-none",
       "tag": "section",
       "top": 2196,
-      "height": 752,
-      "words": 214,
+      "height": 1034,
+      "words": 230,
       "media": 1,
       "middle": 0,
       "heading": {
        "text": "Interactive Banquet Seating Matrix",
-       "size": 30,
+       "size": 36,
        "tag": "h2"
       },
-      "left": 192,
-      "right": 192,
-      "textLeft": 203,
-      "textRight": 192,
+      "left": 194,
+      "right": 198,
+      "textLeft": 212,
+      "textRight": 202,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -538,7 +539,7 @@
      {
       "sel": "section.space-y-8",
       "tag": "section",
-      "top": 3044,
+      "top": 3327,
       "height": 780,
       "words": 150,
       "media": 3,
@@ -561,7 +562,7 @@
      {
       "sel": "section.bg-neutral-surface.rounded-2xl",
       "tag": "section",
-      "top": 3920,
+      "top": 4203,
       "height": 604,
       "words": 95,
       "media": 1,
@@ -584,7 +585,7 @@
      {
       "sel": "section.bg-neutral-text.text-neutral-bg",
       "tag": "section",
-      "top": 4620,
+      "top": 4903,
       "height": 300,
       "words": 37,
       "media": 0,
@@ -658,126 +659,7 @@
      "h": 540
     }
    },
-   "app": {
-    "viewport": {
-     "w": 1440,
-     "h": 900
-    },
-    "dark": false,
-    "ground": "#fdfbf7",
-    "sidebar": null,
-    "topbar": {
-     "h": 80
-    },
-    "canvas": {
-     "left": 176,
-     "right": 176
-    },
-    "hero": {
-     "text": "Every Milestone Celebration, Art-Directed & Audited",
-     "words": 6,
-     "chars": 51,
-     "lines": 2,
-     "size": 68,
-     "vw": 4.7,
-     "font": "Eczar",
-     "weight": 700,
-     "tracking": -0.02,
-     "leading": 1.18,
-     "top": 144,
-     "tag": "h1",
-     "kind": "heading",
-     "align": "left",
-     "position": "left"
-    },
-    "charts": 0,
-    "layout": {
-     "panels": 6,
-     "firstScreen": 0,
-     "ragged": [],
-     "voids": []
-    },
-    "tiles": 0,
-    "panels": {
-     "count": 13,
-     "radii": [
-      [
-       12,
-       9
-      ],
-      [
-       16,
-       3
-      ],
-      [
-       0,
-       1
-      ]
-     ],
-     "heavyBorders": 2,
-     "borderSamples": [
-      "#db7707 on #faf8f5 (2.98:1)",
-      "#e7dfd5 on #1c1917 (13.25:1)"
-     ],
-     "heavyShadows": 0,
-     "softShadows": 0,
-     "shadowSamples": [],
-     "glass": 0
-    },
-    "chips": {
-     "count": 3,
-     "hues": 1,
-     "samples": [
-      {
-       "hue": 48,
-       "size": 32,
-       "radius": "9999px"
-      },
-      {
-       "hue": 48,
-       "size": 32,
-       "radius": "9999px"
-      },
-      {
-       "hue": 48,
-       "size": 32,
-       "radius": "9999px"
-      }
-     ]
-    },
-    "numbers": {
-     "cells": 0,
-     "leftAligned": 0,
-     "figures": 1,
-     "tabularShare": 0,
-     "kpiMax": 14
-    },
-    "rows": null,
-    "chartHues": 0,
-    "placeholders": [],
-    "type": {
-     "under13": 0.21,
-     "tiny": 0,
-     "tinySamples": [],
-     "sizes": [
-      12,
-      14,
-      16,
-      18,
-      20,
-      24,
-      30,
-      36,
-      68
-     ]
-    },
-    "title": {
-     "text": "Every Milestone Celebration,\nArt-Directed & Audited",
-     "size": 68,
-     "top": 144
-    },
-    "colourShare": 0.117
-   },
+   "app": null,
    "consoleErrors": []
   },
   {
@@ -789,9 +671,9 @@
     0.57,
     0.85,
     0.77,
-    0.75,
+    0.79,
     0.74,
-    0.85,
+    0.79,
     0.68
    ],
    "motion": {
@@ -808,9 +690,9 @@
      "h": 1024
     },
     "page": {
-     "height": 6425,
+     "height": 6480,
      "screens": 6.3,
-     "words": 670,
+     "words": 658,
      "img": 21,
      "video": 0,
      "canvas": 0,
@@ -826,7 +708,7 @@
      "pictureSamples": [
       "hero_celebration.jpg",
       "wedding_vivaha.jpg",
-      "image?url=%2Fassets%2Fimages%2Fbanquet%2Fisometr",
+      "image?url=%2Fassets%2Fimages%2Fbanquet%2Fmandap_",
       "wedding_vivaha.jpg",
       "birthday_jubilee.jpg",
       "community_mela.jpg",
@@ -847,13 +729,17 @@
      "vw": 4.7,
      "font": "Eczar",
      "weight": 700,
-     "tracking": -0.02,
+     "tracking": -0.025,
      "leading": 1.2,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "center",
+     "position": "center",
+     "widthRatio": 0.92,
      "top": 144,
      "tag": "h1",
-     "kind": "heading",
-     "align": "left",
-     "position": "left"
+     "kind": "heading"
     },
     "h1": {
      "text": "Every Milestone Celebration, Art-Directed & Audited",
@@ -964,7 +850,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.64,
-      "top": 3750,
+      "top": 3805,
       "tag": "h2",
       "kind": "heading"
      },
@@ -985,7 +871,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.81,
-      "top": 4874,
+      "top": 4929,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1006,7 +892,7 @@
       "align": "center",
       "position": "center",
       "widthRatio": 0.79,
-      "top": 5849,
+      "top": 5904,
       "tag": "h2",
       "kind": "heading"
      }
@@ -1074,8 +960,8 @@
      "microLabelShare": 0,
      "microSamples": [],
      "upperShare": 0.01,
-     "centerShare": 0.35,
-     "smallText": 29
+     "centerShare": 0.34,
+     "smallText": 28
     },
     "eyebrows": [],
     "numbered": [],
@@ -1128,7 +1014,7 @@
      "textColors": [
       {
        "color": "#1c1917",
-       "share": 0.62
+       "share": 0.63
       },
       {
        "color": "#57534e",
@@ -1136,7 +1022,7 @@
       },
       {
        "color": "#c2410c",
-       "share": 0.07
+       "share": 0.08
       },
       {
        "color": "#e7dfd5",
@@ -1202,13 +1088,13 @@
        "count": 3,
        "iconTopped": false,
        "rounded": true,
-       "top": 3487
+       "top": 3542
       },
       {
        "count": 3,
        "iconTopped": false,
        "rounded": true,
-       "top": 3914
+       "top": 3969
       }
      ]
     },
@@ -1237,7 +1123,7 @@
      "w": 768,
      "h": 1024
     },
-    "pageH": 6425,
+    "pageH": 6480,
     "margins": {
      "left": 32,
      "right": 43
@@ -1247,8 +1133,8 @@
       "sel": "div",
       "tag": "div",
       "top": 0,
-      "height": 6193,
-      "words": 682,
+      "height": 6248,
+      "words": 669,
       "media": 7,
       "middle": 0,
       "heading": {
@@ -1269,7 +1155,7 @@
      {
       "sel": "footer.py-12.px-4",
       "tag": "footer",
-      "top": 6289,
+      "top": 6344,
       "height": 136,
       "words": 24,
       "media": 0,
@@ -1330,109 +1216,7 @@
     "voidShare": 0,
     "voidBox": null
    },
-   "app": {
-    "viewport": {
-     "w": 768,
-     "h": 1024
-    },
-    "dark": false,
-    "ground": "#fdfbf7",
-    "sidebar": null,
-    "topbar": {
-     "h": 80
-    },
-    "canvas": {
-     "left": 32,
-     "right": 44
-    },
-    "hero": {
-     "text": "Every Milestone Celebration, Art-Directed & Audited",
-     "words": 6,
-     "chars": 51,
-     "lines": 2,
-     "size": 36,
-     "vw": 4.7,
-     "font": "Eczar",
-     "weight": 700,
-     "tracking": -0.02,
-     "leading": 1.2,
-     "top": 144,
-     "tag": "h1",
-     "kind": "heading",
-     "align": "left",
-     "position": "left"
-    },
-    "charts": 0,
-    "layout": {
-     "panels": 6,
-     "firstScreen": 0,
-     "ragged": [],
-     "voids": []
-    },
-    "tiles": 0,
-    "panels": {
-     "count": 15,
-     "radii": [
-      [
-       12,
-       10
-      ],
-      [
-       16,
-       3
-      ],
-      [
-       0,
-       2
-      ]
-     ],
-     "heavyBorders": 2,
-     "borderSamples": [
-      "#db7707 on #faf8f5 (2.98:1)",
-      "#e7dfd5 on #1c1917 (13.25:1)"
-     ],
-     "heavyShadows": 0,
-     "softShadows": 0,
-     "shadowSamples": [],
-     "glass": 0
-    },
-    "chips": {
-     "count": 0,
-     "hues": 0,
-     "samples": []
-    },
-    "numbers": {
-     "cells": 0,
-     "leftAligned": 0,
-     "figures": 1,
-     "tabularShare": 0,
-     "kpiMax": 14
-    },
-    "rows": null,
-    "chartHues": 0,
-    "placeholders": [],
-    "type": {
-     "under13": 0.21,
-     "tiny": 0,
-     "tinySamples": [],
-     "sizes": [
-      12,
-      14,
-      16,
-      18,
-      20,
-      24,
-      30,
-      36
-     ]
-    },
-    "title": {
-     "text": "Every Milestone Celebration, Art-Directed & Audited",
-     "size": 36,
-     "top": 144
-    },
-    "colourShare": 0.265
-   },
+   "app": null,
    "consoleErrors": []
   },
   {
@@ -1448,9 +1232,9 @@
     0.91,
     0.8,
     0.91,
-    0.86,
+    0.85,
     0.91,
-    0.67,
+    0.68,
     0.75
    ],
    "motion": {
@@ -1467,9 +1251,9 @@
      "h": 844
     },
     "page": {
-     "height": 8565,
+     "height": 8513,
      "screens": 10.1,
-     "words": 656,
+     "words": 644,
      "img": 21,
      "video": 0,
      "canvas": 0,
@@ -1485,7 +1269,7 @@
      "pictureSamples": [
       "hero_celebration.jpg",
       "wedding_vivaha.jpg",
-      "image?url=%2Fassets%2Fimages%2Fbanquet%2Fisometr",
+      "image?url=%2Fassets%2Fimages%2Fbanquet%2Fmandap_",
       "wedding_vivaha.jpg",
       "birthday_jubilee.jpg",
       "community_mela.jpg",
@@ -1506,13 +1290,17 @@
      "vw": 6.7,
      "font": "Eczar",
      "weight": 700,
-     "tracking": -0.02,
+     "tracking": -0.025,
      "leading": 1.2,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "center",
+     "position": "center",
+     "widthRatio": 0.92,
      "top": 136,
      "tag": "h1",
-     "kind": "heading",
-     "align": "left",
-     "position": "left"
+     "kind": "heading"
     },
     "h1": {
      "text": "Every Milestone Celebration, Art-Directed & Audited",
@@ -1644,7 +1432,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.92,
-      "top": 4476,
+      "top": 4424,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1665,7 +1453,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.79,
-      "top": 6792,
+      "top": 6740,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1686,7 +1474,7 @@
       "align": "center",
       "position": "center",
       "widthRatio": 0.75,
-      "top": 7811,
+      "top": 7759,
       "tag": "h2",
       "kind": "heading"
      }
@@ -1709,7 +1497,7 @@
       },
       {
        "family": "Eczar",
-       "share": 0.07,
+       "share": 0.08,
        "mono": false
       },
       {
@@ -1755,7 +1543,7 @@
      "microSamples": [],
      "upperShare": 0.01,
      "centerShare": 0.38,
-     "smallText": 31
+     "smallText": 30
     },
     "eyebrows": [],
     "numbered": [],
@@ -1806,7 +1594,7 @@
       },
       {
        "color": "#1c1917",
-       "top": 7779,
+       "top": 7727,
        "hsl": {
         "h": 24,
         "s": 0.1,
@@ -1817,7 +1605,7 @@
      "textColors": [
       {
        "color": "#1c1917",
-       "share": 0.63
+       "share": 0.64
       },
       {
        "color": "#57534e",
@@ -1825,11 +1613,11 @@
       },
       {
        "color": "#c2410c",
-       "share": 0.07
+       "share": 0.08
       },
       {
        "color": "#e7dfd5",
-       "share": 0.03
+       "share": 0.04
       },
       {
        "color": "#065f46",
@@ -1908,7 +1696,7 @@
      "w": 390,
      "h": 844
     },
-    "pageH": 8565,
+    "pageH": 8513,
     "margins": {
      "left": 16,
      "right": 16
@@ -1918,8 +1706,8 @@
       "sel": "div",
       "tag": "div",
       "top": 0,
-      "height": 8269,
-      "words": 668,
+      "height": 8217,
+      "words": 655,
       "media": 7,
       "middle": 0,
       "heading": {
@@ -1940,7 +1728,7 @@
      {
       "sel": "footer.py-12.px-4",
       "tag": "footer",
-      "top": 8365,
+      "top": 8313,
       "height": 200,
       "words": 24,
       "media": 0,
@@ -1989,131 +1777,31 @@
     "voidShare": 0,
     "voidBox": null
    },
-   "app": {
-    "viewport": {
-     "w": 390,
-     "h": 844
-    },
-    "dark": false,
-    "ground": "#fdfbf7",
-    "sidebar": null,
-    "topbar": null,
-    "canvas": {
-     "left": 16,
-     "right": 16
-    },
-    "hero": {
-     "text": "Every Milestone Celebration, Art-Directed & Audited",
-     "words": 6,
-     "chars": 51,
-     "lines": 2,
-     "size": 26,
-     "vw": 6.7,
-     "font": "Eczar",
-     "weight": 700,
-     "tracking": -0.02,
-     "leading": 1.2,
-     "top": 136,
-     "tag": "h1",
-     "kind": "heading",
-     "align": "left",
-     "position": "left"
-    },
-    "charts": 0,
-    "layout": {
-     "panels": 6,
-     "firstScreen": 0,
-     "ragged": [],
-     "voids": []
-    },
-    "tiles": 0,
-    "panels": {
-     "count": 16,
-     "radii": [
-      [
-       12,
-       10
-      ],
-      [
-       16,
-       3
-      ],
-      [
-       0,
-       2
-      ],
-      [
-       8,
-       1
-      ]
-     ],
-     "heavyBorders": 2,
-     "borderSamples": [
-      "#db7707 on #faf8f5 (2.98:1)",
-      "#e7dfd5 on #1c1917 (13.25:1)"
-     ],
-     "heavyShadows": 0,
-     "softShadows": 0,
-     "shadowSamples": [],
-     "glass": 0
-    },
-    "chips": {
-     "count": 3,
-     "hues": 1,
-     "samples": [
-      {
-       "hue": 48,
-       "size": 32,
-       "radius": "9999px"
-      },
-      {
-       "hue": 48,
-       "size": 32,
-       "radius": "9999px"
-      },
-      {
-       "hue": 48,
-       "size": 32,
-       "radius": "9999px"
-      }
-     ]
-    },
-    "numbers": {
-     "cells": 0,
-     "leftAligned": 0,
-     "figures": 1,
-     "tabularShare": 0,
-     "kpiMax": 12
-    },
-    "rows": null,
-    "chartHues": 0,
-    "placeholders": [],
-    "type": {
-     "under13": 0.26,
-     "tiny": 0,
-     "tinySamples": [],
-     "sizes": [
-      12,
-      14,
-      16,
-      18,
-      20,
-      24,
-      26,
-      30
-     ]
-    },
-    "title": {
-     "text": "Every Milestone Celebration, Art-Directed & Audited",
-     "size": 26,
-     "top": 136
-    },
-    "colourShare": 0.125
-   },
+   "app": null,
    "consoleErrors": []
   }
  ],
  "findings": [
+  {
+   "level": "WARN",
+   "id": "outlined-box",
+   "width": 1440,
+   "message": "1 box(es) drawn with a 1px outline.",
+   "fix": "Prefer a filled surface or no box.",
+   "alsoAt": [
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "card-rows",
+   "width": 1440,
+   "message": "3 rows of identical boxed cards.",
+   "fix": "Vary the composition; not every section is a card grid.",
+   "alsoAt": [
+    768
+   ]
+  },
   {
    "level": "WARN",
    "id": "palette-cream",
@@ -2127,37 +1815,41 @@
   },
   {
    "level": "WARN",
-   "id": "icon-chips",
+   "id": "no-footage",
    "width": 1440,
-   "message": "3 icons sit in tinted squares or circles.",
-   "fix": "This is the commonest tell of a generated dashboard. Drop the tinted square: a KPI is a label and a number; an icon, if it helps, is plain and in the text colour.",
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  },
+  {
+   "level": "WARN",
+   "id": "ragged-edges",
+   "width": 1440,
+   "message": "Left-aligned text starts at 7 different lines (216px, 248px, 176px, 200px, 573px, 947px, 736px); the three most used hold only 59% of it.",
+   "fix": "Pick two or three anchor lines from the grid and start every heading and paragraph on one of them."
+  },
+  {
+   "level": "FAIL",
+   "id": "hairline",
+   "width": 768,
+   "message": "4 thin rule(s)/divider line(s): div.p-3.sm:p-3.5 700px | div.flex.items-center 668px | div.p-3.sm:p-3.5 700px | div.flex.items-center 672px",
+   "fix": "Delete. Separate with space, a tone change, or scale. Lines are only for real tables and form fields.",
    "alsoAt": [
     390
    ]
   },
   {
-   "level": "WARN",
-   "id": "below-fold",
-   "width": 1440,
-   "message": "Only 0 of 6 blocks start on the first 1440px screen.",
-   "fix": "Every block the brief names shows its header and first rows on the first desktop screen: size the headline block to its question, cap long lists with \"View all\", and put time-sensitive blocks before long tables."
-  },
-  {
-   "level": "WARN",
-   "id": "app-title-size",
-   "width": 1440,
-   "message": "The h1 is 68px (\"Every Milestone Celebration,\nArt-Directe\").",
-   "fix": "An app screen is not a landing page: the title is 18-32px (20-24px on a phone).",
-   "alsoAt": [
-    768
-   ]
-  },
-  {
-   "level": "WARN",
-   "id": "colour-sprawl",
+   "level": "FAIL",
+   "id": "outlined-box",
    "width": 768,
-   "message": "27% of the first screen is strongly coloured.",
-   "fix": "Keep the screen neutral and spend colour on data and status: the studied screens sit near 3%, and only tinted styles reach 10–15%, as pale tints rather than saturated fills.",
+   "message": "4 boxes drawn with a 1px outline.",
+   "fix": "Define a surface by its fill (one tone step from the page) or leave the content unboxed."
+  },
+  {
+   "level": "FAIL",
+   "id": "small-text",
+   "width": 768,
+   "message": "28 text blocks under 13px.",
+   "fix": "Nothing meant to be read goes below 13px.",
    "alsoAt": [
     390
    ]

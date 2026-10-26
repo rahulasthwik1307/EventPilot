@@ -13,7 +13,6 @@ import {
   CheckCircle2,
   ChevronRight,
 } from 'lucide-react';
-import { InteractiveBanquetSeatingMatrix } from './InteractiveBanquetSeatingMatrix';
 
 export interface EditorialNocturneHeroProps {
   onOpenSample: () => void;
@@ -301,10 +300,7 @@ export function EditorialNocturneHero({
         </div>
       </section>
 
-      {/* 3. One Live Thing: Interactive Banquet Seating Matrix Centerpiece */}
-      <InteractiveBanquetSeatingMatrix />
-
-      {/* 4. Three Grounded Planning Templates (Archetype Gallery) */}
+      {/* 3. Three Grounded Planning Templates (Archetype Gallery) */}
       <section className="space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>

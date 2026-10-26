@@ -1,23 +1,23 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Event, EventType } from '../features/events/types';
 import { eventStorage } from '../features/events/storage';
 import { EditorialNocturneHero } from '../components/welcome/EditorialNocturneHero';
 import { SavedEventsList } from '../components/welcome/SavedEventsList';
 import { EventCreateDialog } from '../components/events/EventCreateDialog';
-import { WorkspaceShell } from '../components/workspace/WorkspaceShell';
 import { AlertCircle, Sparkles } from 'lucide-react';
 
 export default function HomePage() {
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [personalEvents, setPersonalEvents] = useState<Event[]>([]);
-  const [activeEvent, setActiveEvent] = useState<Event | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [initialCreateType, setInitialCreateType] = useState<EventType>('wedding');
   const [storageError, setStorageError] = useState<string | null>(null);
 
-  // Initialize and load storage state on client mount
+  // Initialize and load personal events from storage on mount (always starts on Landing Page)
   useEffect(() => {
     setMounted(true);
     try {
@@ -27,40 +27,13 @@ export default function HomePage() {
       } else if (listRes.error) {
         setStorageError(listRes.error.message);
       }
-
-      // Check for previously active event
-      const activeIdRes = eventStorage.getActiveEventId();
-      if (activeIdRes.success && activeIdRes.data) {
-        if (activeIdRes.data === 'sample-event-aarav-meera') {
-          const sampleRes = eventStorage.getSampleEvent();
-          if (sampleRes.success && sampleRes.data) {
-            setActiveEvent(sampleRes.data);
-          }
-        } else {
-          const found = listRes.data?.find((e) => e.id === activeIdRes.data);
-          if (found) {
-            setActiveEvent(found);
-          }
-        }
-      }
     } catch {
       setStorageError('Failed to initialize local browser storage.');
     }
   }, []);
 
   const handleOpenSample = () => {
-    const sampleRes = eventStorage.getSampleEvent();
-    if (sampleRes.success && sampleRes.data) {
-      eventStorage.setActiveEventId(sampleRes.data.id);
-      setActiveEvent(sampleRes.data);
-    }
-  };
-
-  const handleResetSample = () => {
-    const resetRes = eventStorage.resetSampleEvent();
-    if (resetRes.success && resetRes.data) {
-      setActiveEvent(resetRes.data);
-    }
+    router.push('/events/sample');
   };
 
   const handleSelectEventType = (type: EventType) => {
@@ -70,60 +43,21 @@ export default function HomePage() {
 
   const handleEventCreated = (newEvent: Event) => {
     setPersonalEvents((prev) => [newEvent, ...prev.filter((e) => e.id !== newEvent.id)]);
-    setActiveEvent(newEvent);
-    eventStorage.setActiveEventId(newEvent.id);
-  };
-
-  const handleUpdateEvent = (updated: Event) => {
-    setActiveEvent(updated);
-    if (updated.isSample) {
-      eventStorage.saveSampleEvent(updated);
-    } else {
-      setPersonalEvents((prev) =>
-        prev.map((e) => (e.id === updated.id ? updated : e))
-      );
-      eventStorage.savePersonalEvent(updated);
-    }
+    router.push(`/events/${newEvent.id}`);
   };
 
   const handleSelectSavedEvent = (id: string) => {
-    const found = personalEvents.find((e) => e.id === id);
-    if (found) {
-      eventStorage.setActiveEventId(id);
-      setActiveEvent(found);
-    }
+    router.push(`/events/${id}`);
   };
 
   const handleDeleteEvent = (id: string) => {
     const delRes = eventStorage.deletePersonalEvent(id);
     if (delRes.success) {
       setPersonalEvents((prev) => prev.filter((e) => e.id !== id));
-      if (activeEvent?.id === id) {
-        setActiveEvent(null);
-        eventStorage.setActiveEventId(null);
-      }
     } else {
       setStorageError(delRes.error?.message || 'Failed to delete event from local storage.');
     }
   };
-
-  const handleBackToWelcome = () => {
-    setActiveEvent(null);
-    eventStorage.setActiveEventId(null);
-  };
-
-  // If viewing an active event workspace, render WorkspaceShell
-  if (mounted && activeEvent) {
-    return (
-      <WorkspaceShell
-        event={activeEvent}
-        onUpdateEvent={handleUpdateEvent}
-        onBackToWelcome={handleBackToWelcome}
-        onResetSample={handleResetSample}
-        onDeleteEvent={!activeEvent.isSample ? () => handleDeleteEvent(activeEvent.id) : undefined}
-      />
-    );
-  }
 
   return (
     <div className="min-h-screen bg-neutral-bg flex flex-col justify-between">
@@ -199,31 +133,28 @@ export default function HomePage() {
         </main>
       </div>
 
-      {/* Footer */}
-      <footer className="py-12 px-4 sm:px-8 mt-24 bg-neutral-surface">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-sm text-neutral-muted gap-4">
-          <div className="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
-            <p className="font-semibold text-neutral-text">
-              Event Pilot · Your celebration, thoughtfully planned.
-            </p>
-            <span className="hidden sm:inline text-neutral-muted">·</span>
-            <p>
-              Thoughtful planning · Clear budgets · Your data stays in your browser.
-            </p>
-          </div>
-          <p className="font-semibold text-secondary">
-            Panchang &amp; Utsav Almanac
-          </p>
-        </div>
-      </footer>
-
-      {/* Event Creation Modal */}
+      {/* Creation Modal */}
       <EventCreateDialog
         isOpen={isCreateDialogOpen}
         onClose={() => setIsCreateDialogOpen(false)}
         onSuccess={handleEventCreated}
         initialType={initialCreateType}
       />
+
+      {/* Product Footer */}
+      <footer className="mt-16 py-8 border-t border-neutral-border bg-neutral-surface">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-muted">
+          <p className="font-medium text-neutral-text">
+            Event Pilot · Your celebration, thoughtfully planned.
+          </p>
+          <p>
+            Thoughtful planning · Clear budgets · Your data stays in your browser.
+          </p>
+          <p className="font-mono text-[11px]">
+            Panchang &amp; Utsav Almanac
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -1,24 +1,23 @@
 {
- "url": "http://localhost:3000",
- "at": "2026-10-24T12:10:50.757Z",
+ "url": "http://localhost:3000/",
+ "at": "2026-10-26T05:12:06.999Z",
  "allow": [],
  "viewports": [
   {
    "width": 1440,
    "height": 900,
    "load": "load",
-   "screens": 6,
+   "screens": 5,
    "filled": [
     0.43,
     0.7,
     0.61,
-    0.61,
-    0.6,
+    0.7,
     0.58
    ],
    "motion": {
-    "elements": 29,
-    "css": 28,
+    "elements": 17,
+    "css": 16,
     "transitions": 0,
     "scripted": 1,
     "videos": 0,
@@ -30,14 +29,14 @@
      "h": 900
     },
     "page": {
-     "height": 4936,
-     "screens": 5.5,
-     "words": 543,
+     "height": 4348,
+     "screens": 4.8,
+     "words": 450,
      "img": 6,
      "video": 0,
      "canvas": 0,
-     "svg": 20,
-     "sections": 6,
+     "svg": 19,
+     "sections": 5,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 0,
@@ -152,27 +151,6 @@
       "kind": "heading"
      },
      {
-      "text": "Interactive Banquet Seating Matrix",
-      "words": 4,
-      "chars": 34,
-      "lines": 1,
-      "size": 36,
-      "vw": 2.5,
-      "font": "Eczar",
-      "weight": 700,
-      "tracking": 0,
-      "leading": 1.11,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "center",
-      "position": "center",
-      "widthRatio": 0.53,
-      "top": 2196,
-      "tag": "h2",
-      "kind": "heading"
-     },
-     {
       "text": "Three Grounded Planning Templates",
       "words": 4,
       "chars": 33,
@@ -189,7 +167,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.44,
-      "top": 2784,
+      "top": 2196,
       "tag": "h2",
       "kind": "heading"
      },
@@ -210,7 +188,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.34,
-      "top": 3700,
+      "top": 3112,
       "tag": "h2",
       "kind": "heading"
      },
@@ -231,17 +209,17 @@
       "align": "center",
       "position": "center",
       "widthRatio": 0.69,
-      "top": 4408,
+      "top": 3820,
       "tag": "h2",
       "kind": "heading"
      }
     ],
     "headingSummary": {
-     "count": 7,
+     "count": 6,
      "maxLines": 2,
      "over2Lines": 0,
      "statements": 0,
-     "centered": 3,
+     "centered": 2,
      "medianWords": 4,
      "mixedFontHeadings": 0
     },
@@ -294,7 +272,7 @@
      "microLabelShare": 0,
      "microSamples": [],
      "upperShare": 0,
-     "centerShare": 0.41,
+     "centerShare": 0.34,
      "smallText": 0
     },
     "eyebrows": [],
@@ -339,22 +317,22 @@
      "textColors": [
       {
        "color": "#1c1917",
-       "share": 0.82
+       "share": 0.81
       },
       {
        "color": "#c2410c",
-       "share": 0.09
+       "share": 0.1
       },
       {
        "color": "#e7dfd5",
-       "share": 0.04
+       "share": 0.05
       },
       {
        "color": "#78716c",
-       "share": 0.02
+       "share": 0.03
       },
       {
-       "color": "#065f46",
+       "color": "#fdfbf7",
        "share": 0.01
       }
      ],
@@ -370,7 +348,7 @@
      "lowContrast": []
     },
     "buttons": {
-     "count": 17,
+     "count": 13,
      "inHero": 3,
      "radius": 8,
      "height": 44,
@@ -397,7 +375,7 @@
      "outlinedBoxes": 0,
      "dashed": 0,
      "blurred": 0,
-     "roundedBoxes": 15,
+     "roundedBoxes": 14,
      "boxRadius": 16,
      "squareMedia": 0,
      "roundedMedia": 6,
@@ -414,7 +392,7 @@
        "count": 3,
        "iconTopped": false,
        "rounded": true,
-       "top": 2908
+       "top": 2320
       }
      ]
     },
@@ -443,10 +421,10 @@
      "w": 1440,
      "h": 900
     },
-    "pageH": 4936,
+    "pageH": 4348,
     "margins": {
      "left": 176,
-     "right": 176
+     "right": 160
     },
     "sections": [
      {
@@ -499,25 +477,6 @@
       "sel": "section.space-y-8",
       "tag": "section",
       "top": 2196,
-      "height": 492,
-      "words": 88,
-      "media": 0,
-      "middle": 0,
-      "heading": null,
-      "left": 208,
-      "right": 237,
-      "textLeft": 224,
-      "textRight": 237,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": false,
-      "pinned": false
-     },
-     {
-      "sel": "section.space-y-8",
-      "tag": "section",
-      "top": 2784,
       "height": 780,
       "words": 150,
       "media": 3,
@@ -540,7 +499,7 @@
      {
       "sel": "section.bg-neutral-surface.rounded-2xl",
       "tag": "section",
-      "top": 3660,
+      "top": 3072,
       "height": 604,
       "words": 95,
       "media": 1,
@@ -563,7 +522,7 @@
      {
       "sel": "section.bg-neutral-text.text-neutral-bg",
       "tag": "section",
-      "top": 4360,
+      "top": 3772,
       "height": 300,
       "words": 37,
       "media": 0,
@@ -648,14 +607,14 @@
    "filled": [
     0.57,
     0.85,
-    0.67,
-    0.77,
     0.73,
+    0.76,
+    0.68,
     0.68
    ],
    "motion": {
-    "elements": 29,
-    "css": 28,
+    "elements": 18,
+    "css": 17,
     "transitions": 0,
     "scripted": 1,
     "videos": 0,
@@ -667,14 +626,14 @@
      "h": 1024
     },
     "page": {
-     "height": 5795,
-     "screens": 5.7,
-     "words": 543,
+     "height": 5123,
+     "screens": 5,
+     "words": 450,
      "img": 6,
      "video": 0,
      "canvas": 0,
-     "svg": 20,
-     "sections": 6,
+     "svg": 19,
+     "sections": 5,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 0,
@@ -789,27 +748,6 @@
       "kind": "heading"
      },
      {
-      "text": "Interactive Banquet Seating Matrix",
-      "words": 4,
-      "chars": 34,
-      "lines": 1,
-      "size": 36,
-      "vw": 4.7,
-      "font": "Eczar",
-      "weight": 700,
-      "tracking": 0,
-      "leading": 1.11,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "center",
-      "position": "center",
-      "widthRatio": 0.92,
-      "top": 2448,
-      "tag": "h2",
-      "kind": "heading"
-     },
-     {
       "text": "Three Grounded Planning Templates",
       "words": 4,
       "chars": 33,
@@ -826,7 +764,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.64,
-      "top": 3120,
+      "top": 2448,
       "tag": "h2",
       "kind": "heading"
      },
@@ -847,7 +785,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.81,
-      "top": 4244,
+      "top": 3572,
       "tag": "h2",
       "kind": "heading"
      },
@@ -868,17 +806,17 @@
       "align": "center",
       "position": "center",
       "widthRatio": 0.79,
-      "top": 5219,
+      "top": 4547,
       "tag": "h2",
       "kind": "heading"
      }
     ],
     "headingSummary": {
-     "count": 7,
+     "count": 6,
      "maxLines": 2,
      "over2Lines": 0,
      "statements": 0,
-     "centered": 3,
+     "centered": 2,
      "medianWords": 4,
      "mixedFontHeadings": 0
     },
@@ -930,7 +868,7 @@
      "microLabelShare": 0,
      "microSamples": [],
      "upperShare": 0,
-     "centerShare": 0.41,
+     "centerShare": 0.34,
      "smallText": 0
     },
     "eyebrows": [],
@@ -975,22 +913,22 @@
      "textColors": [
       {
        "color": "#1c1917",
-       "share": 0.82
+       "share": 0.81
       },
       {
        "color": "#c2410c",
-       "share": 0.09
+       "share": 0.1
       },
       {
        "color": "#e7dfd5",
-       "share": 0.04
+       "share": 0.05
       },
       {
        "color": "#78716c",
-       "share": 0.02
+       "share": 0.03
       },
       {
-       "color": "#065f46",
+       "color": "#fdfbf7",
        "share": 0.01
       }
      ],
@@ -1006,10 +944,10 @@
      "lowContrast": []
     },
     "buttons": {
-     "count": 17,
+     "count": 13,
      "inHero": 3,
      "radius": 8,
-     "height": 36,
+     "height": 44,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
@@ -1033,7 +971,7 @@
      "outlinedBoxes": 0,
      "dashed": 0,
      "blurred": 0,
-     "roundedBoxes": 17,
+     "roundedBoxes": 15,
      "boxRadius": 12,
      "squareMedia": 0,
      "roundedMedia": 6,
@@ -1044,7 +982,7 @@
        "count": 3,
        "iconTopped": false,
        "rounded": true,
-       "top": 3284
+       "top": 2612
       }
      ]
     },
@@ -1073,18 +1011,18 @@
      "w": 768,
      "h": 1024
     },
-    "pageH": 5795,
+    "pageH": 5123,
     "margins": {
      "left": 32,
-     "right": 37
+     "right": 32
     },
     "sections": [
      {
       "sel": "div",
       "tag": "div",
       "top": 0,
-      "height": 5563,
-      "words": 560,
+      "height": 4891,
+      "words": 468,
       "media": 6,
       "middle": 0,
       "heading": {
@@ -1105,7 +1043,7 @@
      {
       "sel": "footer.py-12.px-4",
       "tag": "footer",
-      "top": 5659,
+      "top": 4987,
       "height": 136,
       "words": 24,
       "media": 0,
@@ -1173,22 +1111,21 @@
    "width": 390,
    "height": 844,
    "load": "load",
-   "screens": 10,
+   "screens": 9,
    "filled": [
     0.62,
     0.85,
     0.91,
-    0.79,
     0.8,
-    0.85,
     0.91,
-    0.79,
-    0.79,
+    0.86,
+    0.91,
+    0.67,
     0.75
    ],
    "motion": {
-    "elements": 30,
-    "css": 29,
+    "elements": 18,
+    "css": 17,
     "transitions": 0,
     "scripted": 1,
     "videos": 0,
@@ -1200,14 +1137,14 @@
      "h": 844
     },
     "page": {
-     "height": 7941,
-     "screens": 9.4,
-     "words": 536,
+     "height": 6881,
+     "screens": 8.2,
+     "words": 443,
      "img": 6,
      "video": 0,
      "canvas": 0,
-     "svg": 20,
-     "sections": 6,
+     "svg": 19,
+     "sections": 5,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 0,
@@ -1343,27 +1280,6 @@
       "kind": "heading"
      },
      {
-      "text": "Interactive Banquet Seating Matrix",
-      "words": 4,
-      "chars": 34,
-      "lines": 2,
-      "size": 30,
-      "vw": 7.7,
-      "font": "Eczar",
-      "weight": 700,
-      "tracking": 0,
-      "leading": 1.2,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "center",
-      "position": "center",
-      "widthRatio": 0.92,
-      "top": 2724,
-      "tag": "h2",
-      "kind": "heading"
-     },
-     {
       "text": "Three Grounded Planning Templates",
       "words": 4,
       "chars": 33,
@@ -1380,7 +1296,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.92,
-      "top": 3852,
+      "top": 2792,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1401,7 +1317,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.79,
-      "top": 6168,
+      "top": 5108,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1422,17 +1338,17 @@
       "align": "center",
       "position": "center",
       "widthRatio": 0.75,
-      "top": 7187,
+      "top": 6127,
       "tag": "h2",
       "kind": "heading"
      }
     ],
     "headingSummary": {
-     "count": 8,
+     "count": 7,
      "maxLines": 2,
      "over2Lines": 0,
      "statements": 0,
-     "centered": 3,
+     "centered": 2,
      "medianWords": 4,
      "mixedFontHeadings": 0
     },
@@ -1484,7 +1400,7 @@
      "microLabelShare": 0,
      "microSamples": [],
      "upperShare": 0,
-     "centerShare": 0.44,
+     "centerShare": 0.38,
      "smallText": 0
     },
     "eyebrows": [],
@@ -1527,7 +1443,7 @@
       },
       {
        "color": "#1c1917",
-       "top": 7155,
+       "top": 6095,
        "hsl": {
         "h": 24,
         "s": 0.1,
@@ -1538,22 +1454,22 @@
      "textColors": [
       {
        "color": "#1c1917",
-       "share": 0.82
+       "share": 0.81
       },
       {
        "color": "#c2410c",
-       "share": 0.09
+       "share": 0.11
       },
       {
        "color": "#e7dfd5",
-       "share": 0.04
+       "share": 0.05
       },
       {
        "color": "#78716c",
        "share": 0.02
       },
       {
-       "color": "#065f46",
+       "color": "#fdfbf7",
        "share": 0.01
       }
      ],
@@ -1569,7 +1485,7 @@
      "lowContrast": []
     },
     "buttons": {
-     "count": 17,
+     "count": 13,
      "inHero": 3,
      "radius": 8,
      "height": 44,
@@ -1596,7 +1512,7 @@
      "outlinedBoxes": 0,
      "dashed": 0,
      "blurred": 0,
-     "roundedBoxes": 17,
+     "roundedBoxes": 15,
      "boxRadius": 12,
      "squareMedia": 0,
      "roundedMedia": 6,
@@ -1624,7 +1540,7 @@
      "w": 390,
      "h": 844
     },
-    "pageH": 7941,
+    "pageH": 6881,
     "margins": {
      "left": 16,
      "right": 16
@@ -1634,8 +1550,8 @@
       "sel": "div",
       "tag": "div",
       "top": 0,
-      "height": 7645,
-      "words": 554,
+      "height": 6585,
+      "words": 462,
       "media": 6,
       "middle": 0,
       "heading": {
@@ -1656,7 +1572,7 @@
      {
       "sel": "footer.py-12.px-4",
       "tag": "footer",
-      "top": 7741,
+      "top": 6681,
       "height": 200,
       "words": 24,
       "media": 0,
@@ -1737,10 +1653,10 @@
   },
   {
    "level": "WARN",
-   "id": "untitled-section",
+   "id": "off-centre",
    "width": 1440,
-   "message": "A section carries text but no heading: section.space-y-8 at 2196px.",
-   "fix": "Name it with a short heading unless it is the continuation of the section above."
+   "message": "The margins differ: 176px on the left, 160px on the right, at 1440px.",
+   "fix": "Put the navigation and the content on one pair of margins; check for padding on one side only, a scrollbar gutter, or a header on another inset than the page."
   },
   {
    "level": "WARN",
