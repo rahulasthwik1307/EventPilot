@@ -59,7 +59,7 @@ export function EditorialNocturneHero({
       tagline: 'Multi-Day Sacred Ceremonies',
       description:
         'Architectural coordination of sacred rites from Sangeet to Reception with 8-seat family dining matrices and authentic Vedic Muhurtam windows.',
-      image: '/assets/images/wedding_vivaha.jpg',
+      image: '/assets/images/wedding_vivaha.webp',
       muhurtam: '19 Jan 2027 · 09:15 AM (Dawn Locked)',
       seats: '350 Seats',
       ledgers: '12 Balanced Ledgers',
@@ -77,7 +77,7 @@ export function EditorialNocturneHero({
       tagline: 'Personal & Family Milestones',
       description:
         'Focused celebration schedules with custom entertainment milestones, catering coordination, theme rosters, and heartfelt multi-generational guest lists.',
-      image: '/assets/images/birthday_jubilee.jpg',
+      image: '/assets/images/birthday_jubilee.webp',
       muhurtam: '28 Nov 2026 · Twilight Gala',
       seats: '75 Guests',
       ledgers: '6 Balanced Ledgers',
@@ -95,7 +95,7 @@ export function EditorialNocturneHero({
       tagline: 'Cultural Melas & Celebrations',
       description:
         'Diwali melas and society galas with municipal permit tracking, volunteer squads, public stage timing, and multi-tier funding ledgers.',
-      image: '/assets/images/community_mela.jpg',
+      image: '/assets/images/community_mela.webp',
       muhurtam: '04 Nov 2026 · Auspicious Evening',
       seats: '500+ Scale',
       ledgers: 'Multi-Tier Ledgers',
@@ -181,7 +181,7 @@ export function EditorialNocturneHero({
         <div className="relative rounded-2xl overflow-hidden bg-neutral-surface mt-8 motion-enter">
           <div className="relative overflow-hidden rounded-xl">
             <img
-              src="/assets/images/hero_celebration.jpg"
+              src="/assets/images/hero_celebration.webp"
               alt="Grand Indian celebration feast under glowing lanterns with festive guests"
               className="w-full h-[500px] sm:h-[600px] lg:h-[680px] object-cover hover:scale-[1.01] transition-transform duration-700 ease-out"
             />
@@ -482,7 +482,7 @@ export function EditorialNocturneHero({
 
           <div className="lg:col-span-6 overflow-hidden rounded-xl">
             <img
-              src="/assets/images/planner_atelier.jpg"
+              src="/assets/images/planner_atelier.webp"
               alt="Cozy event planner atelier with open almanac notebook, blueprints, and warm desk lamp"
               className="w-full h-auto object-cover rounded-xl hover:scale-105 transition-transform duration-500 ease-out"
             />
