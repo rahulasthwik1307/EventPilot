@@ -69,4 +69,34 @@ describe('useUndoAction hook', () => {
 
     expect(consumed).toBeNull();
   });
+
+  it('handles rapid consecutive staging by superseding previous item and staging latest', () => {
+    const { result } = renderHook(() => useUndoAction<{ id: string; name: string }>());
+
+    act(() => {
+      result.current.stage({ id: 'item_A', name: 'Stage Decor' }, 'Deleted Stage Decor');
+    });
+
+    expect(result.current.isOpen).toBe(true);
+    expect(result.current.pendingItem?.id).toBe('item_A');
+
+    // Rapidly stage Item B before Item A is consumed or dismissed
+    act(() => {
+      result.current.stage({ id: 'item_B', name: 'DJ Sound System' }, 'Deleted DJ Sound System');
+    });
+
+    expect(result.current.isOpen).toBe(true);
+    expect(result.current.pendingItem?.id).toBe('item_B');
+    expect(result.current.message).toBe('Deleted DJ Sound System');
+
+    // Consuming returns latest item B
+    let consumed: { id: string; name: string } | null = null;
+    act(() => {
+      consumed = result.current.consume();
+    });
+
+    expect(consumed).toEqual({ id: 'item_B', name: 'DJ Sound System' });
+    expect(result.current.isOpen).toBe(false);
+    expect(result.current.pendingItem).toBeNull();
+  });
 });

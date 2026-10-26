@@ -42,6 +42,26 @@ describe('Seating Engine - Capacity, Occupancy & Assignment Rules', () => {
     expect(validateTableInput({ name: 'Table A', capacity: 10 }).isValid).toBe(true);
   });
 
+  it('validates tableType permitting valid enum values and rejecting malformed shapes', () => {
+    // Optional tableType is valid
+    expect(validateTableInput({ name: 'Table A', capacity: 8 }).isValid).toBe(true);
+
+    // Canonical table types are all valid
+    expect(validateTableInput({ name: 'Table A', capacity: 8, tableType: 'round' }).isValid).toBe(true);
+    expect(validateTableInput({ name: 'Table A', capacity: 8, tableType: 'rectangular' }).isValid).toBe(true);
+    expect(validateTableInput({ name: 'Table A', capacity: 8, tableType: 'head_table' }).isValid).toBe(true);
+    expect(validateTableInput({ name: 'Table A', capacity: 8, tableType: 'high_top' }).isValid).toBe(true);
+
+    // Malformed table types produce validation error
+    const invalidRes = validateTableInput({ name: 'Table A', capacity: 8, tableType: 'triangle' as any });
+    expect(invalidRes.isValid).toBe(false);
+    expect(invalidRes.errors.tableType).toBe('Invalid table type selected.');
+
+    const emptyRes = validateTableInput({ name: 'Table A', capacity: 8, tableType: '' as any });
+    expect(emptyRes.isValid).toBe(false);
+    expect(emptyRes.errors.tableType).toBe('Invalid table type selected.');
+  });
+
   it('calculates table occupancy accurately including available seats and fullness', () => {
     const table = mockTable({ capacity: 4 });
     const guests = [

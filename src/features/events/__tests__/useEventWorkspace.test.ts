@@ -143,4 +143,28 @@ describe('useEventWorkspace hook', () => {
     const check = eventStorage.getPersonalEvent('evt_to_delete');
     expect(check.data).toBeNull();
   });
+
+  it('handles corrupted storage JSON gracefully by exposing storageError without crashing or overwriting data', () => {
+    window.localStorage.setItem('event_pilot_personal_events_v1', 'corrupted-{{json');
+    window.localStorage.setItem('unrelated_key', 'preserved_data');
+
+    const { result } = renderHook(() => useEventWorkspace('evt_any_id'));
+
+    expect(result.current.event).toBeNull();
+    expect(result.current.notFound).toBe(false);
+    expect(result.current.storageError).toBe(
+      'Saved personal event data is corrupted and cannot be parsed.'
+    );
+
+    // Attempting an update when storage is corrupted should safely fail without throwing
+    const sample = createFreshSampleEvent();
+    expect(() => {
+      act(() => {
+        result.current.updateEvent(sample);
+      });
+    }).not.toThrow();
+
+    // Unrelated storage keys must remain intact
+    expect(window.localStorage.getItem('unrelated_key')).toBe('preserved_data');
+  });
 });

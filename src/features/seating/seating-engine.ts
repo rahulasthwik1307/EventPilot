@@ -22,9 +22,12 @@ export const TABLE_TYPES: { id: TableType; label: string }[] = [
   { id: 'high_top', label: 'Cocktail / High Top' },
 ];
 
+const VALID_TABLE_TYPES = new Set<string>(['round', 'rectangular', 'head_table', 'high_top']);
+
 /**
  * Validates table input.
  * Strict rule: Capacity must be a positive integer between 1 and 50.
+ * Table type (if provided) must be one of the canonical TableType values.
  */
 export function validateTableInput(input: Partial<TableInput>): {
   isValid: boolean;
@@ -43,6 +46,10 @@ export function validateTableInput(input: Partial<TableInput>): {
     errors.capacity = 'Capacity must be a positive whole number of seats (at least 1).';
   } else if (input.capacity > 50) {
     errors.capacity = 'Capacity cannot exceed 50 seats per table.';
+  }
+
+  if (input.tableType !== undefined && !VALID_TABLE_TYPES.has(input.tableType)) {
+    errors.tableType = 'Invalid table type selected.';
   }
 
   return {

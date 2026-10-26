@@ -31,7 +31,7 @@ export function UndoToast({
     }, durationMs);
 
     return () => clearTimeout(timer);
-  }, [isOpen, onDismiss, durationMs]);
+  }, [isOpen, message, onDismiss, durationMs]);
 
   if (!isOpen) return null;
 

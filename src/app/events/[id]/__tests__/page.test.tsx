@@ -520,5 +520,60 @@ describe("EventWorkspacePage - Dedicated Workspace Routes and Tabs", () => {
         expect(screen.getByRole("heading", { level: 1, name: "Celebration Not Found" })).toBeInTheDocument();
       });
     });
+
+    it("preserves unsaved form edits in active dialog when external tab triggers storage collision", async () => {
+      const initial = createPersonalTestEvent("evt-active-dialog-conflict");
+      eventStorage.savePersonalEvent(initial);
+
+      window.history.pushState({}, "", "/events/evt-active-dialog-conflict");
+      render(<EventWorkspacePage />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("heading", { level: 1, name: "Priya & Rohan's Vivaha" })
+        ).toBeInTheDocument();
+      });
+
+      // Open Edit Details dialog
+      const editBtn = screen.getByRole("button", { name: /Edit Details/i });
+      fireEvent.click(editBtn);
+
+      const titleInput = await screen.findByLabelText(/Title/i);
+      expect(titleInput).toBeInTheDocument();
+
+      // Change input value without submitting form
+      fireEvent.change(titleInput, { target: { value: "My In-Progress Unsaved Title" } });
+      expect(titleInput).toHaveValue("My In-Progress Unsaved Title");
+
+      // External tab updates event in localStorage
+      const stored = eventStorage.getPersonalEvent("evt-active-dialog-conflict").data!;
+      eventStorage.savePersonalEvent(
+        { ...stored, title: "Mutated by Tab B" },
+        { expectedVersion: stored.version, expectedUpdatedAt: stored.updatedAt }
+      );
+
+      // Dispatch cross-tab storage event
+      act(() => {
+        window.dispatchEvent(
+          new StorageEvent("storage", {
+            key: STORAGE_KEYS.PERSONAL_EVENTS,
+            newValue: window.localStorage.getItem(STORAGE_KEYS.PERSONAL_EVENTS),
+          })
+        );
+      });
+
+      // Stale warning status banner appears
+      await waitFor(() => {
+        const statusBanner = screen.getByRole("status");
+        expect(statusBanner).toHaveTextContent(/Celebration Updated Elsewhere/i);
+      });
+
+      // Active dialog form field retains user's in-progress typing
+      expect(titleInput).toHaveValue("My In-Progress Unsaved Title");
+
+      // Storage must not have been accidentally overwritten by unsubmitted edit
+      const currentStored = eventStorage.getPersonalEvent("evt-active-dialog-conflict").data!;
+      expect(currentStored.title).toBe("Mutated by Tab B");
+    });
   });
 });

@@ -128,4 +128,48 @@ describe('UndoToast Component', () => {
 
     expect(onDismiss).not.toHaveBeenCalled();
   });
+
+  it('restarts duration timer when message updates while toast remains open', () => {
+    const onDismiss = vi.fn();
+
+    const { rerender } = render(
+      <UndoToast
+        isOpen={true}
+        message="Item A deleted"
+        onUndo={vi.fn()}
+        onDismiss={onDismiss}
+        durationMs={5000}
+      />
+    );
+
+    // Advance 4000ms with Item A
+    act(() => {
+      vi.advanceTimersByTime(4000);
+    });
+    expect(onDismiss).not.toHaveBeenCalled();
+
+    // Rerender with Item B
+    rerender(
+      <UndoToast
+        isOpen={true}
+        message="Item B deleted"
+        onUndo={vi.fn()}
+        onDismiss={onDismiss}
+        durationMs={5000}
+      />
+    );
+
+    // Advance another 4000ms (total 8000ms from start, but 4000ms from Item B)
+    act(() => {
+      vi.advanceTimersByTime(4000);
+    });
+    // Should NOT have dismissed yet because Item B restarted the 5000ms timer
+    expect(onDismiss).not.toHaveBeenCalled();
+
+    // Advance the remaining 1000ms
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
 });
