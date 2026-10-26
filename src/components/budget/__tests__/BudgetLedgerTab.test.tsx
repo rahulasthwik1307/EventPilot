@@ -161,7 +161,7 @@ describe('BudgetLedgerTab Component', () => {
     });
 
     // Select Per-Guest Rate cost model
-    fireEvent.click(screen.getByRole('button', { name: /Per-Guest Rate/i }));
+    fireEvent.click(screen.getByRole('radio', { name: /Per-Guest Rate/i }));
 
     // Enter unit cost: 150
     fireEvent.change(screen.getByLabelText(/Rate per Guest/i), {

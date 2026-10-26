@@ -133,7 +133,7 @@ export function ExecutiveReadinessDeck({
 
             {/* Authority Radial Score Dial */}
             <div className="relative w-18 h-18 sm:w-20 sm:h-20 flex items-center justify-center flex-shrink-0">
-              <svg className="w-18 h-18 sm:w-20 sm:h-20 transform -rotate-90" viewBox="0 0 80 80">
+              <svg aria-hidden="true" className="w-18 h-18 sm:w-20 sm:h-20 transform -rotate-90" viewBox="0 0 80 80">
                 <circle
                   cx="40"
                   cy="40"

@@ -85,13 +85,20 @@ export function TableDialog({
               if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
             }}
             placeholder="e.g. Table 1 - Mandap Royal, Elders Dining Table"
+            aria-required="true"
+            aria-invalid={Boolean(errors.name)}
+            aria-describedby={errors.name ? 'table-name-error' : undefined}
             className={`w-full px-3 py-2 text-sm bg-neutral-surface border rounded-md focus:outline-none focus:ring-1 ${
               errors.name
                 ? 'border-status-danger focus:ring-status-danger'
                 : 'border-neutral-border focus:ring-primary'
             }`}
           />
-          {errors.name && <p className="text-xs text-status-danger mt-1">{errors.name}</p>}
+          {errors.name && (
+            <p id="table-name-error" className="text-xs text-status-danger mt-1">
+              {errors.name}
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -110,6 +117,9 @@ export function TableDialog({
                 setCapacity(e.target.value);
                 if (errors.capacity) setErrors((prev) => ({ ...prev, capacity: '' }));
               }}
+              aria-required="true"
+              aria-invalid={Boolean(errors.capacity)}
+              aria-describedby={errors.capacity ? 'table-capacity-error' : undefined}
               className={`w-full px-3 py-2 text-sm font-mono bg-neutral-surface border rounded-md focus:outline-none focus:ring-1 ${
                 errors.capacity
                   ? 'border-status-danger focus:ring-status-danger'
@@ -117,7 +127,9 @@ export function TableDialog({
               }`}
             />
             {errors.capacity && (
-              <p className="text-xs text-status-danger mt-1">{errors.capacity}</p>
+              <p id="table-capacity-error" className="text-xs text-status-danger mt-1">
+                {errors.capacity}
+              </p>
             )}
           </div>
 

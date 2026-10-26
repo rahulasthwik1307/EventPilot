@@ -304,7 +304,7 @@ export function QuotationDialog({
                 variant="primary"
                 onClick={handleAiExtract}
                 disabled={isExtracting}
-                className="w-full justify-center text-xs font-mono font-bold bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm py-2.5"
+                className="w-full justify-center text-xs font-mono font-bold bg-primary hover:bg-primary-hover text-neutral-text border-0 shadow-sm py-2.5"
               >
                 <Sparkles className="w-4 h-4 mr-2" />
                 <span>{isExtracting ? 'Extracting Fields...' : 'Extract Quotation Fields'}</span>
@@ -593,7 +593,7 @@ export function QuotationDialog({
             <Button
               variant="primary"
               onClick={handleSave}
-              className="w-full sm:w-auto text-xs font-mono font-bold bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm"
+              className="w-full sm:w-auto text-xs font-mono font-bold bg-primary hover:bg-primary-hover text-neutral-text border-0 shadow-sm"
             >
               <CheckCircle2 className="w-4 h-4 mr-1.5" />
               <span>Save Quotation</span>

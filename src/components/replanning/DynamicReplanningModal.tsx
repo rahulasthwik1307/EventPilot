@@ -333,8 +333,12 @@ export function DynamicReplanningModal({
 
         {/* Tab navigation between Impact Summary and Proposals */}
         <div className="flex items-center justify-between border-b border-neutral-border pb-1">
-          <div className="flex items-center gap-2">
+          <div role="tablist" aria-label="Replanning Views" className="flex items-center gap-2">
             <button
+              id="replan-tab-summary"
+              role="tab"
+              aria-selected={activeView === 'summary'}
+              aria-controls="replan-panel-summary"
               type="button"
               onClick={() => setActiveView('summary')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-t-md transition-colors border-b-2 ${
@@ -346,6 +350,10 @@ export function DynamicReplanningModal({
               Impact Summary
             </button>
             <button
+              id="replan-tab-proposals"
+              role="tab"
+              aria-selected={activeView === 'proposals'}
+              aria-controls="replan-panel-proposals"
               type="button"
               onClick={() => setActiveView('proposals')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-t-md transition-colors border-b-2 flex items-center gap-1.5 ${
@@ -364,21 +372,33 @@ export function DynamicReplanningModal({
 
         {/* Active Panel View */}
         {activeView === 'summary' ? (
-          <ReplanningImpactSummary
-            impact={plan.impact}
-            currency={event.currency}
-            isStale={isStale}
-            onRefreshStale={handleRefreshStale}
-          />
+          <div
+            id="replan-panel-summary"
+            role="tabpanel"
+            aria-labelledby="replan-tab-summary"
+          >
+            <ReplanningImpactSummary
+              impact={plan.impact}
+              currency={event.currency}
+              isStale={isStale}
+              onRefreshStale={handleRefreshStale}
+            />
+          </div>
         ) : (
-          <ReplanningProposalList
-            proposals={plan.proposals}
-            selectedIds={selectedProposalIds}
-            onToggleProposal={handleToggleProposal}
-            onSelectAll={handleSelectAll}
-            onDeselectAll={handleDeselectAll}
-            currency={event.currency}
-          />
+          <div
+            id="replan-panel-proposals"
+            role="tabpanel"
+            aria-labelledby="replan-tab-proposals"
+          >
+            <ReplanningProposalList
+              proposals={plan.proposals}
+              selectedIds={selectedProposalIds}
+              onToggleProposal={handleToggleProposal}
+              onSelectAll={handleSelectAll}
+              onDeselectAll={handleDeselectAll}
+              currency={event.currency}
+            />
+          </div>
         )}
 
         {/* Footer Actions */}

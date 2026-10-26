@@ -247,7 +247,7 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
               setEditingTable(null);
               setIsTableDialogOpen(true);
             }}
-            className="self-start sm:self-center text-xs font-mono font-bold active:scale-[0.98] transition-all bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm px-4 py-2"
+            className="self-start sm:self-center text-xs font-mono font-bold active:scale-[0.98] transition-all bg-primary hover:bg-primary-hover text-neutral-text border-0 shadow-sm px-4 py-2"
           >
             <Plus className="w-4 h-4 mr-1.5" />
             <span>Add Table</span>
@@ -464,7 +464,7 @@ export function SeatingTab({ event, onUpdateEvent }: SeatingTabProps) {
                   setEditingTable(null);
                   setIsTableDialogOpen(true);
                 }}
-                className="bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm"
+                className="bg-primary hover:bg-primary-hover text-neutral-text border-0 shadow-sm"
               >
                 <Plus className="w-4 h-4 mr-1.5" />
                 <span>Add First Table</span>

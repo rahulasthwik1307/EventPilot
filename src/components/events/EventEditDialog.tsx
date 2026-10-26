@@ -258,8 +258,16 @@ export function EventEditDialog({
         )}
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-2 border-b border-neutral-border pb-3 text-xs">
+        <div
+          role="tablist"
+          aria-label="Event Edit Views"
+          className="flex items-center gap-2 border-b border-neutral-border pb-3 text-xs"
+        >
           <button
+            id="edit-tab-details"
+            role="tab"
+            aria-selected={activeTab === 'details'}
+            aria-controls="edit-panel-details"
             type="button"
             onClick={() => setActiveTab('details')}
             className={`px-3 py-1.5 rounded-md font-semibold transition-all ${
@@ -271,6 +279,10 @@ export function EventEditDialog({
             Core Parameters
           </button>
           <button
+            id="edit-tab-preferences"
+            role="tab"
+            aria-selected={activeTab === 'preferences'}
+            aria-controls="edit-panel-preferences"
             type="button"
             onClick={() => setActiveTab('preferences')}
             className={`px-3 py-1.5 rounded-md font-semibold transition-all flex items-center gap-1.5 ${
@@ -285,7 +297,12 @@ export function EventEditDialog({
         </div>
 
         {activeTab === 'details' ? (
-          <>
+          <div
+            id="edit-panel-details"
+            role="tabpanel"
+            aria-labelledby="edit-tab-details"
+            className="space-y-4"
+          >
             <div>
               <label
                 htmlFor="edit-title"
@@ -298,10 +315,15 @@ export function EventEditDialog({
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                aria-required="true"
+                aria-invalid={Boolean(errors.title)}
+                aria-describedby={errors.title ? 'edit-title-error' : undefined}
                 className="w-full bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text focus:outline-none focus:ring-2 focus:ring-primary"
               />
               {errors.title && (
-                <p className="text-xs text-status-danger mt-1">{errors.title}</p>
+                <p id="edit-title-error" className="text-xs text-status-danger mt-1">
+                  {errors.title}
+                </p>
               )}
             </div>
 
@@ -318,10 +340,15 @@ export function EventEditDialog({
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
+                  aria-required="true"
+                  aria-invalid={Boolean(errors.date)}
+                  aria-describedby={errors.date ? 'edit-date-error' : undefined}
                   className="w-full bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text font-mono focus:outline-none focus:ring-2 focus:ring-primary"
                 />
                 {errors.date && (
-                  <p className="text-xs text-status-danger mt-1">{errors.date}</p>
+                  <p id="edit-date-error" className="text-xs text-status-danger mt-1">
+                    {errors.date}
+                  </p>
                 )}
               </div>
 
@@ -356,10 +383,15 @@ export function EventEditDialog({
                   min="1"
                   value={guestTarget}
                   onChange={(e) => setGuestTarget(e.target.value)}
+                  aria-required="true"
+                  aria-invalid={Boolean(errors.guestTarget)}
+                  aria-describedby={errors.guestTarget ? 'edit-guest-target-error' : undefined}
                   className="w-full bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text font-mono focus:outline-none focus:ring-2 focus:ring-primary"
                 />
                 {errors.guestTarget && (
-                  <p className="text-xs text-status-danger mt-1">{errors.guestTarget}</p>
+                  <p id="edit-guest-target-error" className="text-xs text-status-danger mt-1">
+                    {errors.guestTarget}
+                  </p>
                 )}
               </div>
 
@@ -389,11 +421,16 @@ export function EventEditDialog({
                     step="1000"
                     value={budgetCap}
                     onChange={(e) => setBudgetCap(e.target.value)}
+                    aria-required="true"
+                    aria-invalid={Boolean(errors.budgetCap)}
+                    aria-describedby={errors.budgetCap ? 'edit-budget-cap-error' : undefined}
                     className="flex-1 min-w-0 bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text font-mono focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 {errors.budgetCap && (
-                  <p className="text-xs text-status-danger mt-1">{errors.budgetCap}</p>
+                  <p id="edit-budget-cap-error" className="text-xs text-status-danger mt-1">
+                    {errors.budgetCap}
+                  </p>
                 )}
               </div>
             </div>
@@ -440,9 +477,14 @@ export function EventEditDialog({
                 </button>
               </div>
             )}
-          </>
+          </div>
         ) : (
-          <div className="py-1">
+          <div
+            id="edit-panel-preferences"
+            role="tabpanel"
+            aria-labelledby="edit-tab-preferences"
+            className="py-1"
+          >
             <PreferencesForm
               eventType={event.type}
               values={preferences}

@@ -16,6 +16,7 @@ export default {
         },
         secondary: {
           DEFAULT: "#C2410C",
+          hover: "#9A3412",
           subtle: "#FFEDD5",
         },
         neutral: {

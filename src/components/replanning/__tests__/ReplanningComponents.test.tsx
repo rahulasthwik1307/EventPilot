@@ -263,7 +263,7 @@ describe('Replanning UI Components', () => {
       fireEvent.change(screen.getByLabelText(/Target Attendance/i), { target: { value: '250' } });
 
       // Switch to Review Proposals view
-      fireEvent.click(screen.getByRole('button', { name: /Review Proposals/i }));
+      fireEvent.click(screen.getByRole('tab', { name: /Review Proposals/i }));
       expect(screen.getByTestId('replanning-proposal-list')).toBeInTheDocument();
     });
 

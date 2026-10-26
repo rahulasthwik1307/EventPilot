@@ -584,6 +584,7 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
                           handleDraftMessage(vQuote);
                         }}
                         title="Draft coordination message"
+                        aria-label={`Draft coordination message for ${vendor.name}`}
                         className="p-1.5 rounded-md text-neutral-muted hover:text-secondary hover:bg-neutral-subtle transition-colors"
                       >
                         <MessageSquare className="w-3.5 h-3.5" />

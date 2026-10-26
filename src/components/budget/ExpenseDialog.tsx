@@ -184,6 +184,9 @@ export function ExpenseDialog({
             id="expense-category-select"
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
+            aria-required="true"
+            aria-invalid={Boolean(errors.categoryId)}
+            aria-describedby={errors.categoryId ? 'expense-category-error' : undefined}
             className="w-full bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text focus:outline-none focus:ring-2 focus:ring-primary"
           >
             {categories.length === 0 && (
@@ -196,7 +199,7 @@ export function ExpenseDialog({
             ))}
           </select>
           {errors.categoryId && (
-            <p className="text-xs text-status-danger mt-1 flex items-center gap-1">
+            <p id="expense-category-error" className="text-xs text-status-danger mt-1 flex items-center gap-1">
               <AlertCircle className="w-3.5 h-3.5" />
               <span>{errors.categoryId}</span>
             </p>
@@ -217,10 +220,13 @@ export function ExpenseDialog({
             placeholder="e.g. Kalyana Mandapam Advance Payment"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            aria-required="true"
+            aria-invalid={Boolean(errors.title)}
+            aria-describedby={errors.title ? 'expense-title-error' : undefined}
             className="w-full bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text focus:outline-none focus:ring-2 focus:ring-primary"
           />
           {errors.title && (
-            <p className="text-xs text-status-danger mt-1 flex items-center gap-1">
+            <p id="expense-title-error" className="text-xs text-status-danger mt-1 flex items-center gap-1">
               <AlertCircle className="w-3.5 h-3.5" />
               <span>{errors.title}</span>
             </p>
@@ -229,13 +235,22 @@ export function ExpenseDialog({
 
         {/* Cost Model Selection */}
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-text mb-1.5">
+          <label id="cost-model-label" className="block text-xs font-semibold uppercase tracking-wider text-neutral-text mb-1.5">
             Cost Model
           </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          <div role="radiogroup" aria-labelledby="cost-model-label" className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             <button
               type="button"
+              role="radio"
+              aria-checked={costModel === 'fixed'}
+              tabIndex={costModel === 'fixed' ? 0 : -1}
               onClick={() => handleCostModelToggle('fixed')}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  handleCostModelToggle('per_guest');
+                }
+              }}
               className={`p-2.5 rounded-md border text-left font-medium transition-all ${
                 costModel === 'fixed'
                   ? 'border-primary bg-primary-subtle text-neutral-text font-semibold shadow-xs'
@@ -247,7 +262,16 @@ export function ExpenseDialog({
             </button>
             <button
               type="button"
+              role="radio"
+              aria-checked={costModel === 'per_guest'}
+              tabIndex={costModel === 'per_guest' ? 0 : -1}
               onClick={() => handleCostModelToggle('per_guest')}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  handleCostModelToggle('fixed');
+                }
+              }}
               className={`p-2.5 rounded-md border text-left font-medium transition-all ${
                 costModel === 'per_guest'
                   ? 'border-primary bg-primary-subtle text-neutral-text font-semibold shadow-xs'
@@ -284,10 +308,13 @@ export function ExpenseDialog({
               placeholder="e.g. 2400"
               value={unitCost}
               onChange={(e) => handleUnitCostChange(e.target.value)}
+              aria-required="true"
+              aria-invalid={Boolean(errors.unitCost)}
+              aria-describedby={errors.unitCost ? 'expense-unit-cost-error' : undefined}
               className="w-full bg-neutral-surface border border-neutral-border px-3 py-1.5 rounded-md text-sm text-neutral-text font-mono focus:outline-none focus:ring-2 focus:ring-primary"
             />
             {errors.unitCost && (
-              <p className="text-xs text-status-danger flex items-center gap-1">
+              <p id="expense-unit-cost-error" className="text-xs text-status-danger flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5" />
                 <span>{errors.unitCost}</span>
               </p>
@@ -323,10 +350,13 @@ export function ExpenseDialog({
               placeholder="0"
               value={estimatedAmount}
               onChange={(e) => setEstimatedAmount(e.target.value)}
+              aria-required="true"
+              aria-invalid={Boolean(errors.estimatedAmount)}
+              aria-describedby={errors.estimatedAmount ? 'expense-est-error' : undefined}
               className="w-full bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text font-mono focus:outline-none focus:ring-2 focus:ring-primary"
             />
             {errors.estimatedAmount && (
-              <p className="text-xs text-status-danger mt-1 flex items-center gap-1">
+              <p id="expense-est-error" className="text-xs text-status-danger mt-1 flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5" />
                 <span>{errors.estimatedAmount}</span>
               </p>

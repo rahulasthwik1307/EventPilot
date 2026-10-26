@@ -224,12 +224,20 @@ export function EditorialNocturneHero({
           </div>
 
           {/* Archetype Tabs */}
-          <div className="flex flex-wrap items-center gap-2 bg-neutral-surface p-1.5 rounded-lg">
+          <div
+            role="tablist"
+            aria-label="Celebration Folios"
+            className="flex flex-wrap items-center gap-2 bg-neutral-surface p-1.5 rounded-lg"
+          >
             {archetypes.map((item) => {
               const isSelected = activeTab === item.type;
               return (
                 <button
                   key={item.type}
+                  id={`tab-${item.type}`}
+                  role="tab"
+                  aria-selected={isSelected}
+                  aria-controls={`panel-${item.type}`}
                   type="button"
                   onClick={() => setActiveTab(item.type)}
                   className={`px-4 py-2 text-sm font-semibold rounded-md transition-all motion-enter ${
@@ -246,7 +254,13 @@ export function EditorialNocturneHero({
         </div>
 
         {/* Dynamic Folio Content Panel */}
-        <div key={currentFolio.type} className="bg-neutral-surface rounded-xl p-6 sm:p-8 animate-tab-enter">
+        <div
+          key={currentFolio.type}
+          id={`panel-${currentFolio.type}`}
+          role="tabpanel"
+          aria-labelledby={`tab-${currentFolio.type}`}
+          className="bg-neutral-surface rounded-xl p-6 sm:p-8 animate-tab-enter"
+        >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Folio Image Column */}
             <div className="lg:col-span-6 overflow-hidden rounded-xl bg-neutral-bg">

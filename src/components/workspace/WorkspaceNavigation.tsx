@@ -63,6 +63,7 @@ export function WorkspaceNavigation({
               key={tab.id}
               type="button"
               aria-label={tab.label}
+              aria-current={isActive ? 'page' : undefined}
               onClick={() => onTabChange(tab.id)}
               className={`group relative text-left inline-flex items-center justify-between gap-3 py-2.5 px-3 sm:px-3.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap lg:w-full ${
                 isActive

@@ -73,9 +73,18 @@ export function WorkspaceShell({
         return;
       }
 
+      const isAnyModalOpen = Boolean(document.querySelector('[role="dialog"]'));
+
       if (e.key === '?') {
-        e.preventDefault();
-        setIsShortcutsDialogOpen((prev) => !prev);
+        if (!isAnyModalOpen || isShortcutsDialogOpen) {
+          e.preventDefault();
+          setIsShortcutsDialogOpen((prev) => !prev);
+        }
+        return;
+      }
+
+      // If any modal dialog is active, isolate and prevent workspace tab navigation
+      if (isAnyModalOpen || target?.closest?.('[role="dialog"]')) {
         return;
       }
 
@@ -97,7 +106,7 @@ export function WorkspaceShell({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleTabChange]);
+  }, [handleTabChange, isShortcutsDialogOpen]);
 
   const handleEventUpdated = (updated: Event, options?: UpdateEventOptions) => {
     onUpdateEvent(updated, options);

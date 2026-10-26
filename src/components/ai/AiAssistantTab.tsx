@@ -645,7 +645,7 @@ export function AiAssistantTab({
               type="submit"
               variant="primary"
               disabled={isLoading || !prompt.trim()}
-              className="self-end sm:self-auto min-w-[150px] font-bold text-xs font-mono active:scale-[0.98] transition-all bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm px-5 py-2.5"
+              className="self-end sm:self-auto min-w-[150px] font-bold text-xs font-mono active:scale-[0.98] transition-all bg-primary hover:bg-primary-hover text-neutral-text border-0 shadow-sm px-5 py-2.5"
             >
               {isLoading ? (
                 <>
@@ -664,14 +664,21 @@ export function AiAssistantTab({
 
         {/* Loading Indicator */}
         {isLoading && (
-          <div className="p-8 rounded-xl bg-[#FAF8F5] border border-[#E7DFD5] flex flex-col items-center justify-center text-center space-y-3">
+          <div
+            role="status"
+            aria-live="polite"
+            className="p-8 rounded-xl bg-[#FAF8F5] border border-[#E7DFD5] flex flex-col items-center justify-center text-center space-y-3"
+          >
             <div className="p-3 rounded-full bg-[#FEF3C7] text-[#D97706]">
               <Sparkles className="w-6 h-6 text-[#D97706] animate-spin" />
             </div>
             <div className="space-y-1">
               <h4 className="font-semibold text-[#1C1917] text-sm flex items-center justify-center gap-2">
                 <span>Consulting AI Planning Assistant...</span>
-                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-[#D97706] text-white">
+                <span
+                  aria-hidden="true"
+                  className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-primary text-neutral-text"
+                >
                   {(elapsedMs / 1000).toFixed(1)}s
                 </span>
               </h4>
@@ -836,7 +843,7 @@ export function AiAssistantTab({
                   variant="primary"
                   size="sm"
                   onClick={handleAcceptAllStaged}
-                  className="text-xs font-mono font-bold bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm"
+                  className="text-xs font-mono font-bold bg-primary hover:bg-primary-hover text-neutral-text border-0 shadow-sm"
                 >
                   <CheckCheck className="w-3.5 h-3.5 mr-1" />
                   <span>Accept All ({stagedCount})</span>

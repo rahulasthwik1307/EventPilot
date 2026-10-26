@@ -194,7 +194,7 @@ export function QuotationComparisonView({
               <Button
                 variant="primary"
                 onClick={() => onAddNewQuote(selectedCategory)}
-                className="mt-2 bg-[#D97706] hover:bg-[#B45309] text-white border-0"
+                className="mt-2 bg-primary hover:bg-primary-hover text-neutral-text border-0"
               >
                 <Plus className="w-4 h-4 mr-1.5" />
                 <span>Record First Quotation</span>
@@ -405,7 +405,7 @@ export function QuotationComparisonView({
                         <Button
                           variant="primary"
                           onClick={() => onPromoteQuote(quote)}
-                          className="w-full justify-center text-xs font-mono font-bold bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm"
+                          className="w-full justify-center text-xs font-mono font-bold bg-primary hover:bg-primary-hover text-neutral-text border-0 shadow-sm"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
                           <span>Accept &amp; Stage Proposal</span>

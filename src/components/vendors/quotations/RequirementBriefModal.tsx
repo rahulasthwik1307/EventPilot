@@ -386,11 +386,11 @@ export function RequirementBriefModal({
             <Button
               variant="primary"
               onClick={handleCopy}
-              className="w-full sm:w-auto text-xs font-mono font-bold bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm"
+              className="w-full sm:w-auto text-xs font-mono font-bold bg-primary hover:bg-primary-hover text-neutral-text border-0 shadow-sm"
             >
               {copied ? (
                 <>
-                  <Check className="w-3.5 h-3.5 mr-1.5 text-white" />
+                  <Check className="w-3.5 h-3.5 mr-1.5 text-neutral-text" />
                   <span>Copied to Clipboard!</span>
                 </>
               ) : (

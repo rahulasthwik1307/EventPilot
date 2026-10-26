@@ -337,7 +337,7 @@ export function StagedProposalCard({
                 variant="primary"
                 size="sm"
                 onClick={() => onAccept(id)}
-                className="text-xs font-mono font-bold bg-[#D97706] hover:bg-[#B45309] text-white border-0 shadow-sm"
+                className="text-xs font-mono font-bold bg-primary hover:bg-primary-hover text-neutral-text border-0 shadow-sm"
               >
                 <Check className="w-3.5 h-3.5 mr-1" />
                 <span>Accept &amp; Apply</span>

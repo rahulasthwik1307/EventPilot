@@ -113,7 +113,7 @@ describe('EventEditDialog Component', () => {
     expect(screen.getByRole('heading', { name: 'Edit Celebration Details' })).toBeInTheDocument();
 
     // Switch to Celebration Preferences tab
-    fireEvent.click(screen.getByRole('button', { name: /Celebration Preferences/i }));
+    fireEvent.click(screen.getByRole('tab', { name: /Celebration Preferences/i }));
 
     expect(screen.getByText(/Celebration Priorities & Focus/i)).toBeInTheDocument();
 

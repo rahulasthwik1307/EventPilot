@@ -150,6 +150,9 @@ export function GuestDialog({
                 if (errors.firstName) setErrors((prev) => ({ ...prev, firstName: '' }));
               }}
               placeholder="e.g. Priya, Rajesh"
+              aria-required="true"
+              aria-invalid={Boolean(errors.firstName)}
+              aria-describedby={errors.firstName ? 'guest-first-name-error' : undefined}
               className={`w-full px-3 py-2 text-sm bg-neutral-surface border rounded-md focus:outline-none focus:ring-1 ${
                 errors.firstName
                   ? 'border-status-danger focus:ring-status-danger'
@@ -157,7 +160,9 @@ export function GuestDialog({
               }`}
             />
             {errors.firstName && (
-              <p className="text-xs text-status-danger mt-1">{errors.firstName}</p>
+              <p id="guest-first-name-error" className="text-xs text-status-danger mt-1">
+                {errors.firstName}
+              </p>
             )}
           </div>
 
