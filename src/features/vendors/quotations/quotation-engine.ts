@@ -23,6 +23,14 @@ export interface QuotationItemizedCalculation {
 }
 
 const VALID_CURRENCIES = ['INR', 'USD', 'EUR', 'GBP'] as const;
+type ValidCurrency = (typeof VALID_CURRENCIES)[number];
+const isValidCurrency = (val: unknown): val is ValidCurrency =>
+  typeof val === 'string' && (VALID_CURRENCIES as readonly string[]).includes(val);
+
+const VALID_QUOTATION_STATUSES = ['active', 'archived', 'accepted', 'declined'] as const;
+type QuotationStatus = (typeof VALID_QUOTATION_STATUSES)[number];
+const isValidStatus = (val: unknown): val is QuotationStatus =>
+  typeof val === 'string' && (VALID_QUOTATION_STATUSES as readonly string[]).includes(val);
 const VALID_CATEGORIES: VendorCategory[] = [
   'venue',
   'catering',
@@ -71,7 +79,7 @@ export function validateVendorQuotation(
     errors.push('Quoted total must be a non-negative number.');
   }
 
-  if (!input.currency || !VALID_CURRENCIES.includes(input.currency as any)) {
+  if (!input.currency || !isValidCurrency(input.currency)) {
     errors.push(`Currency must be one of: ${VALID_CURRENCIES.join(', ')}`);
   }
 
@@ -190,10 +198,7 @@ export function validateVendorQuotation(
     notes: typeof input.notes === 'string' && input.notes.trim() ? input.notes.trim() : undefined,
     sourceText: typeof input.sourceText === 'string' ? input.sourceText : undefined,
     provenance: input.provenance === 'ai_extracted' ? 'ai_extracted' : 'user_manual',
-    status:
-      input.status && ['active', 'archived', 'accepted', 'declined'].includes(input.status)
-        ? (input.status as any)
-        : 'active',
+    status: isValidStatus(input.status) ? input.status : 'active',
     createdAt: (input as VendorQuotation).createdAt || nowIso,
     updatedAt: (input as VendorQuotation).updatedAt || nowIso,
   };

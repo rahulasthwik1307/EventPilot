@@ -31,11 +31,11 @@ export async function POST(req: NextRequest) {
     // 3. Schema validation
     const validated = AiAssistantRequestSchema.safeParse(bodyResult.data);
     if (!validated.success) {
-      const issues = validated.error.issues || (validated.error as any).errors || [];
+      const issues = validated.error.issues;
       return NextResponse.json(
         {
           error: 'Validation failed for request parameters.',
-          details: issues.map((e: any) => ({
+          details: issues.map((e) => ({
             field: Array.isArray(e.path) ? e.path.join('.') : '',
             message: e.message,
           })),
@@ -70,7 +70,8 @@ export async function POST(req: NextRequest) {
     });
 
     return attachRateLimitHeaders(response, rateLimit);
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const _errorMessage = err instanceof Error ? err.message : String(err);
     // Top-level catch to guarantee secrets and stack traces are never leaked
     return NextResponse.json(
       {

@@ -68,16 +68,20 @@ export function generateVendorRequirementBrief(
   const prefs = event.preferences;
 
   if (prefs) {
+    const rawPrefs = prefs as unknown as Record<string, unknown>;
     const dietaryStyle =
-      prefs.tradition?.value?.dietaryStyle || (prefs as any).dietaryStyle;
+      prefs.tradition?.value?.dietaryStyle ||
+      (typeof rawPrefs.dietaryStyle === 'string' ? rawPrefs.dietaryStyle : undefined);
     const notes =
       prefs.tradition?.value?.notes ||
       prefs.priorities?.value?.experienceNotes ||
-      (prefs as any).notes;
+      (typeof rawPrefs.notes === 'string' ? rawPrefs.notes : undefined);
     const atmosphere =
-      prefs.priorities?.value?.atmosphere || (prefs as any).atmosphere;
+      prefs.priorities?.value?.atmosphere ||
+      (typeof rawPrefs.atmosphere === 'string' ? rawPrefs.atmosphere : undefined);
     const nonNegotiables =
-      prefs.budget?.value?.nonNegotiables || (prefs as any).nonNegotiables;
+      prefs.budget?.value?.nonNegotiables ||
+      (Array.isArray(rawPrefs.nonNegotiables) ? (rawPrefs.nonNegotiables as string[]) : undefined);
     const primaryFocus = prefs.priorities?.value?.primaryFocus || [];
     const spendingPriorities = prefs.budget?.value?.spendingPriorities || [];
     const venuePreference = prefs.logistics?.value?.venueTypePreference;
@@ -121,7 +125,7 @@ export function generateVendorRequirementBrief(
     const focusNames: string[] = [
       ...primaryFocus.map((f: string) => f.replace(/_/g, ' ')),
       ...spendingPriorities,
-      ...(Array.isArray((prefs as any).priorities) ? (prefs as any).priorities : []),
+      ...(Array.isArray(rawPrefs.priorities) ? (rawPrefs.priorities as string[]) : []),
     ];
 
     const isPriorityCategory = focusNames.some((p: string) =>

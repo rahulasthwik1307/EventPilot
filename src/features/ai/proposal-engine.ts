@@ -1,6 +1,14 @@
 import { ChecklistTask, Event, TimelineMilestone } from '../events/types';
 import { calculateMilestoneDate } from '../events/timeline-engine';
-import { StagedProposal, UpdatePreferencePayload } from './types';
+import {
+  AddChecklistItemPayload,
+  AddMilestonePayload,
+  AddTaskPayload,
+  BudgetAdjustmentPayload,
+  StagedProposal,
+  SuggestVendorFollowupPayload,
+  UpdatePreferencePayload,
+} from './types';
 import {
   createDefaultPreferenceRecord,
   createEmptyPreferences,
@@ -8,6 +16,43 @@ import {
   mergePreferences,
   mergeSinglePreferenceField,
 } from '../preferences/preferences';
+
+export type DiscriminatedStagedProposal =
+  | (Omit<StagedProposal, 'actionType' | 'payload'> & {
+      actionType: 'adjust_budget_allocation';
+      payload: BudgetAdjustmentPayload;
+    })
+  | (Omit<StagedProposal, 'actionType' | 'payload'> & {
+      actionType: 'add_task';
+      payload: AddTaskPayload;
+    })
+  | (Omit<StagedProposal, 'actionType' | 'payload'> & {
+      actionType: 'add_milestone';
+      payload: AddMilestonePayload;
+    })
+  | (Omit<StagedProposal, 'actionType' | 'payload'> & {
+      actionType: 'add_checklist_item';
+      payload: AddChecklistItemPayload;
+    })
+  | (Omit<StagedProposal, 'actionType' | 'payload'> & {
+      actionType: 'suggest_vendor_followup';
+      payload: SuggestVendorFollowupPayload;
+    })
+  | (Omit<StagedProposal, 'actionType' | 'payload'> & {
+      actionType: 'update_preference';
+      payload: UpdatePreferencePayload;
+    });
+
+export function isDiscriminatedProposal(p: StagedProposal): p is DiscriminatedStagedProposal {
+  return (
+    p.actionType === 'adjust_budget_allocation' ||
+    p.actionType === 'add_task' ||
+    p.actionType === 'add_milestone' ||
+    p.actionType === 'add_checklist_item' ||
+    p.actionType === 'suggest_vendor_followup' ||
+    p.actionType === 'update_preference'
+  );
+}
 
 export interface ApplyProposalResult {
   success: boolean;
@@ -67,13 +112,19 @@ export function detectProposalConflicts(
   event: Event,
   proposals: StagedProposal[]
 ): StagedProposal[] {
-  return proposals.map((proposal) => {
-    if (proposal.status !== 'staged') {
-      return proposal;
+  return proposals.map((rawProposal) => {
+    if (rawProposal.status !== 'staged') {
+      return rawProposal;
     }
 
+    if (!isDiscriminatedProposal(rawProposal)) {
+      return rawProposal;
+    }
+
+    const proposal = rawProposal;
+
     if (proposal.actionType === 'adjust_budget_allocation') {
-      const payload = proposal.payload as any;
+      const payload = proposal.payload;
       const index = findMatchingCategoryIndex(event.categories || [], payload.categoryName);
 
       if (index === -1) {
@@ -86,7 +137,7 @@ export function detectProposalConflicts(
     }
 
     if (proposal.actionType === 'update_preference') {
-      const payload = proposal.payload as UpdatePreferencePayload;
+      const payload = proposal.payload;
       const conflict = detectPreferenceConflict(
         event.preferences,
         payload.category,
@@ -116,13 +167,28 @@ export function detectProposalConflicts(
  */
 export function applyProposalToEvent(
   event: Event,
-  proposal: StagedProposal
+  rawProposal: StagedProposal
 ): ApplyProposalResult {
   const now = new Date().toISOString();
 
+  if (!isDiscriminatedProposal(rawProposal)) {
+    const unhandled: unknown = rawProposal;
+    const actionType =
+      typeof unhandled === 'object' && unhandled !== null && 'actionType' in unhandled
+        ? String((unhandled as Record<string, unknown>).actionType)
+        : 'unknown';
+    return {
+      success: false,
+      event,
+      error: `Unsupported proposal action type: ${actionType}`,
+    };
+  }
+
+  const proposal = rawProposal;
+
   switch (proposal.actionType) {
     case 'adjust_budget_allocation': {
-      const payload = proposal.payload as any;
+      const payload = proposal.payload;
       const categories = event.categories || [];
       const index = findMatchingCategoryIndex(categories, payload.categoryName);
 
@@ -159,7 +225,7 @@ export function applyProposalToEvent(
     }
 
     case 'add_task': {
-      const payload = proposal.payload as any;
+      const payload = proposal.payload;
       const offsetDays = typeof payload.offsetDays === 'number' ? payload.offsetDays : 0;
       const calculatedDate = calculateMilestoneDate(event.date, offsetDays);
 
@@ -167,7 +233,7 @@ export function applyProposalToEvent(
       let milestoneId: string | undefined;
       if (payload.milestoneTitle && Array.isArray(event.milestones)) {
         const foundMs = event.milestones.find(
-          (m) => m.title.trim().toLowerCase() === payload.milestoneTitle.trim().toLowerCase()
+          (m) => m.title.trim().toLowerCase() === payload.milestoneTitle?.trim().toLowerCase()
         );
         if (foundMs) {
           milestoneId = foundMs.id;
@@ -212,7 +278,7 @@ export function applyProposalToEvent(
     }
 
     case 'add_milestone': {
-      const payload = proposal.payload as any;
+      const payload = proposal.payload;
       const offsetDays = typeof payload.offsetDays === 'number' ? payload.offsetDays : 0;
 
       const newMilestone: TimelineMilestone = {
@@ -233,7 +299,7 @@ export function applyProposalToEvent(
     }
 
     case 'add_checklist_item': {
-      const payload = proposal.payload as any;
+      const payload = proposal.payload;
       const calculatedDate = calculateMilestoneDate(event.date, -7); // Default 1 week prior
 
       const newChecklistTask: ChecklistTask = {
@@ -258,7 +324,7 @@ export function applyProposalToEvent(
     }
 
     case 'suggest_vendor_followup': {
-      const payload = proposal.payload as any;
+      const payload = proposal.payload;
       const calculatedDate = calculateMilestoneDate(event.date, -30); // Default 1 month prior
 
       const questionsList = Array.isArray(payload.suggestedQuestions)
@@ -289,7 +355,7 @@ export function applyProposalToEvent(
     }
 
     case 'update_preference': {
-      const payload = proposal.payload as UpdatePreferencePayload;
+      const payload = proposal.payload;
       const currentPrefs = event.preferences || createEmptyPreferences();
 
       // Proposals when accepted become confirmed preferences, recording ai_inference source
@@ -320,12 +386,18 @@ export function applyProposalToEvent(
       };
     }
 
-    default:
+    default: {
+      const unhandled: unknown = proposal;
+      const unhandledAction =
+        typeof unhandled === 'object' && unhandled !== null && 'actionType' in unhandled
+          ? String((unhandled as Record<string, unknown>).actionType)
+          : 'unknown';
       return {
         success: false,
         event,
-        error: `Unsupported proposal action type: ${(proposal as any).actionType}`,
+        error: `Unsupported proposal action type: ${unhandledAction}`,
       };
+    }
   }
 }
 

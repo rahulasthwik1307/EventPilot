@@ -150,9 +150,9 @@ export const UpdatePreferencePayloadSchema = z
       if (field === 'flexibility') {
         const validFlex = ['strict_hard_limit', 'moderate_flexibility', 'flexible_target'];
         const val = typeof proposedValue === 'object' && proposedValue !== null && 'flexibility' in proposedValue
-          ? (proposedValue as any).flexibility
+          ? (proposedValue as Record<string, unknown>).flexibility
           : proposedValue;
-        if (!validFlex.includes(val)) {
+        if (!validFlex.includes(val as string)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ['proposedValue'],
@@ -161,7 +161,7 @@ export const UpdatePreferencePayloadSchema = z
         }
       } else if (['spendingPriorities', 'economizeAreas', 'nonNegotiables'].includes(field)) {
         const val = typeof proposedValue === 'object' && proposedValue !== null && field in proposedValue
-          ? (proposedValue as any)[field]
+          ? (proposedValue as Record<string, unknown>)[field]
           : proposedValue;
         if (!Array.isArray(val) || !val.every((item) => typeof item === 'string')) {
           ctx.addIssue({
@@ -192,9 +192,9 @@ export const UpdatePreferencePayloadSchema = z
           'custom',
         ];
         const val = typeof proposedValue === 'object' && proposedValue !== null && 'atmosphere' in proposedValue
-          ? (proposedValue as any).atmosphere
+          ? (proposedValue as Record<string, unknown>).atmosphere
           : proposedValue;
-        if (!validAtmospheres.includes(val)) {
+        if (!validAtmospheres.includes(val as string)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ['proposedValue'],
@@ -203,7 +203,7 @@ export const UpdatePreferencePayloadSchema = z
         }
       } else if (field === 'primaryFocus') {
         const val = typeof proposedValue === 'object' && proposedValue !== null && 'primaryFocus' in proposedValue
-          ? (proposedValue as any).primaryFocus
+          ? (proposedValue as Record<string, unknown>).primaryFocus
           : proposedValue;
         if (!Array.isArray(val) || !val.every((item) => typeof item === 'string')) {
           ctx.addIssue({
@@ -227,9 +227,9 @@ export const UpdatePreferencePayloadSchema = z
       if (field === 'guestCountFlexibility') {
         const validFlex = ['strict_cap', 'small_buffer', 'open_estimate'];
         const val = typeof proposedValue === 'object' && proposedValue !== null && 'guestCountFlexibility' in proposedValue
-          ? (proposedValue as any).guestCountFlexibility
+          ? (proposedValue as Record<string, unknown>).guestCountFlexibility
           : proposedValue;
-        if (!validFlex.includes(val)) {
+        if (!validFlex.includes(val as string)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ['proposedValue'],
@@ -238,7 +238,7 @@ export const UpdatePreferencePayloadSchema = z
         }
       } else if (field === 'accessibilityRequirements') {
         const val = typeof proposedValue === 'object' && proposedValue !== null && 'accessibilityRequirements' in proposedValue
-          ? (proposedValue as any).accessibilityRequirements
+          ? (proposedValue as Record<string, unknown>).accessibilityRequirements
           : proposedValue;
         if (!Array.isArray(val) || !val.every((item) => typeof item === 'string')) {
           ctx.addIssue({
@@ -262,9 +262,9 @@ export const UpdatePreferencePayloadSchema = z
       if (field === 'dietaryStyle') {
         const validDiet = ['pure_vegetarian', 'sattvic_jain', 'vegetarian_and_non_veg', 'multi_cuisine', 'custom'];
         const val = typeof proposedValue === 'object' && proposedValue !== null && 'dietaryStyle' in proposedValue
-          ? (proposedValue as any).dietaryStyle
+          ? (proposedValue as Record<string, unknown>).dietaryStyle
           : proposedValue;
-        if (!validDiet.includes(val)) {
+        if (!validDiet.includes(val as string)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ['proposedValue'],

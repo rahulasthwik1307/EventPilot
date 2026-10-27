@@ -19,7 +19,7 @@ export interface OrchestratorOptions {
   retryDelayMs?: number;
   cfInvocationFn?: typeof generateCloudflareAssistantResponse;
   geminiInvocationFn?: typeof generateGeminiAssistantResponse;
-  clientOverride?: any;
+  clientOverride?: import('@google/genai').GoogleGenAI;
   timeoutMs?: number;
   fetchFn?: typeof fetch;
   allowGeminiFallback?: boolean;
@@ -187,12 +187,12 @@ export async function orchestrateAssistantResponse(
       code: geminiErr.code,
       message: geminiErr.message,
     });
-  } catch (geminiCatchErr: any) {
+  } catch (geminiCatchErr: unknown) {
     failureLog.push({
       provider: 'gemini',
       model: process.env.GEMINI_MODEL || 'gemini-3.8-flash',
       code: 'GEMINI_EXCEPTION',
-      message: geminiCatchErr?.message || 'Gemini threw an unexpected exception.',
+      message: geminiCatchErr instanceof Error ? geminiCatchErr.message : 'Gemini threw an unexpected exception.',
     });
   }
 

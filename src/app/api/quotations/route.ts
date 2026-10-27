@@ -34,11 +34,11 @@ export async function POST(req: NextRequest) {
     // 3. Schema validation
     const validated = QuotationsApiRequestSchema.safeParse(bodyResult.data);
     if (!validated.success) {
-      const issues = validated.error.issues || (validated.error as any).errors || [];
+      const issues = validated.error.issues;
       return NextResponse.json(
         {
           error: 'Validation failed for quotation request parameters.',
-          details: issues.map((e: any) => ({
+          details: issues.map((e) => ({
             field: Array.isArray(e.path) ? e.path.join('.') : '',
             message: e.message,
           })),
@@ -83,7 +83,8 @@ export async function POST(req: NextRequest) {
       },
       { status: 400 }
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const _errorMessage = err instanceof Error ? err.message : String(err);
     // Guaranteed non-leaking error response
     return NextResponse.json(
       {

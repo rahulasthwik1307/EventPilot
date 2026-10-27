@@ -26,6 +26,13 @@ import {
   X,
 } from 'lucide-react';
 
+const VALID_QUOTE_CURRENCIES = ['INR', 'USD', 'EUR', 'GBP'] as const;
+type QuoteCurrency = (typeof VALID_QUOTE_CURRENCIES)[number];
+
+function isQuoteCurrency(value: string): value is QuoteCurrency {
+  return (VALID_QUOTE_CURRENCIES as readonly string[]).includes(value);
+}
+
 interface QuotationDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -167,8 +174,8 @@ export function QuotationDialog({
       }
 
       setActiveTab('form');
-    } catch (err: any) {
-      setExtractError(err.message || 'Error occurred during extraction.');
+    } catch (err: unknown) {
+      setExtractError(err instanceof Error ? err.message : 'Error occurred during extraction.');
     } finally {
       setIsExtracting(false);
     }
@@ -364,7 +371,12 @@ export function QuotationDialog({
                   <div className="flex gap-2">
                     <select
                       value={currency}
-                      onChange={(e) => setCurrency(e.target.value as any)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (isQuoteCurrency(val)) {
+                          setCurrency(val);
+                        }
+                      }}
                       className="bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg px-2.5 text-xs sm:text-sm text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#D97706]"
                     >
                       <option value="INR">INR (₹)</option>

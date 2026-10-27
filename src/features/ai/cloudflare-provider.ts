@@ -1,6 +1,7 @@
 import {
   AiAssistantRequest,
   AiAssistantResponse,
+  ProposalPayload,
   StagedProposal,
 } from './types';
 import { AiAssistantResponseSchema, StagedProposalSchema } from './schemas';
@@ -131,14 +132,23 @@ CRITICAL RULES:
  * Normalizes raw model proposal output into a strictly validated StagedProposal.
  * Recovers slightly unaligned keys (e.g. nested budget_allocation or missing actionType inside payload).
  */
-export function normalizeStagedProposal(p: any, idx: number): StagedProposal | null {
+export function normalizeStagedProposal(p: unknown, idx: number): StagedProposal | null {
   if (!p || typeof p !== 'object') return null;
 
-  const actionType = p.actionType || p.payload?.actionType;
+  const rawObj = p as Record<string, unknown>;
+  const actionType = String(
+    rawObj.actionType ||
+      (typeof rawObj.payload === 'object' && rawObj.payload !== null
+        ? (rawObj.payload as Record<string, unknown>).actionType
+        : '') ||
+      ''
+  );
   if (!actionType) return null;
 
-  const rawPayload = p.payload || p;
-  let normalizedPayload: any = null;
+  const rawPayload = (
+    typeof rawObj.payload === 'object' && rawObj.payload !== null ? rawObj.payload : p
+  ) as Record<string, unknown>;
+  let normalizedPayload: ProposalPayload | null = null;
 
   if (actionType === 'adjust_budget_allocation') {
     const catName =
@@ -161,7 +171,7 @@ export function normalizeStagedProposal(p: any, idx: number): StagedProposal | n
       categoryName: String(catName || 'General Allocation'),
       currentAllocated: Math.max(0, Number(current) || 0),
       proposedAllocated: Math.max(0, Number(proposed) || 0),
-      rationale: String(rawPayload.rationale || p.explanation || 'Budget adjustment proposal'),
+      rationale: String(rawPayload.rationale || rawObj.explanation || 'Budget adjustment proposal'),
     };
   } else if (actionType === 'add_task') {
     const rawOffset =
@@ -172,13 +182,14 @@ export function normalizeStagedProposal(p: any, idx: number): StagedProposal | n
 
     normalizedPayload = {
       actionType: 'add_task',
-      title: String(rawPayload.title || p.title || 'Follow up on event milestone'),
+      title: String(rawPayload.title || rawObj.title || 'Follow up on event milestone'),
       offsetDays: clampedOffset,
-      priority: ['low', 'medium', 'high'].includes(rawPayload.priority)
-        ? rawPayload.priority
-        : 'medium',
-      description: rawPayload.description || p.explanation,
-      milestoneTitle: rawPayload.milestoneTitle,
+      priority:
+        typeof rawPayload.priority === 'string' && ['low', 'medium', 'high'].includes(rawPayload.priority)
+          ? (rawPayload.priority as 'low' | 'medium' | 'high')
+          : 'medium',
+      description: typeof rawPayload.description === 'string' ? rawPayload.description : typeof rawObj.explanation === 'string' ? rawObj.explanation : undefined,
+      milestoneTitle: typeof rawPayload.milestoneTitle === 'string' ? rawPayload.milestoneTitle : undefined,
     };
   } else if (actionType === 'add_milestone') {
     const rawOffset =
@@ -189,34 +200,38 @@ export function normalizeStagedProposal(p: any, idx: number): StagedProposal | n
 
     normalizedPayload = {
       actionType: 'add_milestone',
-      title: String(rawPayload.title || p.title || 'Key Celebration Milestone'),
+      title: String(rawPayload.title || rawObj.title || 'Key Celebration Milestone'),
       offsetDays: clampedOffset,
-      description: rawPayload.description || p.explanation,
+      description: typeof rawPayload.description === 'string' ? rawPayload.description : typeof rawObj.explanation === 'string' ? rawObj.explanation : undefined,
     };
   } else if (actionType === 'add_checklist_item') {
     normalizedPayload = {
       actionType: 'add_checklist_item',
-      area: ['logistics', 'vendor', 'rsvp'].includes(rawPayload.area)
-        ? rawPayload.area
-        : 'logistics',
-      itemText: String(rawPayload.itemText || p.title || 'Review arrangements'),
+      area:
+        typeof rawPayload.area === 'string' && ['logistics', 'vendor', 'rsvp'].includes(rawPayload.area)
+          ? (rawPayload.area as 'logistics' | 'vendor' | 'rsvp')
+          : 'logistics',
+      itemText: String(rawPayload.itemText || rawObj.title || 'Review arrangements'),
     };
   } else if (actionType === 'suggest_vendor_followup') {
     const questions =
       Array.isArray(rawPayload.suggestedQuestions) && rawPayload.suggestedQuestions.length > 0
         ? rawPayload.suggestedQuestions.map(String)
-        : [String(p.explanation || 'Confirm schedule, team size, and setup requirements')];
+        : [String(rawObj.explanation || 'Confirm schedule, team size, and setup requirements')];
 
     normalizedPayload = {
       actionType: 'suggest_vendor_followup',
       vendorCategory: String(rawPayload.vendorCategory || 'Catering & Dining'),
       suggestedQuestions: questions,
-      checklistNotes: rawPayload.checklistNotes,
+      checklistNotes: typeof rawPayload.checklistNotes === 'string' ? rawPayload.checklistNotes : undefined,
     };
   } else if (actionType === 'update_preference') {
-    const validCategories = ['priorities', 'budget', 'logistics', 'tradition'];
-    const category = rawPayload.category;
-    if (!validCategories.includes(category)) {
+    const validCategories = ['priorities', 'budget', 'logistics', 'tradition'] as const;
+    const category =
+      typeof rawPayload.category === 'string' && (validCategories as readonly string[]).includes(rawPayload.category)
+        ? (rawPayload.category as (typeof validCategories)[number])
+        : null;
+    if (!category) {
       return null;
     }
 
@@ -232,7 +247,7 @@ export function normalizeStagedProposal(p: any, idx: number): StagedProposal | n
       currentValue: rawPayload.currentValue,
       proposedValue: rawPayload.proposedValue,
       provenance: 'inferred', // Model-supplied provenance is untrusted; always inferred
-      rationale: String(rawPayload.rationale || p.explanation || 'Refined preference recommendation'),
+      rationale: String(rawPayload.rationale || rawObj.explanation || 'Refined preference recommendation'),
       userEvidence: typeof rawPayload.userEvidence === 'string' ? rawPayload.userEvidence : undefined,
       conflictsWith: typeof rawPayload.conflictsWith === 'string' ? rawPayload.conflictsWith : undefined,
     };
@@ -240,14 +255,14 @@ export function normalizeStagedProposal(p: any, idx: number): StagedProposal | n
 
   if (!normalizedPayload) return null;
 
-  const candidate: StagedProposal = {
+  const candidate = {
     id: `prop-${Date.now()}-${idx + 1}`,
     actionType,
-    title: String(p.title || 'Staged Planning Change'),
-    explanation: String(p.explanation || 'Suggested adjustment based on event context.'),
-    assumptions: p.assumptions,
-    potentialImpact: p.potentialImpact,
-    status: 'staged',
+    title: String(rawObj.title || 'Staged Planning Change'),
+    explanation: String(rawObj.explanation || 'Suggested adjustment based on event context.'),
+    assumptions: typeof rawObj.assumptions === 'string' ? rawObj.assumptions : undefined,
+    potentialImpact: typeof rawObj.potentialImpact === 'string' ? rawObj.potentialImpact : undefined,
+    status: 'staged' as const,
     payload: normalizedPayload,
   };
 
@@ -260,15 +275,19 @@ export function normalizeStagedProposal(p: any, idx: number): StagedProposal | n
  * - standard text generation: { result: { response: "..." } }
  * - chat completion format: { result: { choices: [{ message: { content: "..." } }] } }
  */
-export function extractCloudflareContent(result: any): string | null {
+export function extractCloudflareContent(result: unknown): string | null {
   if (!result || typeof result !== 'object') return null;
+  const res = result as {
+    response?: unknown;
+    choices?: Array<{ message?: { content?: unknown } }>;
+  };
 
-  if (typeof result.response === 'string' && result.response.trim().length > 0) {
-    return result.response;
+  if (typeof res.response === 'string' && res.response.trim().length > 0) {
+    return res.response;
   }
 
-  if (Array.isArray(result.choices) && result.choices.length > 0) {
-    const firstChoice = result.choices[0];
+  if (Array.isArray(res.choices) && res.choices.length > 0) {
+    const firstChoice = res.choices[0];
     if (typeof firstChoice?.message?.content === 'string') {
       return firstChoice.message.content;
     }
@@ -359,9 +378,13 @@ export async function generateCloudflareAssistantResponse(
 
     clearTimeout(timeoutTimer);
 
-    let jsonResponse: any;
+    let jsonResponse: {
+      success?: boolean;
+      errors?: Array<{ code?: number; message?: string }>;
+      result?: unknown;
+    };
     try {
-      jsonResponse = await response.json();
+      jsonResponse = (await response.json()) as typeof jsonResponse;
     } catch {
       return {
         success: false,
@@ -466,9 +489,9 @@ export async function generateCloudflareAssistantResponse(
 
     const cleanedContent = cleanJsonOutput(rawContent);
 
-    let parsedJson: any;
+    let parsedJson: Record<string, unknown>;
     try {
-      parsedJson = JSON.parse(cleanedContent);
+      parsedJson = JSON.parse(cleanedContent) as Record<string, unknown>;
     } catch {
       return {
         success: false,
@@ -481,15 +504,15 @@ export async function generateCloudflareAssistantResponse(
     }
 
     // Assign stable proposal IDs and stage them with schema normalization
-    const rawProposals = Array.isArray(parsedJson.proposals) ? parsedJson.proposals : [];
+    const rawProposals = Array.isArray(parsedJson.proposals) ? (parsedJson.proposals as unknown[]) : [];
     const proposals: StagedProposal[] = rawProposals
-      .map((p: any, idx: number) => normalizeStagedProposal(p, idx))
+      .map((p: unknown, idx: number) => normalizeStagedProposal(p, idx))
       .filter((p: StagedProposal | null): p is StagedProposal => p !== null);
 
     const responsePayload: AiAssistantResponse = {
-      answer: parsedJson.answer || '',
-      summary: parsedJson.summary || '',
-      recommendations: Array.isArray(parsedJson.recommendations) ? parsedJson.recommendations : [],
+      answer: typeof parsedJson.answer === 'string' ? parsedJson.answer : '',
+      summary: typeof parsedJson.summary === 'string' ? parsedJson.summary : '',
+      recommendations: Array.isArray(parsedJson.recommendations) ? (parsedJson.recommendations as string[]) : [],
       proposals,
       modelUsed: modelId,
       provider: 'cloudflare',
@@ -512,10 +535,13 @@ export async function generateCloudflareAssistantResponse(
       success: true,
       data: validated.data,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     clearTimeout(timeoutTimer);
 
-    if (err.name === 'AbortError' || /aborted|timeout/i.test(err.message || '')) {
+    const isAbort =
+      (err instanceof Error && err.name === 'AbortError') ||
+      /aborted|timeout/i.test(err instanceof Error ? err.message : String(err));
+    if (isAbort) {
       return {
         success: false,
         error: {

@@ -119,7 +119,7 @@ export async function generateAssistantResponse(
       };
     }
 
-    let parsedJson: any;
+    let parsedJson: Record<string, unknown>;
     try {
       parsedJson = JSON.parse(rawText);
     } catch {
@@ -134,22 +134,22 @@ export async function generateAssistantResponse(
     }
 
     // Assign stable proposal IDs if not present and ensure status is 'staged'
-    const rawProposals = Array.isArray(parsedJson.proposals) ? parsedJson.proposals : [];
-    const proposals: StagedProposal[] = rawProposals.map((p: any, idx: number) => ({
+    const rawProposals = Array.isArray(parsedJson.proposals) ? (parsedJson.proposals as Record<string, unknown>[]) : [];
+    const proposals: StagedProposal[] = rawProposals.map((p, idx: number) => ({
       id: `prop-${Date.now()}-${idx + 1}`,
-      actionType: p.actionType,
-      title: p.title || 'Untitled Proposal',
-      explanation: p.explanation || '',
-      assumptions: p.assumptions,
-      potentialImpact: p.potentialImpact,
+      actionType: p.actionType as StagedProposal['actionType'],
+      title: typeof p.title === 'string' ? p.title : 'Untitled Proposal',
+      explanation: typeof p.explanation === 'string' ? p.explanation : '',
+      assumptions: typeof p.assumptions === 'string' ? p.assumptions : undefined,
+      potentialImpact: typeof p.potentialImpact === 'string' ? p.potentialImpact : undefined,
       status: 'staged',
-      payload: p.payload || p,
+      payload: (p.payload || p) as StagedProposal['payload'],
     }));
 
     const responsePayload: AiAssistantResponse = {
-      answer: parsedJson.answer || '',
-      summary: parsedJson.summary || '',
-      recommendations: Array.isArray(parsedJson.recommendations) ? parsedJson.recommendations : [],
+      answer: typeof parsedJson.answer === 'string' ? parsedJson.answer : '',
+      summary: typeof parsedJson.summary === 'string' ? parsedJson.summary : '',
+      recommendations: Array.isArray(parsedJson.recommendations) ? (parsedJson.recommendations as string[]) : [],
       proposals,
       modelUsed: model,
       timestamp: new Date().toISOString(),
@@ -171,8 +171,8 @@ export async function generateAssistantResponse(
       success: true,
       data: validated.data,
     };
-  } catch (err: any) {
-    const errorMsg = String(err?.message || err || '');
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err || '');
 
     if (errorMsg.includes('503') || errorMsg.includes('UNAVAILABLE') || errorMsg.includes('high demand')) {
       return {

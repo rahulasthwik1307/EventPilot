@@ -436,12 +436,13 @@ export function AiAssistantTab({
         provider: data.provider,
         latencyMs: elapsed,
       });
-    } catch (err: any) {
-      if (err.name === 'AbortError' || controller.signal.aborted || activeEventIdRef.current !== targetEventId) {
+    } catch (err: unknown) {
+      const isAbort = (err instanceof Error && err.name === 'AbortError') || (err instanceof DOMException && err.name === 'AbortError');
+      if (isAbort || controller.signal.aborted || activeEventIdRef.current !== targetEventId) {
         return;
       }
       setErrorMessage(
-        err?.message || 'A network error occurred while connecting to the assistant.'
+        err instanceof Error ? err.message : 'A network error occurred while connecting to the assistant.'
       );
     } finally {
       if (activeEventIdRef.current === targetEventId) {

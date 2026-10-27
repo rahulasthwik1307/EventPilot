@@ -516,52 +516,64 @@ export function validateEvent(data: unknown): ValidationResult<Event> {
           validUntilDate: typeof item.validUntilDate === 'string' ? item.validUntilDate : undefined,
           includedServices: Array.isArray(item.includedServices)
             ? item.includedServices
-                .map((s: any) => ({
-                  description: String(s?.description || '').trim(),
-                  quantity: Number.isFinite(s?.quantity) ? Number(s.quantity) : undefined,
-                  unit: typeof s?.unit === 'string' ? s.unit : undefined,
-                  itemizedCost: Number.isFinite(s?.itemizedCost)
-                    ? Math.max(0, Math.round(Number(s.itemizedCost)))
-                    : undefined,
-                }))
-                .filter((s: any) => s.description.length > 0)
+                .map((s: unknown) => {
+                  const sObj = typeof s === 'object' && s !== null ? (s as Record<string, unknown>) : {};
+                  return {
+                    description: String(sObj.description || '').trim(),
+                    quantity: Number.isFinite(sObj.quantity) ? Number(sObj.quantity) : undefined,
+                    unit: typeof sObj.unit === 'string' ? sObj.unit : undefined,
+                    itemizedCost: Number.isFinite(sObj.itemizedCost)
+                      ? Math.max(0, Math.round(Number(sObj.itemizedCost)))
+                      : undefined,
+                  };
+                })
+                .filter((s: { description: string }) => s.description.length > 0)
             : [],
           exclusions: Array.isArray(item.exclusions)
             ? item.exclusions
-                .map((e: any) => String(e).trim())
+                .map((e: unknown) => String(e).trim())
                 .filter((e: string) => e.length > 0)
             : [],
           optionalAddOns: Array.isArray(item.optionalAddOns)
             ? item.optionalAddOns
-                .map((a: any) => ({
-                  title: String(a?.title || '').trim(),
-                  additionalCost: Number.isFinite(a?.additionalCost)
-                    ? Math.max(0, Math.round(Number(a.additionalCost)))
-                    : 0,
-                  description: typeof a?.description === 'string' ? a.description : undefined,
-                }))
-                .filter((a: any) => a.title.length > 0)
+                .map((a: unknown) => {
+                  const aObj = typeof a === 'object' && a !== null ? (a as Record<string, unknown>) : {};
+                  return {
+                    title: String(aObj.title || '').trim(),
+                    additionalCost: Number.isFinite(aObj.additionalCost)
+                      ? Math.max(0, Math.round(Number(aObj.additionalCost)))
+                      : 0,
+                    description: typeof aObj.description === 'string' ? aObj.description : undefined,
+                  };
+                })
+                .filter((a: { title: string }) => a.title.length > 0)
             : [],
           taxesAndFees: Array.isArray(item.taxesAndFees)
             ? item.taxesAndFees
-                .map((t: any) => ({
-                  name: String(t?.name || '').trim(),
-                  amount: Number.isFinite(t?.amount) ? Math.max(0, Math.round(Number(t.amount))) : 0,
-                  isIncludedInTotal: Boolean(t?.isIncludedInTotal),
-                }))
-                .filter((t: any) => t.name.length > 0)
+                .map((t: unknown) => {
+                  const tObj = typeof t === 'object' && t !== null ? (t as Record<string, unknown>) : {};
+                  return {
+                    name: String(tObj.name || '').trim(),
+                    amount: Number.isFinite(tObj.amount) ? Math.max(0, Math.round(Number(tObj.amount))) : 0,
+                    isIncludedInTotal: Boolean(tObj.isIncludedInTotal),
+                  };
+                })
+                .filter((t: { name: string }) => t.name.length > 0)
             : [],
           depositRequired: Number.isFinite(item.depositRequired)
             ? Math.max(0, Math.round(Number(item.depositRequired)))
             : undefined,
           paymentMilestones: Array.isArray(item.paymentMilestones)
             ? item.paymentMilestones
-                .map((m: any) => ({
-                  stage: String(m?.stage || '').trim(),
-                  amount: Number.isFinite(m?.amount) ? Math.max(0, Math.round(Number(m.amount))) : 0,
-                  dueDate: typeof m?.dueDate === 'string' ? m.dueDate : undefined,
-                }))
-                .filter((m: any) => m.stage.length > 0)
+                .map((m: unknown) => {
+                  const mObj = typeof m === 'object' && m !== null ? (m as Record<string, unknown>) : {};
+                  return {
+                    stage: String(mObj.stage || '').trim(),
+                    amount: Number.isFinite(mObj.amount) ? Math.max(0, Math.round(Number(mObj.amount))) : 0,
+                    dueDate: typeof mObj.dueDate === 'string' ? mObj.dueDate : undefined,
+                  };
+                })
+                .filter((m: { stage: string }) => m.stage.length > 0)
             : [],
           cancellationPolicy:
             typeof item.cancellationPolicy === 'string' ? item.cancellationPolicy.trim() : undefined,

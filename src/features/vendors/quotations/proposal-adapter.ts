@@ -245,7 +245,7 @@ export function applyQuoteDerivedProposal(
       const newVendor: Vendor = {
         id: vp.vendorId,
         name: vp.vendorName,
-        category: (quotations.find((q) => q.id === proposal.quotationUpdate.id)?.serviceCategory || 'other') as any,
+        category: quotations.find((q) => q.id === proposal.quotationUpdate.id)?.serviceCategory || 'other',
         status: vp.after.status,
         quotedCost: vp.after.quotedCost,
         agreedCost: vp.after.agreedCost,

@@ -343,12 +343,16 @@ export function detectPreferenceConflict(
     return { hasConflict: false };
   }
 
-  const existing = existingRecord.value as Record<string, any>;
-  const proposed = proposedValue as Record<string, any>;
+  const existing = (existingRecord.value || {}) as Record<string, unknown>;
+  const proposed = (typeof proposedValue === 'object' && proposedValue !== null ? proposedValue : {}) as Record<string, unknown>;
 
   if (category === 'budget') {
     // Check flexibility conflict
-    if (existing.flexibility && proposed.flexibility && existing.flexibility !== proposed.flexibility) {
+    if (
+      typeof existing.flexibility === 'string' &&
+      typeof proposed.flexibility === 'string' &&
+      existing.flexibility !== proposed.flexibility
+    ) {
       const formatFlex = (f: string) => f.replace(/_/g, ' ');
       return {
         hasConflict: true,
@@ -360,8 +364,12 @@ export function detectPreferenceConflict(
 
     // Check if an area explicitly marked non-negotiable is proposed to be economized
     if (Array.isArray(existing.nonNegotiables) && Array.isArray(proposed.economizeAreas)) {
-      const contested = existing.nonNegotiables.find((nn: string) =>
-        proposed.economizeAreas.some((ea: string) => ea.toLowerCase() === nn.toLowerCase())
+      const nonNegotiables = existing.nonNegotiables as unknown[];
+      const economizeAreas = proposed.economizeAreas as unknown[];
+      const contested = nonNegotiables.find(
+        (nn): nn is string =>
+          typeof nn === 'string' &&
+          economizeAreas.some((ea) => typeof ea === 'string' && ea.toLowerCase() === nn.toLowerCase())
       );
       if (contested) {
         return {
@@ -374,8 +382,8 @@ export function detectPreferenceConflict(
 
   if (category === 'logistics') {
     if (
-      existing.guestCountFlexibility &&
-      proposed.guestCountFlexibility &&
+      typeof existing.guestCountFlexibility === 'string' &&
+      typeof proposed.guestCountFlexibility === 'string' &&
       existing.guestCountFlexibility !== proposed.guestCountFlexibility
     ) {
       return {
@@ -386,7 +394,11 @@ export function detectPreferenceConflict(
   }
 
   if (category === 'tradition') {
-    if (existing.dietaryStyle && proposed.dietaryStyle && existing.dietaryStyle !== proposed.dietaryStyle) {
+    if (
+      typeof existing.dietaryStyle === 'string' &&
+      typeof proposed.dietaryStyle === 'string' &&
+      existing.dietaryStyle !== proposed.dietaryStyle
+    ) {
       return {
         hasConflict: true,
         reason: `Dietary style conflict: currently confirmed as "${existing.dietaryStyle}", but proposed as "${proposed.dietaryStyle}".`,
@@ -409,12 +421,10 @@ export function mergePreferences(
     updatedAt: new Date().toISOString(),
   };
 
-  const categories: PreferenceCategoryKey[] = ['priorities', 'budget', 'logistics', 'tradition'];
-  for (const cat of categories) {
-    if (incoming[cat]) {
-      merged[cat] = incoming[cat] as any;
-    }
-  }
+  if (incoming.priorities) merged.priorities = incoming.priorities;
+  if (incoming.budget) merged.budget = incoming.budget;
+  if (incoming.logistics) merged.logistics = incoming.logistics;
+  if (incoming.tradition) merged.tradition = incoming.tradition;
 
   return merged;
 }
@@ -433,13 +443,13 @@ export function mergeSinglePreferenceField(
   source: PreferenceSource = 'ai_inference'
 ): { success: boolean; preferences?: EventPreferences; error?: string } {
   const currentCategoryRecord = current?.[category];
-  const currentCategoryValue = (currentCategoryRecord?.value || {}) as Record<string, any>;
+  const currentCategoryValue = (currentCategoryRecord?.value || {}) as Record<string, unknown>;
 
-  let incomingFieldValues: Record<string, any> = {};
+  let incomingFieldValues: Record<string, unknown> = {};
 
   if (proposedValue !== null && typeof proposedValue === 'object' && !Array.isArray(proposedValue)) {
     // If the proposedValue is an object that already has the field key or multiple keys
-    incomingFieldValues = { ...(proposedValue as Record<string, any>) };
+    incomingFieldValues = { ...(proposedValue as Record<string, unknown>) };
   } else {
     // Single primitive or array proposed for the specified field
     incomingFieldValues = { [field]: proposedValue };
