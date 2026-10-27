@@ -6,7 +6,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-15.1-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
-[![Vitest](https://img.shields.io/badge/Vitest-426_Tests_Passing-6E9F18?logo=vitest)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-498_Tests_Passing-6E9F18?logo=vitest)](https://vitest.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
@@ -234,12 +234,14 @@ Event Pilot is engineered with deep modules, strict boundary contracts, and resi
 - **Deep Module Architecture:** Key capabilities are encapsulated behind minimal interfaces. [`useEventWorkspace`](src/features/events/useEventWorkspace.ts) manages persistence, optimistic version locking, and cross-tab reconciliation behind a clean hook. [`useUndoAction`](src/hooks/useUndoAction.ts) isolates staged deletion queues and timer lifecycles.
 - **Optimistic Concurrency Protection:** Personal celebrations track `version` and `updatedAt`. Saving operations pass `expectedVersion` to prevent silent overwrites when multiple browser tabs are open, surfacing a non-destructive conflict banner when background changes are detected.
 - **Early-Abort Streaming Request Limits:** The API enforces strict size boundaries (64 KB for assistant, 128 KB for quotations) chunk-by-chunk using a `ReadableStreamDefaultReader`. If a stream exceeds the limit, it cancels the stream immediately and returns HTTP 413 without buffering excess bytes into server memory.
-- **Zero Circular Dependencies:** AST-based dependency graph traversal across all 96 source TypeScript files confirms **0 circular dependency cycles**.
 - **Verified Accessibility Improvements (4.69:1 Contrast & ARIA):**
+  - "Skip to main content" link visible on keyboard focus for rapid keyboard navigation.
   - Primary amber button contrast elevated to **4.69:1** (`text-neutral-text` on `#D97706`), meeting the WCAG AA 4.5:1 minimum threshold for standard text.
+  - Strengthened keyboard focus rings and darker dietary badge text for contrast.
+  - Corrected heading hierarchy in the quotation comparison view.
+  - `aria-invalid` and `aria-describedby` on all dialog form inputs for programmatic error association.
   - Active workspace navigation rail state communicated via `aria-current="page"`.
   - In-page view switchers implemented with standard `role="tablist"`, `role="tab"`, and `role="tabpanel"`.
-  - Form validation errors programmatically linked to inputs via `aria-invalid` and `aria-describedby`.
   - Cost-model switchers structured as accessible `role="radiogroup"` controls with roving tabindex and Arrow-key navigation.
   - Global hotkeys (1–7) are automatically isolated when modal dialogs are open.
 
@@ -277,7 +279,7 @@ Follow these verified steps in the running application (`http://localhost:3000`)
 | Layer | Technologies & Libraries | Purpose in Event Pilot |
 |---|---|---|
 | **Application Framework** | [Next.js 15.1](https://nextjs.org/) (App Router, React 19) | Server components, API routes, fast client navigation |
-| **Language & Typing** | [TypeScript 5.7](https://www.typescriptlang.org/) (Strict Mode) | Strict typing across domain models, zero `any` in business engines |
+| **Language & Typing** | [TypeScript 5.7](https://www.typescriptlang.org/) (Strict Mode) | Strict typing across domain models, zero `any` in production code |
 | **Styling & Design** | [Tailwind CSS 3.4](https://tailwindcss.com/) | Panchang & Utsav Almanac design tokens (`DESIGN.md`) |
 | **Typography** | `Eczar` & `Plus Jakarta Sans` | Self-hosted Google Fonts via `next/font/google` eliminating FOUC |
 | **Schema Validation** | [Zod 4.6](https://zod.dev/) | Runtime contract enforcement for API routes and proposals |
@@ -348,7 +350,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 All quality checks have been verified directly in the project environment:
 
 ```bash
-# 1. Run Complete Automated Test Suite (49 files, 426 tests)
+# 1. Run Complete Automated Test Suite (53 files, 498 tests)
 npm test
 
 # 2. Strict TypeScript Compilation Check
@@ -367,15 +369,16 @@ npm run build
 ┌───────────────────────────────────────┬───────────────────────────────────────┐
 │ Check                                 │ Verified Result                       │
 ├───────────────────────────────────────┼───────────────────────────────────────┤
-│ Vitest Automated Test Suite           │ 49 passed / 49 files (426/426 tests)  │
+│ Vitest Automated Test Suite           │ 53 passed / 53 files (498/498 tests)  │
 │ TypeScript Typecheck (tsc --noEmit)   │ 0 errors (clean exit, code 0)         │
 │ ESLint Validation (next lint)         │ 0 warnings, 0 errors (clean exit)     │
 │ Production Build (next build)         │ Compiled successfully (all routes)    │
-│ Circular Dependencies                 │ 0 cycles detected across 96 files     │
 └───────────────────────────────────────┴───────────────────────────────────────┘
 ```
 
-> **Testing Tooling Note:** Automated coverage tooling (`@vitest/coverage-v8`) was intentionally deferred during testing remediation to avoid adding unpinned packages. All 426 tests execute deterministically against local mocks without consuming external API quotas.
+> **Testing Tooling Note:** Automated coverage tooling (`@vitest/coverage-v8`) was intentionally deferred during testing remediation to avoid adding unpinned packages. All 498 tests execute deterministically against local mocks without consuming external API quotas.
+>
+> **Testing Highlights:** Recent test coverage additions include thorough unit and regression suites for the **quotation extraction fallback chain** (multi-provider Cloudflare $\rightarrow$ Gemini $\rightarrow$ regex fallback), runtime validation of **quotation schemas**, and type-narrowing safety for **proposal type guards**.
 
 ---
 
