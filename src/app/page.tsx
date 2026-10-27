@@ -120,7 +120,7 @@ export default function HomePage() {
         )}
 
         {/* Main Welcome Content */}
-        <main className="max-w-6xl mx-auto w-full px-4 sm:px-8">
+        <main id="main-content" className="max-w-6xl mx-auto w-full px-4 sm:px-8">
           <EditorialNocturneHero
             onOpenSample={handleOpenSample}
             onCreateEvent={() => {

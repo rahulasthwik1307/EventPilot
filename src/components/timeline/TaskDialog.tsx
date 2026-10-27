@@ -180,10 +180,12 @@ export function TaskDialog({
             placeholder="e.g. Confirm wedding silk saree delivery and blouse stitching"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            aria-invalid={Boolean(errors.title)}
+            aria-describedby={errors.title ? 'task-title-error' : undefined}
             className="w-full bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text focus:outline-none focus:ring-2 focus:ring-primary"
           />
           {errors.title && (
-            <p className="text-xs text-status-danger mt-1 flex items-center gap-1">
+            <p id="task-title-error" className="text-xs text-status-danger mt-1 flex items-center gap-1">
               <AlertCircle className="w-3.5 h-3.5" />
               <span>{errors.title}</span>
             </p>
@@ -257,10 +259,12 @@ export function TaskDialog({
             type="date"
             value={dueDate}
             onChange={(e) => handleDueDateChange(e.target.value)}
+            aria-invalid={Boolean(errors.dueDate)}
+            aria-describedby={errors.dueDate ? 'task-due-date-error' : undefined}
             className="w-full bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text font-mono focus:outline-none focus:ring-2 focus:ring-primary"
           />
           {errors.dueDate && (
-            <p className="text-xs text-status-danger mt-1 flex items-center gap-1">
+            <p id="task-due-date-error" className="text-xs text-status-danger mt-1 flex items-center gap-1">
               <AlertCircle className="w-3.5 h-3.5" />
               <span>{errors.dueDate}</span>
             </p>

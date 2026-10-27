@@ -133,7 +133,7 @@ function EventWorkspaceView() {
           </div>
         </header>
 
-        <main className="max-w-xl mx-auto px-4 py-16 text-center">
+        <main id="main-content" className="max-w-xl mx-auto px-4 py-16 text-center">
           <div className="w-14 h-14 rounded-2xl bg-status-danger-subtle text-status-danger flex items-center justify-center mx-auto mb-6">
             <AlertCircle className="w-7 h-7" />
           </div>
@@ -170,7 +170,7 @@ function EventWorkspaceView() {
           </div>
         </header>
 
-        <main className="max-w-lg mx-auto px-4 py-16 text-center">
+        <main id="main-content" className="max-w-lg mx-auto px-4 py-16 text-center">
           <div className="w-14 h-14 rounded-2xl bg-primary-subtle text-primary flex items-center justify-center mx-auto mb-5">
             <AlertTriangle className="w-7 h-7" />
           </div>

@@ -48,6 +48,12 @@ export default function RootLayout({
         className="min-h-screen bg-neutral-bg text-neutral-text antialiased font-sans"
         suppressHydrationWarning
       >
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-md focus:shadow-lg font-semibold text-sm outline-none ring-2 ring-offset-2 ring-primary"
+        >
+          Skip to main content
+        </a>
         {children}
       </body>
     </html>

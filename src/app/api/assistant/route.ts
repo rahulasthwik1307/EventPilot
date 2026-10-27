@@ -12,6 +12,13 @@ import {
 // Maximum payload size for assistant requests: 64 KB
 const MAX_ASSISTANT_BODY_BYTES = 64 * 1024;
 
+/**
+ * Handles incoming AI planning assistant POST requests.
+ * Enforces rate limiting, payload size bounds, schema validation, and provider orchestration.
+ *
+ * @param req - The incoming Next.js API request containing assistant parameters.
+ * @returns A JSON response with assistant answers, summaries, recommendations, and staged proposals.
+ */
 export async function POST(req: NextRequest) {
   try {
     // 1. Rate limiting check by client identity

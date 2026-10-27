@@ -111,10 +111,12 @@ export function MilestoneDialog({
             placeholder="e.g. 1 Month Prior — Invitations & RSVPs"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            aria-invalid={Boolean(errors.title)}
+            aria-describedby={errors.title ? 'milestone-title-error' : undefined}
             className="w-full bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text focus:outline-none focus:ring-2 focus:ring-primary"
           />
           {errors.title && (
-            <p className="text-xs text-status-danger mt-1 flex items-center gap-1">
+            <p id="milestone-title-error" className="text-xs text-status-danger mt-1 flex items-center gap-1">
               <AlertCircle className="w-3.5 h-3.5" />
               <span>{errors.title}</span>
             </p>
@@ -135,6 +137,8 @@ export function MilestoneDialog({
               step="1"
               value={offsetDays}
               onChange={(e) => setOffsetDays(e.target.value)}
+              aria-invalid={Boolean(errors.offsetDays)}
+              aria-describedby={errors.offsetDays ? 'milestone-offset-error' : undefined}
               className="w-32 bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text font-mono focus:outline-none focus:ring-2 focus:ring-primary"
             />
             <span className="text-xs text-neutral-muted">
@@ -146,7 +150,7 @@ export function MilestoneDialog({
             </span>
           </div>
           {errors.offsetDays && (
-            <p className="text-xs text-status-danger mt-1 flex items-center gap-1">
+            <p id="milestone-offset-error" className="text-xs text-status-danger mt-1 flex items-center gap-1">
               <AlertCircle className="w-3.5 h-3.5" />
               <span>{errors.offsetDays}</span>
             </p>

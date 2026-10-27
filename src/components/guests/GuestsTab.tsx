@@ -954,7 +954,7 @@ export function GuestsTab({ event, onUpdateEvent }: GuestsTabProps) {
                 </span>
               )}
               {dietLabel && (
-                <span className="inline-flex items-center gap-1 font-mono text-xs px-2 py-0.5 rounded bg-secondary-subtle text-secondary border border-secondary/30">
+                <span className="inline-flex items-center gap-1 font-mono text-xs px-2 py-0.5 rounded bg-secondary-subtle text-[#9A3412] border border-secondary/30">
                   <Utensils className="w-3 h-3" />
                   <span>{dietLabel}</span>
                 </span>

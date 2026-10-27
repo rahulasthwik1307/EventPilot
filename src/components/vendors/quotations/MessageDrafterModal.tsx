@@ -148,7 +148,7 @@ export function MessageDrafterModal({
             <select
               value={selectedScenario}
               onChange={(e) => setSelectedScenario(e.target.value as VendorMessageScenario)}
-              className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2.5 text-xs font-mono text-[#1C1917] focus:outline-none focus:border-[#D97706] focus:ring-1 focus:ring-[#D97706]/20 transition-all shadow-sm"
+              className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2.5 text-xs font-mono text-[#1C1917] focus:outline-none focus:border-[#D97706] focus:ring-2 focus:ring-primary focus:ring-offset-1 transition-all shadow-sm"
             >
               {SCENARIO_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -165,7 +165,7 @@ export function MessageDrafterModal({
             <select
               value={selectedQuoteId}
               onChange={(e) => setSelectedQuoteId(e.target.value)}
-              className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2.5 text-xs font-mono text-[#1C1917] focus:outline-none focus:border-[#D97706] focus:ring-1 focus:ring-[#D97706]/20 transition-all shadow-sm"
+              className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2.5 text-xs font-mono text-[#1C1917] focus:outline-none focus:border-[#D97706] focus:ring-2 focus:ring-primary focus:ring-offset-1 transition-all shadow-sm"
             >
               <option value="">-- Generic / No specific quote --</option>
               {quotations.map((q) => (
@@ -210,7 +210,7 @@ export function MessageDrafterModal({
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="w-full bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg p-2.5 font-mono text-xs text-[#1C1917] focus:bg-white focus:outline-none focus:border-[#D97706] focus:ring-1 focus:ring-[#D97706]/20 transition-all"
+              className="w-full bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg p-2.5 font-mono text-xs text-[#1C1917] focus:bg-white focus:outline-none focus:border-[#D97706] focus:ring-2 focus:ring-primary focus:ring-offset-1 transition-all"
             />
           </div>
 
@@ -223,7 +223,7 @@ export function MessageDrafterModal({
               rows={10}
               value={body}
               onChange={(e) => setBody(e.target.value)}
-              className="w-full bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg p-3.5 font-mono text-xs text-[#1C1917] leading-relaxed focus:bg-white focus:outline-none focus:border-[#D97706] focus:ring-1 focus:ring-[#D97706]/20 transition-all"
+              className="w-full bg-[#FAF8F5] border border-[#E7DFD5] rounded-lg p-3.5 font-mono text-xs text-[#1C1917] leading-relaxed focus:bg-white focus:outline-none focus:border-[#D97706] focus:ring-2 focus:ring-primary focus:ring-offset-1 transition-all"
             />
           </div>
         </div>

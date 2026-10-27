@@ -78,10 +78,23 @@ const VALID_DIETARY_STYLES: DietaryStyle[] = [
   'custom',
 ];
 
+/**
+ * Creates an empty EventPreferences record container.
+ *
+ * @returns An empty EventPreferences object.
+ */
 export function createEmptyPreferences(): EventPreferences {
   return {};
 }
 
+/**
+ * Wraps a domain preference value in a versioned provenance record envelope.
+ *
+ * @param value - The preference data payload.
+ * @param provenance - The verification state of the preference (e.g. explicit, inferred).
+ * @param source - The channel or agent that originated the preference entry.
+ * @returns A structured PreferenceRecord envelope stamped with the current timestamp.
+ */
 export function createDefaultPreferenceRecord<T>(
   value: T,
   provenance: PreferenceProvenance = 'explicit',
@@ -141,6 +154,12 @@ function validateRecordEnvelope<T>(
   };
 }
 
+/**
+ * Validates and normalizes raw celebration preferences against category-specific domain schemas.
+ *
+ * @param raw - The raw, untrusted preference payload object to validate.
+ * @returns A ValidationResult containing normalized preferences or validation error messages.
+ */
 export function validateEventPreferences(raw: unknown): ValidationResult<EventPreferences> {
   if (!raw || typeof raw !== 'object') {
     return {

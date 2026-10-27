@@ -37,10 +37,14 @@ export const VENDOR_STATUSES: { id: VendorStatus; label: string }[] = [
   { id: 'cancelled', label: 'Cancelled' },
 ];
 
+export const MAX_VENDOR_NAME_LENGTH = 100;
+
 /**
  * Calculates remaining balance for a single vendor.
  * Deterministic rule: Balance is derived solely from agreedCost - amountPaid.
  * Never calculates remaining balance from quotedCost when agreedCost is available.
+ * @param vendor - The vendor object to calculate balance for.
+ * @returns Object containing remaining balance, established flag, and overpayment info.
  */
 export function calculateVendorRemainingBalance(vendor: Vendor): VendorRemainingBalance {
   if (vendor.agreedCost == null || !Number.isFinite(vendor.agreedCost)) {
@@ -76,6 +80,8 @@ export function calculateVendorRemainingBalance(vendor: Vendor): VendorRemaining
 /**
  * Pure calculation of aggregated vendor financial metrics.
  * Cancelled vendors are preserved in history and counted, but excluded from active agreed/remaining totals.
+ * @param vendors - Array of vendor objects to aggregate.
+ * @returns Aggregated vendor financial summary metrics.
  */
 export function calculateVendorFinancials(vendors: Vendor[]): VendorFinancialSummary {
   let totalQuoted = 0;
@@ -137,6 +143,8 @@ export function calculateVendorFinancials(vendors: Vendor[]): VendorFinancialSum
 
 /**
  * Validates vendor inputs safely without mutating or casting.
+ * @param input - Partial vendor input data to validate.
+ * @returns Validation result with isValid flag and field errors.
  */
 export function validateVendorInput(input: Partial<VendorInput>): {
   isValid: boolean;
@@ -147,8 +155,8 @@ export function validateVendorInput(input: Partial<VendorInput>): {
   const name = typeof input.name === 'string' ? input.name.trim() : '';
   if (!name) {
     errors.name = 'Vendor name is required.';
-  } else if (name.length > 100) {
-    errors.name = 'Vendor name must be 100 characters or fewer.';
+  } else if (name.length > MAX_VENDOR_NAME_LENGTH) {
+    errors.name = `Vendor name must be ${MAX_VENDOR_NAME_LENGTH} characters or fewer.`;
   }
 
   const validCategories: VendorCategory[] = VENDOR_CATEGORIES.map((c) => c.id);
@@ -204,6 +212,9 @@ export function validateVendorInput(input: Partial<VendorInput>): {
 /**
  * Safely unlinks a deleted budget category from any vendors referencing it.
  * Preserves all vendor details, costs, and payment histories.
+ * @param vendors - Array of vendor objects.
+ * @param deletedCategoryId - The ID of the deleted budget category.
+ * @returns Updated array of vendors with unlinked references.
  */
 export function reconcileBudgetCategoryDeletion(
   vendors: Vendor[],
@@ -223,6 +234,11 @@ export function reconcileBudgetCategoryDeletion(
 
 /**
  * Filters vendors by text search query, category, and status.
+ * @param vendors - Array of vendor objects to filter.
+ * @param query - Free text search query string.
+ * @param categoryFilter - Optional category filter ID.
+ * @param statusFilter - Optional status filter ID.
+ * @returns Filtered array of vendor objects.
  */
 export function filterVendors(
   vendors: Vendor[],

@@ -22,12 +22,17 @@ export const TABLE_TYPES: { id: TableType; label: string }[] = [
   { id: 'high_top', label: 'Cocktail / High Top' },
 ];
 
+export const MAX_TABLE_NAME_LENGTH = 80;
+export const MAX_TABLE_CAPACITY = 50;
+
 const VALID_TABLE_TYPES = new Set<string>(['round', 'rectangular', 'head_table', 'high_top']);
 
 /**
  * Validates table input.
  * Strict rule: Capacity must be a positive integer between 1 and 50.
  * Table type (if provided) must be one of the canonical TableType values.
+ * @param input - Partial table input data to validate.
+ * @returns Validation result with isValid flag and field-level errors.
  */
 export function validateTableInput(input: Partial<TableInput>): {
   isValid: boolean;
@@ -38,14 +43,14 @@ export function validateTableInput(input: Partial<TableInput>): {
   const name = typeof input.name === 'string' ? input.name.trim() : '';
   if (!name) {
     errors.name = 'Table name or number is required.';
-  } else if (name.length > 80) {
-    errors.name = 'Table name must be 80 characters or fewer.';
+  } else if (name.length > MAX_TABLE_NAME_LENGTH) {
+    errors.name = `Table name must be ${MAX_TABLE_NAME_LENGTH} characters or fewer.`;
   }
 
   if (input.capacity == null || !Number.isInteger(input.capacity) || input.capacity < 1) {
     errors.capacity = 'Capacity must be a positive whole number of seats (at least 1).';
-  } else if (input.capacity > 50) {
-    errors.capacity = 'Capacity cannot exceed 50 seats per table.';
+  } else if (input.capacity > MAX_TABLE_CAPACITY) {
+    errors.capacity = `Capacity cannot exceed ${MAX_TABLE_CAPACITY} seats per table.`;
   }
 
   if (input.tableType !== undefined && !VALID_TABLE_TYPES.has(input.tableType)) {
@@ -61,6 +66,11 @@ export function validateTableInput(input: Partial<TableInput>): {
 /**
  * Calculates authoritative occupancy metrics for an individual table.
  * Supports optional pre-indexed guestMap and pre-filtered tableAssignments for high-throughput batching.
+ * @param table - The seating table object.
+ * @param assignments - All seating assignments.
+ * @param guests - Guest list or pre-indexed Map of guests.
+ * @param prefilteredAssignments - Optional assignments pre-filtered for this table.
+ * @returns Comprehensive occupancy metrics and status flags for the table.
  */
 export function calculateTableOccupancy(
   table: SeatingTable,
@@ -124,6 +134,10 @@ export function calculateTableOccupancy(
  * Efficiently calculates occupancy status for all tables in a single pass.
  * Indexes guests (O(G)) and groups assignments by tableId (O(A)) once,
  * achieving O(G + A + T) asymptotic complexity instead of O(T * (G + A)).
+ * @param tables - List of tables.
+ * @param assignments - List of seating assignments.
+ * @param guests - Guest list or Map of guests by ID.
+ * @returns Map of table ID to TableOccupancyStatus.
  */
 export function calculateAllTablesOccupancy(
   tables: SeatingTable[],
@@ -157,6 +171,10 @@ export function calculateAllTablesOccupancy(
 
 /**
  * Calculates global seating metrics across all tables and expected attendees.
+ * @param tables - List of seating tables.
+ * @param assignments - List of seating assignments.
+ * @param guests - List of guests.
+ * @returns Aggregated seating summary metrics.
  */
 export function calculateSeatingSummary(
   tables: SeatingTable[],
@@ -209,6 +227,10 @@ export function calculateSeatingSummary(
 
 /**
  * Returns all expected attendees (confirmed and pending) who do not currently have a seat assigned.
+ * @param guests - List of guests.
+ * @param households - List of guest households.
+ * @param assignments - List of current seating assignments.
+ * @returns Array of unassigned attendees.
  */
 export function getUnassignedAttendees(
   guests: Guest[],
@@ -267,6 +289,11 @@ export function getUnassignedAttendees(
  * Assigns an attendee to a table.
  * Critical Rule: An attendee (guestId + isPlusOne) can have at most one active table assignment.
  * Automatically removes any prior assignment for this attendee before adding to the new table.
+ * @param assignments - Current seating assignments.
+ * @param tableId - Target table ID.
+ * @param guestId - Guest ID.
+ * @param isPlusOne - Whether this assignment is for the guest's plus-one.
+ * @returns Updated array of seating assignments.
  */
 export function assignAttendee(
   assignments: SeatingAssignment[],
@@ -292,6 +319,9 @@ export function assignAttendee(
 
 /**
  * Unassigns an attendee seat from a table.
+ * @param assignments - Current seating assignments.
+ * @param assignmentId - The ID of the assignment to remove.
+ * @returns Updated array of seating assignments.
  */
 export function unassignAttendee(
   assignments: SeatingAssignment[],
@@ -302,6 +332,10 @@ export function unassignAttendee(
 
 /**
  * Safely deletes a table and unassigns all guests seated at that table.
+ * @param tables - Current seating tables.
+ * @param assignments - Current seating assignments.
+ * @param tableId - ID of table to delete.
+ * @returns Object with updated tables and assignments arrays.
  */
 export function deleteTableSafely(
   tables: SeatingTable[],

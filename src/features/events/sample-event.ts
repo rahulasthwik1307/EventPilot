@@ -31,6 +31,12 @@ function getFutureSampleDate(daysAhead: number = 90): string {
 
 export const SAMPLE_EVENT_ID = 'sample-event-aarav-meera';
 
+/**
+ * Generates an immutable, fully populated realistic sample celebration event.
+ * Creates Aarav & Meera's Vivaha with starter categories, milestones, tasks, vendors, and guests.
+ *
+ * @returns A freshly constructed sample Event object adhering to the canonical domain schema.
+ */
 export function createFreshSampleEvent(): Event {
   const targetDate = '2027-01-19'; // Canonical date: 19 January 2027
   const budgetCap = 2500000; // ₹25,00,000 INR

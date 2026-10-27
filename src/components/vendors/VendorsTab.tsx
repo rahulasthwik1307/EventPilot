@@ -644,14 +644,18 @@ export function VendorsTab({ event, onUpdateEvent }: VendorsTabProps) {
                       {vendor.website && (
                         <div className="flex items-center gap-1">
                           <ExternalLink className="w-3.5 h-3.5 text-secondary shrink-0" />
-                          <a
-                            href={vendor.website}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:underline text-secondary font-medium"
-                          >
-                            Website
-                          </a>
+                          {/^https?:\/\//i.test(vendor.website.trim()) ? (
+                            <a
+                              href={vendor.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:underline text-secondary font-medium"
+                            >
+                              Website
+                            </a>
+                          ) : (
+                            <span className="text-neutral-text font-medium">{vendor.website}</span>
+                          )}
                         </div>
                       )}
                     </div>

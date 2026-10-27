@@ -15,6 +15,13 @@ import {
 // Maximum payload size for quotation requests: 128 KB
 const MAX_QUOTATION_BODY_BYTES = 128 * 1024;
 
+/**
+ * Handles vendor quotation analysis and extraction POST requests.
+ * Enforces rate limiting, payload size bounds, schema validation, and quotation engine operations.
+ *
+ * @param req - The incoming Next.js API request containing quotation text or comparison payloads.
+ * @returns A JSON response with extracted or compared quotation data and findings.
+ */
 export async function POST(req: NextRequest) {
   try {
     // 1. Rate limiting check by client identity

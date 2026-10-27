@@ -160,7 +160,7 @@ export function QuoteProposalReviewModal({
                 <select
                   value={targetExpenseId}
                   onChange={(e) => setTargetExpenseId(e.target.value)}
-                  className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2 text-xs font-mono text-[#1C1917] focus:outline-none focus:border-[#D97706] focus:ring-1 focus:ring-[#D97706]/20 transition-all shadow-sm"
+                  className="w-full bg-white border border-[#E7DFD5] rounded-lg p-2 text-xs font-mono text-[#1C1917] focus:outline-none focus:border-[#D97706] focus:ring-2 focus:ring-primary focus:ring-offset-1 transition-all shadow-sm"
                 >
                   <option value="">-- Do not adjust ledger expense --</option>
                   {eligibleExpenses.map((exp) => (

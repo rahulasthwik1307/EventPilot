@@ -43,6 +43,12 @@ export type DiscriminatedStagedProposal =
       payload: UpdatePreferencePayload;
     });
 
+/**
+ * Type guard verifying if a proposal has a recognized actionType for discriminated narrowing.
+ *
+ * @param p - The staged proposal candidate.
+ * @returns True if the proposal matches one of the discriminated proposal union members.
+ */
 export function isDiscriminatedProposal(p: StagedProposal): p is DiscriminatedStagedProposal {
   return (
     p.actionType === 'adjust_budget_allocation' ||
@@ -108,6 +114,13 @@ export function findMatchingCategoryIndex(
   return -1;
 }
 
+/**
+ * Revalidates staged proposals against the live event state and annotates any conflicting or invalid proposals.
+ *
+ * @param event - The current live celebration event state.
+ * @param proposals - The array of staged proposals to inspect.
+ * @returns An updated array of proposals with conflict flags and warnings populated.
+ */
 export function detectProposalConflicts(
   event: Event,
   proposals: StagedProposal[]

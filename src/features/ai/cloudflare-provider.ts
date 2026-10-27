@@ -25,6 +25,12 @@ export const VERIFIED_FREE_CLOUDFLARE_MODELS = [
 export type VerifiedCloudflareModel =
   (typeof VERIFIED_FREE_CLOUDFLARE_MODELS)[number];
 
+/**
+ * Type guard verifying whether a model ID belongs to the verified free-tier Cloudflare model whitelist.
+ *
+ * @param modelId - The identifier of the model to test.
+ * @returns True if the model is in the verified free-tier whitelist, false otherwise.
+ */
 export function isVerifiedFreeModel(
   modelId: string
 ): modelId is VerifiedCloudflareModel {

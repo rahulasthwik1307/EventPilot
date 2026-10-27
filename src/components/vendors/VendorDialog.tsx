@@ -154,13 +154,15 @@ export function VendorDialog({
                 if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
               }}
               placeholder="e.g. The Tamarind Tree, Drishti Photography"
+              aria-invalid={Boolean(errors.name)}
+              aria-describedby={errors.name ? 'vendor-name-error' : undefined}
               className={`w-full px-3 py-2 text-sm bg-neutral-surface border rounded-md focus:outline-none focus:ring-1 ${
                 errors.name
                   ? 'border-status-danger focus:ring-status-danger'
                   : 'border-neutral-border focus:ring-primary'
               }`}
             />
-            {errors.name && <p className="text-xs text-status-danger mt-1">{errors.name}</p>}
+            {errors.name && <p id="vendor-name-error" className="text-xs text-status-danger mt-1">{errors.name}</p>}
           </div>
 
           <div className="space-y-1">
@@ -226,6 +228,8 @@ export function VendorDialog({
                     if (errors.quotedCost) setErrors((prev) => ({ ...prev, quotedCost: '' }));
                   }}
                   placeholder="0"
+                  aria-invalid={Boolean(errors.quotedCost)}
+                  aria-describedby={errors.quotedCost ? 'vendor-quoted-error' : undefined}
                   className={`w-full pl-8 pr-3 py-2 text-sm font-mono bg-neutral-surface border rounded-md focus:outline-none focus:ring-1 ${
                     errors.quotedCost
                       ? 'border-status-danger focus:ring-status-danger'
@@ -234,7 +238,7 @@ export function VendorDialog({
                 />
               </div>
               {errors.quotedCost && (
-                <p className="text-xs text-status-danger mt-1">{errors.quotedCost}</p>
+                <p id="vendor-quoted-error" className="text-xs text-status-danger mt-1">{errors.quotedCost}</p>
               )}
             </div>
 
@@ -257,6 +261,8 @@ export function VendorDialog({
                     if (errors.agreedCost) setErrors((prev) => ({ ...prev, agreedCost: '' }));
                   }}
                   placeholder="Leave empty if negotiating"
+                  aria-invalid={Boolean(errors.agreedCost)}
+                  aria-describedby={errors.agreedCost ? 'vendor-agreed-error' : undefined}
                   className={`w-full pl-8 pr-3 py-2 text-sm font-mono bg-neutral-surface border rounded-md focus:outline-none focus:ring-1 ${
                     errors.agreedCost
                       ? 'border-status-danger focus:ring-status-danger'
@@ -265,7 +271,7 @@ export function VendorDialog({
                 />
               </div>
               {errors.agreedCost && (
-                <p className="text-xs text-status-danger mt-1">{errors.agreedCost}</p>
+                <p id="vendor-agreed-error" className="text-xs text-status-danger mt-1">{errors.agreedCost}</p>
               )}
             </div>
 
@@ -317,6 +323,8 @@ export function VendorDialog({
                     if (errors.amountPaid) setErrors((prev) => ({ ...prev, amountPaid: '' }));
                   }}
                   placeholder="0"
+                  aria-invalid={Boolean(errors.amountPaid)}
+                  aria-describedby={errors.amountPaid ? 'vendor-amount-paid-error' : undefined}
                   className={`w-full pl-8 pr-3 py-2 text-sm font-mono bg-neutral-surface border rounded-md focus:outline-none focus:ring-1 ${
                     errors.amountPaid
                       ? 'border-status-danger focus:ring-status-danger'
@@ -325,7 +333,7 @@ export function VendorDialog({
                 />
               </div>
               {errors.amountPaid && (
-                <p className="text-xs text-status-danger mt-1">{errors.amountPaid}</p>
+                <p id="vendor-amount-paid-error" className="text-xs text-status-danger mt-1">{errors.amountPaid}</p>
               )}
             </div>
           </div>
@@ -399,13 +407,15 @@ export function VendorDialog({
                   if (errors.email) setErrors((prev) => ({ ...prev, email: '' }));
                 }}
                 placeholder="contact@business.com"
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? 'vendor-email-error' : undefined}
                 className={`w-full px-3 py-2 text-sm bg-neutral-surface border rounded-md focus:outline-none focus:ring-1 ${
                   errors.email
                     ? 'border-status-danger focus:ring-status-danger'
                     : 'border-neutral-border focus:ring-primary'
                 }`}
               />
-              {errors.email && <p className="text-xs text-status-danger mt-1">{errors.email}</p>}
+              {errors.email && <p id="vendor-email-error" className="text-xs text-status-danger mt-1">{errors.email}</p>}
             </div>
           </div>
 

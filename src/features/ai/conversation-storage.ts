@@ -32,6 +32,12 @@ export interface SaveConversationInput {
   proposals?: StagedProposal[];
 }
 
+/**
+ * Constructs the deterministic localStorage key for persisting an event's AI conversation history.
+ *
+ * @param eventId - The unique celebration event identifier.
+ * @returns The prefixed localStorage storage key string.
+ */
 export function getAiConversationStorageKey(eventId: string): string {
   return `${AI_CONVERSATION_STORAGE_PREFIX}${eventId}`;
 }

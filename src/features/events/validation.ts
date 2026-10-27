@@ -114,6 +114,12 @@ export function formatCurrency(amount: number, currency: CurrencyCode): string {
   return `${sign}${symbol}${formatted}`;
 }
 
+/**
+ * Resolves the currency symbol corresponding to a standard ISO currency code.
+ *
+ * @param currency - The currency code (INR, USD, EUR, or GBP).
+ * @returns The single-character or standard currency symbol (e.g. ₹, $, €, £).
+ */
 export function getCurrencySymbol(currency: CurrencyCode): string {
   switch (currency) {
     case 'INR':

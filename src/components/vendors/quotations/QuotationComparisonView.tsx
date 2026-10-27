@@ -282,9 +282,9 @@ export function QuotationComparisonView({
                             <span className="text-[11px] font-mono uppercase tracking-wider text-[#78716C] block">
                               {quote.vendorName}
                             </span>
-                            <h4 className="font-serif text-lg font-bold text-[#1C1917] tracking-tight">
+                            <h3 className="font-serif text-lg font-bold text-[#1C1917] tracking-tight">
                               {quote.title}
-                            </h4>
+                            </h3>
                           </div>
                           {isCheapest && (
                             <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] shrink-0">

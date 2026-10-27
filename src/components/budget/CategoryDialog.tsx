@@ -92,10 +92,12 @@ export function CategoryDialog({
             placeholder="e.g. Mandap Floral Architecture"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            aria-invalid={Boolean(errors.name)}
+            aria-describedby={errors.name ? 'cat-name-error' : undefined}
             className="w-full bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text focus:outline-none focus:ring-2 focus:ring-primary"
           />
           {errors.name && (
-            <p className="text-xs text-status-danger mt-1 flex items-center gap-1">
+            <p id="cat-name-error" className="text-xs text-status-danger mt-1 flex items-center gap-1">
               <AlertCircle className="w-3.5 h-3.5" />
               <span>{errors.name}</span>
             </p>
@@ -116,6 +118,8 @@ export function CategoryDialog({
             step="1000"
             value={allocatedAmount}
             onChange={(e) => setAllocatedAmount(e.target.value)}
+            aria-invalid={Boolean(errors.allocatedAmount)}
+            aria-describedby={errors.allocatedAmount ? 'cat-amount-error' : undefined}
             className="w-full bg-neutral-surface border border-neutral-border px-3.5 py-2 rounded-md text-sm text-neutral-text font-mono focus:outline-none focus:ring-2 focus:ring-primary"
           />
           {Number(allocatedAmount) > 0 && !errors.allocatedAmount && (
@@ -124,7 +128,7 @@ export function CategoryDialog({
             </p>
           )}
           {errors.allocatedAmount && (
-            <p className="text-xs text-status-danger mt-1 flex items-center gap-1">
+            <p id="cat-amount-error" className="text-xs text-status-danger mt-1 flex items-center gap-1">
               <AlertCircle className="w-3.5 h-3.5" />
               <span>{errors.allocatedAmount}</span>
             </p>
